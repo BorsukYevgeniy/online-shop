@@ -12,7 +12,7 @@ export class UserService {
     return await this.userRepository.findAll();
   }
 
-  async findOneUser(email: string) {
+  async findOneUserByEmail(email: string) {
     return await this.userRepository.findOneByEmail(email);
   }
 

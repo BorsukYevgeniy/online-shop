@@ -3,15 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @Get()
@@ -21,7 +18,7 @@ export class UserController {
 
   @Get(':email')
   async findOne(@Param('email') id: string) {
-    return await this.userService.findOneUser(id);
+    return await this.userService.findOneUserByEmail(id);
   }
 
   @Post()
