@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Product } from '@prisma/client';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -12,16 +13,40 @@ export class ProductRepository {
     return products;
   }
 
-  async findUserProducts(userId: number): Promise<Product[] | null> {
-    const products = await this.prismaService.product.findMany({
-      where: { userId },
+  async findById(productId: number): Promise<Product | null> {
+    const product: Product = await this.prismaService.product.findUnique({
+      where: { id: productId },
     });
+    return product;
+  }
+
+  async findUserProducts(userId: number): Promise<Product[] | null> {
+    const products: Product[] | null =
+      await this.prismaService.product.findMany({
+        where: { userId },
+      });
     return products;
   }
 
-  async create(userId: number, dto: CreateProductDto) {
-    const product = await this.prismaService.product.create({
-      data: { ...dto, userId },
+  async create(userId: number, dto: CreateProductDto , file: string): Promise<Product> {
+    const product: Product = await this.prismaService.product.create({
+      data: { ...dto, userId, photos: [file] },
+    });
+    return product;
+  }
+
+  async update(productId: number, dto: UpdateProductDto): Promise<Product> {
+    const product: Product | null = await this.prismaService.product.update({
+      where: { id: productId },
+      data: dto,
+    });
+
+    return product;
+  }
+
+  async delete(productId: number): Promise<Product> {
+    const product: Product | null = await this.prismaService.product.delete({
+      where: { id: productId },
     });
     return product;
   }

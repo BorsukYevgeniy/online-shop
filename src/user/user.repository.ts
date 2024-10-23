@@ -6,6 +6,17 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Injectable()
 export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
+  async findAll(): Promise<User[]> {
+    const users: User[] = await this.prismaService.user.findMany({});
+    return users;
+  }
+
+  async findById(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+    return user;
+  }
 
   async findOneByEmail(email: string): Promise<User | null> {
     const user: User = await this.prismaService.user.findUnique({
@@ -14,13 +25,10 @@ export class UserRepository {
     return user;
   }
 
-  async findAll(): Promise<User[]> {
-    const users: User[] = await this.prismaService.user.findMany({});
-    return users;
-  }
-
-  async create(dto: CreateUserDto): Promise<User> {
-    const user = await this.prismaService.user.create({ data: dto });
+  async create(dto: CreateUserDto, image?: string): Promise<User> {
+    const user = await this.prismaService.user.create({
+      data: { ...dto},
+    });
     return user;
   }
 }

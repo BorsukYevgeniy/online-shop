@@ -7,6 +7,7 @@ import { ProductRepository } from './product.repository';
 @Module({
   imports: [PrismaModule],
   controllers: [ProductController],
-  providers: [ProductService , ProductRepository],
+  providers: [ProductService, ProductRepository],
+  exports: [ProductService],
 })
 export class ProductModule {}

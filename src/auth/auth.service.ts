@@ -13,7 +13,7 @@ export class AuthService {
   ) {}
 
   async register(dto: CreateUserDto) {
-    const candidate: User | null = await this.userService.findOneUserByEmail(
+    const candidate: User | null = await this.userService.findByEmail(
       dto.email,
     );
 
@@ -31,7 +31,7 @@ export class AuthService {
   }
 
   async login(dto: CreateUserDto) {
-    const candidate: User | null = await this.userService.findOneUserByEmail(
+    const candidate: User | null = await this.userService.findByEmail(
       dto.email,
     );
 

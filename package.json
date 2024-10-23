@@ -29,7 +29,8 @@
     "@prisma/client": "^5.21.1",
     "bcryptjs": "^2.4.3",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
