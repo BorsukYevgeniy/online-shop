@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,6 +10,7 @@ import {
   Post,
   Req,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +18,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('products')
 export class ProductController {
@@ -34,13 +36,26 @@ export class ProductController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FilesInterceptor('image', 4, {
+      fileFilter(req, file, callback) {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          return callback(
+            new BadRequestException('Only JPG, JPEG, PNG files'),
+            false,
+          );
+        }
+
+        callback(null, true);
+      },
+    }),
+  )
   async createProduct(
     @Req() req,
     @Body() dto: CreateProductDto,
-    @UploadedFile() image,
+    @UploadedFiles() image: Express.Multer.File[],
   ) {
-    return await this.productService.create(Number(req.user.id), dto,image);
+    return await this.productService.create(Number(req.user.id), dto, image);
   }
 
   @Patch(':productId')

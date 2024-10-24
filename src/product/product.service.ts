@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,10 +8,14 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FilesService } from 'src/files/files.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository,
+  constructor(
+    private readonly productRepository: ProductRepository,
+    private readonly fileService: FilesService,
   ) {}
 
   private async validateProductOwnership(
@@ -41,10 +46,22 @@ export class ProductService {
     return await this.productRepository.findUserProducts(userId);
   }
 
-  async create(userId: number, dto: CreateProductDto,file): Promise<Product> {
-    //const fileName = await this.fileService.createFile(file)
-    
-    return await this.productRepository.create(userId, dto, file);
+  async create(
+    userId: number,
+    dto: CreateProductDto,
+    file: Express.Multer.File[],
+  ): Promise<Product> {
+    try {
+      const fileNames = await this.fileService.createFiles(file);
+
+      return await this.productRepository.create(userId, dto, fileNames);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(
+          'Product with same name created.Please change the name',
+        );
+      }
+    }
   }
 
   async updateProduct(

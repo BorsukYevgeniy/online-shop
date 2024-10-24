@@ -27,7 +27,7 @@ export class UserService {
     return await this.userRepository.findOneByEmail(email);
   }
 
-  async create(createUserDto: CreateUserDto, img?:string): Promise<User> {
-    return await this.userRepository.create(createUserDto);
+  async create(dto: CreateUserDto): Promise<User> {
+    return await this.userRepository.create(dto.email, dto.password);
   }
 }

@@ -22,10 +22,9 @@ export class AuthService {
     }
 
     const hashedPassword: string = await hash(dto.password, 3);
-    const user: User = await this.userService.create({
-      email: dto.email,
-      password: hashedPassword,
-    });
+    const user: User = await this.userService.create(
+      {...dto , password: hashedPassword},
+    );
 
     return await this.generateToken(user.id, user.email);
   }

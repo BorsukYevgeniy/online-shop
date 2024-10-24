@@ -28,9 +28,9 @@ export class ProductRepository {
     return products;
   }
 
-  async create(userId: number, dto: CreateProductDto , file: string): Promise<Product> {
+  async create(userId: number, dto: CreateProductDto , image: string[]): Promise<Product> {
     const product: Product = await this.prismaService.product.create({
-      data: { ...dto, userId, photos: [file] },
+      data: { ...dto, price: Number(dto.price), userId, photos: image },
     });
     return product;
   }
