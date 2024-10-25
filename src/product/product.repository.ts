@@ -28,17 +28,25 @@ export class ProductRepository {
     return products;
   }
 
-  async create(userId: number, dto: CreateProductDto , image: string[]): Promise<Product> {
+  async create(
+    userId: number,
+    dto: CreateProductDto,
+    images: string[],
+  ): Promise<Product> {
     const product: Product = await this.prismaService.product.create({
-      data: { ...dto, price: Number(dto.price), userId, photos: image },
+      data: { ...dto, price: Number(dto.price), userId, images },
     });
     return product;
   }
 
-  async update(productId: number, dto: UpdateProductDto): Promise<Product> {
+  async update(
+    productId: number,
+    dto: UpdateProductDto,
+    images: string[],
+  ): Promise<Product> {
     const product: Product | null = await this.prismaService.product.update({
       where: { id: productId },
-      data: dto,
+      data: { ...dto, price: Number(dto.price), images },
     });
 
     return product;

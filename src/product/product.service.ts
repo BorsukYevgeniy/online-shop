@@ -49,12 +49,12 @@ export class ProductService {
   async create(
     userId: number,
     dto: CreateProductDto,
-    file: Express.Multer.File[],
+    images: Express.Multer.File[],
   ): Promise<Product> {
     try {
-      const fileNames = await this.fileService.createFiles(file);
+      const imagesNames = await this.fileService.createImages(images);
 
-      return await this.productRepository.create(userId, dto, fileNames);
+      return await this.productRepository.create(userId, dto, imagesNames);
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         throw new BadRequestException(
@@ -68,10 +68,13 @@ export class ProductService {
     userId: number,
     productId: number,
     dto: UpdateProductDto,
+    images: Express.Multer.File[]
   ): Promise<Product> {
     await this.validateProductOwnership(userId, productId);
+    const imagesNames = await this.fileService.createImages(images);  
 
-    return await this.productRepository.update(productId, dto);
+
+    return await this.productRepository.update(productId, dto, imagesNames);
   }
 
   async deleteProduct(userId: number, productId: number): Promise<Product> {

@@ -9,7 +9,6 @@ import {
   Patch,
   Post,
   Req,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -18,7 +17,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { ImagesInterceptor } from './interceptor/images.interceptor';
 
 @Controller('products')
 export class ProductController {
@@ -36,39 +35,29 @@ export class ProductController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(
-    FilesInterceptor('image', 4, {
-      fileFilter(req, file, callback) {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
-          return callback(
-            new BadRequestException('Only JPG, JPEG, PNG files'),
-            false,
-          );
-        }
-
-        callback(null, true);
-      },
-    }),
-  )
+  @UseInterceptors(ImagesInterceptor())
   async createProduct(
     @Req() req,
     @Body() dto: CreateProductDto,
-    @UploadedFiles() image: Express.Multer.File[],
+    @UploadedFiles() images: Express.Multer.File[],
   ) {
-    return await this.productService.create(Number(req.user.id), dto, image);
+    return await this.productService.create(Number(req.user.id), dto, images);
   }
 
   @Patch(':productId')
   @UseGuards(AuthGuard)
+  @UseInterceptors(ImagesInterceptor())
   async updateProduct(
     @Req() req,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
+    @UploadedFiles() images: Express.Multer.File[],
   ) {
     return await this.productService.updateProduct(
       Number(req.user.id),
       productId,
       dto,
+      images,
     );
   }
 
