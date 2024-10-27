@@ -2,14 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import { hash, compare } from 'bcryptjs';
-import { User } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
+import { Token, User } from '@prisma/client';
+import { TokenService } from 'src/token/token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async register(dto: CreateUserDto) {
@@ -22,11 +22,12 @@ export class AuthService {
     }
 
     const hashedPassword: string = await hash(dto.password, 3);
-    const user: User = await this.userService.create(
-      {...dto , password: hashedPassword},
-    );
+    const user: User = await this.userService.create({
+      ...dto,
+      password: hashedPassword,
+    });
 
-    return await this.generateToken(user.id, user.email);
+    return user;
   }
 
   async login(dto: CreateUserDto) {
@@ -58,12 +59,18 @@ export class AuthService {
       );
     }
 
-    return await this.generateToken(candidate.id, candidate.email);
+    return await this.tokenService.generateTokens(candidate.id);
   }
 
-  private async generateToken(id: number, email: string) {
-    return {
-      accessToken: await this.jwtService.signAsync({ id, email }),
-    };
+  async refreshToken(refreshToken: string) {
+    const { userId } = await this.tokenService.verifyRefreshToken(refreshToken);
+
+    const userTokens: Token[] | null =
+      await this.tokenService.getUserTokens(userId);
+
+    const validToken = userTokens.some((token) => token.token === refreshToken);
+    if (!validToken) throw new Error('Invalid refresh token');
+
+    return this.tokenService.generateTokens(userId);
   }
 }

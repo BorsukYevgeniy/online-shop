@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'static'),
     }),
+    TokenModule,
   ],
 })
 export class AppModule {}

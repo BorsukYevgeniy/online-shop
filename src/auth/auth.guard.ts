@@ -4,29 +4,23 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { TokenService } from 'src/token/token.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly tokenService: TokenService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const authHeader: string = req.headers['authorization'];
+    const accessToken: string = req.cookies.accessToken
 
-    if (!authHeader) {
-      throw new UnauthorizedException('Authorization header is missing');
-    }
-
-    const [type, token] = authHeader.split(' ');
-
-    if (!type || type !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Authorization header is missing');
+    if (!accessToken) {
+      throw new UnauthorizedException('Access token is missing in cookies');
     }
 
     try {
-      const decoded = await this.jwtService.verifyAsync(token);
-      req.user = decoded;
+      const {userId: id} = await this.tokenService.verifyAccessToken(accessToken);
+      req.user = {id};
       return true;
     } catch (e) {
       throw new UnauthorizedException('Invalid token');
