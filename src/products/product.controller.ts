@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,9 +14,10 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/guards/jwt-auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
+import { AuthRequest } from 'src/interfaces/express-requests.interface';
 
 @Controller('products')
 export class ProductController {
@@ -37,24 +37,24 @@ export class ProductController {
   @UseGuards(AuthGuard)
   @UseInterceptors(ImagesInterceptor())
   async createProduct(
-    @Req() req,
+    @Req() req: AuthRequest,
     @Body() dto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ) {
-    return await this.productService.create(Number(req.user.id), dto, images);
+    return await this.productService.create(req.user.id, dto, images);
   }
 
   @Patch(':productId')
   @UseGuards(AuthGuard)
   @UseInterceptors(ImagesInterceptor())
   async updateProduct(
-    @Req() req,
+    @Req() req: AuthRequest,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ) {
     return await this.productService.updateProduct(
-      Number(req.user.id),
+      req.user.id,
       productId,
       dto,
       images,
@@ -64,12 +64,9 @@ export class ProductController {
   @Delete(':productId')
   @UseGuards(AuthGuard)
   async deleteProduct(
-    @Req() req,
+    @Req() req: AuthRequest,
     @Param('productId', ParseIntPipe) productId: number,
   ) {
-    return await this.productService.deleteProduct(
-      Number(req.user.id),
-      productId,
-    );
+    return await this.productService.deleteProduct(req.user.id, productId);
   }
 }

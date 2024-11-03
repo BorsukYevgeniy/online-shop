@@ -56,9 +56,11 @@ export class ProductService {
 
       return await this.productRepository.create(userId, dto, imagesNames);
     } catch (e) {
+      console.log(e);
       if (e instanceof PrismaClientKnownRequestError) {
+        console.log(e);
         throw new BadRequestException(
-          'Product with same name created.Please change the name',
+          'Product with same name created.Please change the name!',
         );
       }
     }
@@ -68,11 +70,11 @@ export class ProductService {
     userId: number,
     productId: number,
     dto: UpdateProductDto,
-    images: Express.Multer.File[]
+    images: Express.Multer.File[],
   ): Promise<Product> {
     await this.validateProductOwnership(userId, productId);
-    const imagesNames = await this.fileService.createImages(images);  
 
+    const imagesNames = await this.fileService.createImages(images);
 
     return await this.productRepository.update(productId, dto, imagesNames);
   }

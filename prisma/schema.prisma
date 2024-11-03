@@ -9,20 +9,21 @@ datasource db {
 
 model Product {
   id          Int      @id @default(autoincrement())
-  title       String   @unique
+  title       String
   description String
   price       Float
   images      String[]
   userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  tokens   Token[]
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
   password String
+  tokens   Token[]
   products Product[]
+  roles    UserRole[]
 }
 
 model Token {
@@ -30,5 +31,21 @@ model Token {
   userId    Int
   token     String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id          Int        @id @default(autoincrement())
+  value       String     @unique
+  description String
+  user        UserRole[]
+}
+
+model UserRole {
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId Int
+
+  @@id([userId, roleId])
 }

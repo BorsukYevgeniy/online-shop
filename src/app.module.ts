@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
+import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
-import { ProductModule } from './product/product.module';
+import { ProductModule } from './products/product.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { TokenModule } from './token/token.module';
+import { TokensModule } from './token/tokens.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
     PrismaModule,
-    UserModule,
+    UsersModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     ProductModule,
     AuthModule,
@@ -20,7 +21,8 @@ import { TokenModule } from './token/token.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'static'),
     }),
-    TokenModule,
+    TokensModule,
+    RolesModule,
   ],
 })
 export class AppModule {}

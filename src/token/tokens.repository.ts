@@ -3,7 +3,7 @@ import { Token } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class TokenRepository {
+export class TokensRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findOne(userId: number): Promise<Token | null> {
@@ -27,7 +27,11 @@ export class TokenRepository {
     const tokens: Token[] = await this.prismaService.token.findMany({
       where: { userId },
     });
-  
-    return tokens
+
+    return tokens;
+  }
+
+  async deleteUserTokens(token: string) {
+    return await this.prismaService.token.deleteMany({ where: { token } });
   }
 }

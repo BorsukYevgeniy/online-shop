@@ -1,7 +1,15 @@
-import { Controller, Post, Body, Res, Req, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  Req,
+  BadRequestException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Request, Response } from 'express';
+import { AuthRequest } from 'src/interfaces/express-requests.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -12,11 +20,8 @@ export class AuthController {
     return await this.authService.register(dto);
   }
   @Post('login')
-  async login(
-    @Body() dto: CreateUserDto,
-    @Res() res: Response,
-  ) {
-    console.log()
+  async login(@Body() dto: CreateUserDto, @Res() res: Response) {
+    console.log();
     const { accessToken, refreshToken } = await this.authService.login(dto);
 
     res.cookie('accessToken', accessToken, {
@@ -29,31 +34,41 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.send("Loggined succesfully")
+    res.send('Loggined succesfully');
   }
+
+  @Post('logout')
+  async logout(@Req() req: AuthRequest, @Res() res: Response) {
+    await this.authService.logout(req.cookies['refreshToken']);
+
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    res.send('Logouted succesfully');
+  }
+
   @Post('refresh')
-  async refresh(@Body('refreshToken') token: string,
-  @Req() req: Request,
-@Res() res: Response) {
-  const refresh = req.cookies['refreshToken'];
-  if (!refresh) {
-    throw new BadRequestException("Refresh token not found");
-  }
-
-
+  async refresh(
+    @Body('refreshToken') token: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const refresh = req.cookies['refreshToken'];
+    if (!refresh) {
+      throw new BadRequestException('Refresh token not found');
+    }
 
     const newTokens = await this.authService.refreshToken(token);
-  
+
     res.cookie('accessToken', newTokens.accessToken, {
       httpOnly: true,
-      maxAge: 15 * 60 * 1000, // 15 хвилин
+      maxAge: 60 * 60 * 1000, // 60 хвилин
     });
     res.cookie('refreshToken', newTokens.refreshToken, {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 днів
+      maxAge: 24 * 60 * 60 * 1000, // 1 день
     });
 
     res.send({ message: 'Token refreshed' });
-  
   }
 }
