@@ -1,6 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { mkdirSync, existsSync, writeFileSync } from 'fs';
-import { join, resolve, extname } from 'path';
+import {
+  join as joinPath,
+  resolve as resolvePath,
+  extname as fileExtname,
+} from 'path';
 import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
@@ -9,15 +13,15 @@ export class FilesService {
     try {
       const fileNames = [];
 
-      const filePath = resolve(__dirname, '..', 'static');
+      const filePath = resolvePath(__dirname, '..', 'static');
 
       if (!existsSync(filePath)) {
-        await mkdirSync(filePath, { recursive: true });
+        mkdirSync(filePath, { recursive: true });
       }
 
       images.forEach((file) => {
-        const fileName = uuidV4() + extname(file.originalname);
-        writeFileSync(join(filePath, fileName), file.buffer);
+        const fileName = uuidV4() + fileExtname(file.originalname);
+        writeFileSync(joinPath(filePath, fileName), file.buffer);
         fileNames.push(fileName);
       });
 

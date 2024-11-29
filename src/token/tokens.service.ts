@@ -32,7 +32,7 @@ export class TokensService {
       { expiresIn: '1d', secret: this.refreshSecret },
     );
 
-    await this.tokenRepositry.create(userId, refreshToken);
+    await this.saveToken(userId, refreshToken);
     return { accessToken, refreshToken };
   }
 
@@ -64,5 +64,11 @@ export class TokensService {
 
   async deleteUserTokens(token: string) {
     return await this.tokenRepositry.deleteUserTokens(token);
+  }
+
+  private async saveToken(userId: number, refreshToken: string) {
+    const expiredAt = new Date();
+    expiredAt.setDate(expiredAt.getDate() + 7);
+    return await this.tokenRepositry.create(userId, refreshToken, expiredAt);
   }
 }

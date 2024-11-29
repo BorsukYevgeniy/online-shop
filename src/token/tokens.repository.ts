@@ -15,9 +15,13 @@ export class TokensRepository {
     return token;
   }
 
-  async create(userId: number, refreshToken: string): Promise<Token> {
+  async create(
+    userId: number,
+    refreshToken: string,
+    expiresAt: Date,
+  ): Promise<Token> {
     const token: Token = await this.prismaService.token.create({
-      data: { userId, token: refreshToken },
+      data: { userId, expiresAt, token: refreshToken },
     });
 
     return token;
@@ -33,5 +37,11 @@ export class TokensRepository {
 
   async deleteUserTokens(token: string) {
     return await this.prismaService.token.deleteMany({ where: { token } });
+  }
+
+  async deleteExpiredTokens(now: Date): Promise<{ count: number }> {
+    return await this.prismaService.token.deleteMany({
+      where: { expiresAt: { lt: now } },
+    });
   }
 }
