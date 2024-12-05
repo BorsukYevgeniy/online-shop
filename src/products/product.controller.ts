@@ -1,13 +1,14 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
-  ParseIntPipe,
-  Patch,
   Post,
+  Patch,
+  Delete,
   Req,
+  Param,
+  Query,
+  Body,
+  ParseIntPipe,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -23,9 +24,17 @@ import { AuthRequest } from 'src/interfaces/express-requests.interface';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get()
-  async getAllProducts() {
-    return await this.productService.findAll();
+  @Get('')
+  async getAllProducts(
+    @Query('title') title?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+  ) {
+    return await this.productService.findAll(
+      title,
+      Number(minPrice),
+      Number(maxPrice),
+    );
   }
 
   @Get(':productId')
@@ -33,7 +42,7 @@ export class ProductController {
     return await this.productService.findById(productId);
   }
 
-  @Post()
+  @Post('')
   @UseGuards(AuthGuard)
   @UseInterceptors(ImagesInterceptor())
   async createProduct(

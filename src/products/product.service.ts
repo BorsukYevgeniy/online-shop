@@ -6,10 +6,11 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
-import { Product } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilesService } from 'src/files/files.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ProductFilter } from './interface/product-filter.interface';
 
 @Injectable()
 export class ProductService {
@@ -34,8 +35,24 @@ export class ProductService {
     return product;
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.productRepository.findAll();
+  async findAll(
+    title?: string,
+    minPrice?: number,
+    maxPrice?: number,
+  ): Promise<Product[]> {
+    const filter: ProductFilter = {};
+
+    if (title) {
+      filter.title = title;
+    }
+    if (minPrice) {
+      filter.minPrice = minPrice;
+    }
+    if (maxPrice) {
+      filter.maxPrice = maxPrice;
+    }
+
+    return await this.productRepository.findAll(filter);
   }
 
   async findById(productId: number): Promise<Product | null> {

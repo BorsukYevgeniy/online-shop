@@ -3,13 +3,24 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Product } from '@prisma/client';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductFilter } from './interface/product-filter.interface';
 
 @Injectable()
 export class ProductRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll(): Promise<Product[]> {
-    const products: Product[] = await this.prismaService.product.findMany({});
+  async findAll(filter: ProductFilter): Promise<Product[]> {
+    const { title, minPrice, maxPrice } = filter;
+
+    const products: Product[] = await this.prismaService.product.findMany({
+      where: {
+        title: title ? { contains: title, mode: 'insensitive' } : undefined,
+        price: {
+          gte: minPrice ?? undefined,
+          lte: maxPrice ?? undefined,
+        },
+      },
+    });
     return products;
   }
 

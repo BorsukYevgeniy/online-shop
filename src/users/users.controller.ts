@@ -18,7 +18,7 @@ import { AuthRequest } from 'src/interfaces/express-requests.interface';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UsersService) {}
-  @Get()
+  @Get('')
   async findAll() {
     return await this.userService.findAll();
   }

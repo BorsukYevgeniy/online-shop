@@ -21,9 +21,9 @@ export class RolesController {
     return await this.roleService.getRoleByValue(value);
   }
 
-  @Post()
-  @Roles('ADMIN')
-  @UseGuards(RolesGuard)
+  @Post('')
+  // @Roles('ADMIN')
+  // @UseGuards(RolesGuard)
   async createRole(@Body() dto: CreateRoleDto) {
     return await this.roleService.createRole(dto);
   }
