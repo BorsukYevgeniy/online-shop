@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
-import { Prisma, Product } from '@prisma/client';
+import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilesService } from 'src/files/files.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -55,12 +55,20 @@ export class ProductService {
     return await this.productRepository.findAll(filter);
   }
 
-  async findById(productId: number): Promise<Product | null> {
-    return await this.productRepository.findById(productId);
+  async findById(productId: number): Promise<Product> {
+    const product = await this.productRepository.findById(productId);
+
+    if (!product) throw new NotFoundException('Product not found');
+
+    return product;
   }
 
-  async findUserProduct(userId: number): Promise<Product[] | null> {
-    return await this.productRepository.findUserProducts(userId);
+  async findUserProduct(userId: number): Promise<Product[]> {
+    const userProducts = await this.productRepository.findUserProducts(userId);
+
+    if (!userProducts) throw new NotFoundException('Products not found');
+
+    return userProducts;
   }
 
   async create(

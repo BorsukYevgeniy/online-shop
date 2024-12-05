@@ -14,12 +14,15 @@ export class UsersService {
     private readonly roleService: RolesService,
   ) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll() {
     return await this.userRepository.findAll();
   }
 
   async findById(userId: number) {
-    return await this.userRepository.findById(userId);
+    const user = await this.userRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
   }
 
   async findUserProducts(userId: number) {

@@ -5,12 +5,20 @@ import { User } from '@prisma/client';
 @Injectable()
 export class UsersRepository {
   constructor(private readonly prismaService: PrismaService) {}
-  async findAll(): Promise<User[]> {
-    const users: User[] = await this.prismaService.user.findMany({
-      include: {
+  async findAll() {
+    const users = await this.prismaService.user.findMany({
+      select: {
+        id: true,
+        email: true,
         roles: {
           select: {
-            role: { select: { id: true, value: true, description: true } },
+            role: {
+              select: {
+                id: true,
+                value: true,
+                description: true,
+              },
+            },
           },
         },
       },
@@ -21,17 +29,24 @@ export class UsersRepository {
   async findById(userId: number) {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
-      include: {
+      select: {
+        id: true,
+        email: true,
         roles: {
           select: {
-            role: { select: { id: true, value: true, description: true } },
+            role: {
+              select: {
+                id: true,
+                value: true,
+                description: true,
+              },
+            },
           },
         },
       },
     });
     return user;
   }
-
   async findOneByEmail(email: string) {
     const user = await this.prismaService.user.findUnique({
       where: { email },
