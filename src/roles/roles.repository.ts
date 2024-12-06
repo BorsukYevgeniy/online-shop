@@ -16,7 +16,7 @@ export class RolesRepository {
     return await this.prismaService.role.findUnique({ where: { value } });
   }
 
-  async deleteRole(value: string) {
+  async deleteRoleByValue(value: string) {
     return await this.prismaService.role.delete({ where: { value } });
   }
 }

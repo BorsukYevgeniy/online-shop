@@ -68,15 +68,15 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string) {
-    const { userId, roles } =
+    const { id, roles } =
       await this.tokenService.verifyRefreshToken(refreshToken);
 
     const userTokens: Token[] | null =
-      await this.tokenService.getUserTokens(userId);
+      await this.tokenService.getUserTokens(id);
 
     const validToken = userTokens.some((token) => token.token === refreshToken);
     if (!validToken) throw new Error('Invalid refresh token');
 
-    return this.tokenService.generateTokens(userId, roles);
+    return this.tokenService.generateTokens(id, roles);
   }
 }

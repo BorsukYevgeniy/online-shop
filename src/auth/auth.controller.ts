@@ -48,25 +48,22 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(
-    @Body('refreshToken') token: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    const refresh = req.cookies['refreshToken'];
-    if (!refresh) {
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    const refreshToken: string = req.cookies['refreshToken'];
+
+    if (!refreshToken) {
       throw new BadRequestException('Refresh token not found');
     }
 
-    const newTokens = await this.authService.refreshToken(token);
+    const newTokens = await this.authService.refreshToken(refreshToken);
 
     res.cookie('accessToken', newTokens.accessToken, {
       httpOnly: true,
-      maxAge: 60 * 60 * 1000, // 60 хвилин
+      maxAge: 60 * 60 * 1000, // 60 minutes
     });
     res.cookie('refreshToken', newTokens.refreshToken, {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 1 день
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
     res.send({ message: 'Token refreshed' });

@@ -38,9 +38,9 @@ export class TokensService {
 
   async verifyRefreshToken(
     refreshToken: string,
-  ): Promise<{ userId: number; roles: string[] }> {
+  ): Promise<{ id: number; roles: string[] }> {
     return await this.jwtService.verifyAsync<{
-      userId: number;
+      id: number;
       roles: string[];
     }>(refreshToken, {
       secret: this.refreshSecret,

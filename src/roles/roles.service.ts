@@ -15,6 +15,6 @@ export class RolesService {
   }
 
   async deleteRoleByValue(value: string) {
-    return await this.roleRepository.deleteRole(value);
+    return await this.roleRepository.deleteRoleByValue(value);
   }
 }
