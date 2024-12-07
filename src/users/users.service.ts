@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   async findUserProducts(userId: number) {
-    return await this.productService.findUserProduct(userId);
+    return await this.productService.findUserProducts(userId);
   }
 
   async findByEmail(email: string) {

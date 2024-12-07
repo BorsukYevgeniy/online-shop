@@ -32,6 +32,24 @@ describe('RolesRepository', () => {
     expect(repository).toBeDefined();
   });
 
+  it('should get role by value', async () => {
+    const getRoleData = { value: 'TEST' };
+    const mockRole = {
+      id: 1,
+      value: getRoleData.value,
+      description: 'Test description',
+    };
+
+    jest.spyOn(prisma.role, 'findUnique').mockResolvedValue(mockRole);
+
+    const role = await repository.findByValue(getRoleData.value);
+    expect(prisma.role.findUnique).toHaveBeenCalledWith({
+      where: { value: getRoleData.value },
+    });
+
+    expect(role).toEqual(mockRole);
+  });
+
   it('should crate new role', async () => {
     const createRoleDto: CreateRoleDto = {
       value: 'TEST',
@@ -55,24 +73,6 @@ describe('RolesRepository', () => {
         value: createRoleDto.value,
         description: createRoleDto.description,
       },
-    });
-
-    expect(role).toEqual(mockRole);
-  });
-
-  it('should get role by value', async () => {
-    const getRoleData = { value: 'TEST' };
-    const mockRole = {
-      id: 1,
-      value: getRoleData.value,
-      description: 'Test description',
-    };
-
-    jest.spyOn(prisma.role, 'findUnique').mockResolvedValue(mockRole);
-
-    const role = await repository.findByValue(getRoleData.value);
-    expect(prisma.role.findUnique).toHaveBeenCalledWith({
-      where: { value: getRoleData.value },
     });
 
     expect(role).toEqual(mockRole);

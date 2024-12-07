@@ -15,10 +15,10 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { AuthGuard } from 'src/guards/jwt-auth.guard';
+import { AuthGuard } from '../guards/jwt-auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
-import { AuthRequest } from 'src/interfaces/express-requests.interface';
+import { AuthRequest } from '../interfaces/express-requests.interface';
 
 @Controller('products')
 export class ProductController {
@@ -30,11 +30,11 @@ export class ProductController {
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
   ) {
-    return await this.productService.findAll(
+    return await this.productService.findAll({
       title,
-      Number(minPrice),
-      Number(maxPrice),
-    );
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+    });
   }
 
   @Get(':productId')
@@ -60,7 +60,7 @@ export class ProductController {
     @Req() req: AuthRequest,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
-    @UploadedFiles() images: Express.Multer.File[],
+    @UploadedFiles() images?: Express.Multer.File[],
   ) {
     return await this.productService.updateProduct(
       req.user.id,

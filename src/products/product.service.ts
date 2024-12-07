@@ -8,7 +8,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FilesService } from 'src/files/files.service';
+import { FilesService } from '../files/files.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ProductFilter } from './interface/product-filter.interface';
 
@@ -35,24 +35,21 @@ export class ProductService {
     return product;
   }
 
-  async findAll(
-    title?: string,
-    minPrice?: number,
-    maxPrice?: number,
-  ): Promise<Product[]> {
-    const filter: ProductFilter = {};
+  async findAll(filter: ProductFilter): Promise<Product[]> {
+    const { maxPrice, minPrice, title } = filter;
+    const productFilter: ProductFilter = {};
 
     if (title) {
-      filter.title = title;
+      productFilter.title = title;
     }
     if (minPrice) {
-      filter.minPrice = minPrice;
+      productFilter.minPrice = minPrice;
     }
     if (maxPrice) {
-      filter.maxPrice = maxPrice;
+      productFilter.maxPrice = maxPrice;
     }
 
-    return await this.productRepository.findAll(filter);
+    return await this.productRepository.findAll(productFilter);
   }
 
   async findById(productId: number): Promise<Product> {
@@ -63,7 +60,7 @@ export class ProductService {
     return product;
   }
 
-  async findUserProduct(userId: number): Promise<Product[]> {
+  async findUserProducts(userId: number): Promise<Product[]> {
     const userProducts = await this.productRepository.findUserProducts(userId);
 
     if (!userProducts) throw new NotFoundException('Products not found');
@@ -95,11 +92,16 @@ export class ProductService {
     userId: number,
     productId: number,
     dto: UpdateProductDto,
-    images: Express.Multer.File[],
+    images?: Express.Multer.File[],
   ): Promise<Product> {
     await this.validateProductOwnership(userId, productId);
 
-    const imagesNames = await this.fileService.createImages(images);
+    let imagesNames: string[] = [];
+    if (images && images.length > 0) {
+      imagesNames = await this.fileService.createImages(images);
+    } else {
+      imagesNames = [];
+    }
 
     return await this.productRepository.update(productId, dto, imagesNames);
   }

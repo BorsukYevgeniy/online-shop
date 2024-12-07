@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Product } from '@prisma/client';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -16,8 +16,8 @@ export class ProductRepository {
       where: {
         title: title ? { contains: title, mode: 'insensitive' } : undefined,
         price: {
-          gte: minPrice ?? undefined,
-          lte: maxPrice ?? undefined,
+          gte: minPrice,
+          lte: maxPrice,
         },
       },
     });
@@ -42,22 +42,31 @@ export class ProductRepository {
   async create(
     userId: number,
     dto: CreateProductDto,
-    images: string[],
+    imageNames: string[],
   ): Promise<Product> {
     const product: Product = await this.prismaService.product.create({
-      data: { ...dto, price: Number(dto.price), userId, images },
+      data: { userId, ...dto, images: imageNames, price: Number(dto.price) },
     });
     return product;
   }
-
   async update(
     productId: number,
     dto: UpdateProductDto,
-    images: string[],
+    imageNames: string[],
   ): Promise<Product> {
+    const updateData: any = {};
+
+    if (dto.title) updateData.title = dto.title;
+    if (dto.description) updateData.description = dto.description;
+    if (dto.price !== undefined) updateData.price = Number(dto.price);
+
+    if (imageNames.length > 0) {
+      updateData.images = imageNames;
+    }
+
     const product: Product | null = await this.prismaService.product.update({
       where: { id: productId },
-      data: { ...dto, price: Number(dto.price), images },
+      data: updateData,
     });
 
     return product;

@@ -30,6 +30,23 @@ describe('RoleService', () => {
     expect(service).toBeDefined();
   });
 
+  it('should get a role by value', async () => {
+    const getRoleData = { value: 'TEST' };
+    const mockRole = {
+      id: 1,
+      value: getRoleData.value,
+      description: 'Test description',
+    };
+
+    jest.spyOn(repository, 'findByValue').mockResolvedValue(mockRole);
+
+    const role = await service.getRoleByValue(getRoleData.value);
+
+    expect(repository.findByValue).toHaveBeenCalledWith(getRoleData.value);
+
+    expect(role).toEqual(mockRole);
+  });
+
   it('should create a new role', async () => {
     const roleDto: CreateRoleDto = {
       value: 'TEST',
@@ -50,23 +67,6 @@ describe('RoleService', () => {
       roleDto.value,
       roleDto.description,
     );
-
-    expect(role).toEqual(mockRole);
-  });
-
-  it('should get a role by value', async () => {
-    const getRoleData = { value: 'TEST' };
-    const mockRole = {
-      id: 1,
-      value: getRoleData.value,
-      description: 'Test description',
-    };
-
-    jest.spyOn(repository, 'findByValue').mockResolvedValue(mockRole);
-
-    const role = await service.getRoleByValue(getRoleData.value);
-
-    expect(repository.findByValue).toHaveBeenCalledWith(getRoleData.value);
 
     expect(role).toEqual(mockRole);
   });

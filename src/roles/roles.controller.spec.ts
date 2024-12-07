@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RolesController } from './roles.controller';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { TokensService } from '../token/tokens.service';
 
 describe('RoleController', () => {
   let controller: RolesController;
@@ -19,6 +20,13 @@ describe('RoleController', () => {
             deleteRoleByValue: jest.fn(),
           },
         },
+
+        {
+          provide: TokensService,
+          useValue: {
+            verifyAccessToken: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -28,6 +36,23 @@ describe('RoleController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  it('should get a role by value', async () => {
+    const getRoleData = { value: 'TEST' };
+    const mockRole = {
+      id: 1,
+      value: getRoleData.value,
+      description: 'Test description',
+    };
+
+    jest.spyOn(service, 'getRoleByValue').mockResolvedValue(mockRole);
+
+    const role = await controller.getRoleByValue(getRoleData.value);
+
+    expect(service.getRoleByValue).toHaveBeenCalledWith(getRoleData.value);
+
+    expect(role).toEqual(mockRole);
   });
 
   it('should create a new role', async () => {
@@ -46,27 +71,10 @@ describe('RoleController', () => {
 
     const role = await controller.createRole(roleDto);
 
-    expect(service.createRole).toHaveBeenCalledWith(
-      roleDto.value,
-      roleDto.description,
-    );
-
-    expect(role).toEqual(mockRole);
-  });
-
-  it('should get a role by value', async () => {
-    const getRoleData = { value: 'TEST' };
-    const mockRole = {
-      id: 1,
-      value: getRoleData.value,
-      description: 'Test description',
-    };
-
-    jest.spyOn(service, 'getRoleByValue').mockResolvedValue(mockRole);
-
-    const role = await controller.getRoleByValue(getRoleData.value);
-
-    expect(service.getRoleByValue).toHaveBeenCalledWith(getRoleData.value);
+    expect(service.createRole).toHaveBeenCalledWith({
+      description: roleDto.description,
+      value: roleDto.value,
+    });
 
     expect(role).toEqual(mockRole);
   });
