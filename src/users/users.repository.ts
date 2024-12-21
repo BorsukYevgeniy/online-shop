@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -10,6 +10,7 @@ export class UsersRepository {
       select: {
         id: true,
         email: true,
+        products: true,
         roles: {
           select: {
             role: {
@@ -32,6 +33,8 @@ export class UsersRepository {
       select: {
         id: true,
         email: true,
+        products: true,
+
         roles: {
           select: {
             role: {
@@ -58,6 +61,7 @@ export class UsersRepository {
         },
       },
     });
+    
     return user;
   }
 
@@ -78,6 +82,7 @@ export class UsersRepository {
     const user = await this.prismaService.user.delete({
       where: { id: userId },
       include: {
+        products: true,
         roles: {
           select: {
             role: { select: { id: true, value: true, description: true } },

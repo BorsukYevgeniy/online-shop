@@ -9,11 +9,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AuthGuard } from 'src/guards/jwt-auth.guard';
+import { AuthGuard } from '../guards/jwt-auth.guard';
 import { Response } from 'express';
-import { Roles } from 'src/decorators/roles-auth.decorator';
-import { RolesGuard } from 'src/guards/roles-auth.guard';
-import { AuthRequest } from 'src/interfaces/express-requests.interface';
+import { Roles } from '../decorators/roles-auth.decorator';
+import { RolesGuard } from '../guards/roles-auth.guard';
+import { AuthRequest } from '../interfaces/express-requests.interface';
 
 @Controller('users')
 export class UserController {
@@ -38,6 +38,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   async deleteUserById(@Req() req: AuthRequest, @Res() res: Response) {
     const deletedUser = await this.userService.delete(req.user.id);
+    
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 

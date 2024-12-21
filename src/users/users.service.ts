@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
 import { User } from '@prisma/client';
-import { ProductService } from 'src/products/product.service';
+import { ProductService } from '../products/product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { RolesService } from 'src/roles/roles.service';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class UsersService {
