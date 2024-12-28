@@ -21,7 +21,7 @@ import { join as joinPath } from 'path';
     AuthModule,
     FileModule,
     ServeStaticModule.forRoot({
-      rootPath: joinPath(__dirname,'..', 'static'),
+      rootPath: joinPath(__dirname, '..', 'static'),
     }),
     TokenModule,
     RoleModule,

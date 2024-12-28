@@ -302,7 +302,6 @@ describe('ProductRepository', () => {
     expect(product).toEqual(mockProduct);
   });
 
-
   it('should update only price in product', async () => {
     const productId = 1;
     const dto: UpdateProductDto = {
@@ -313,7 +312,7 @@ describe('ProductRepository', () => {
     const mockProduct = {
       id: productId,
       userId: 1,
-      title: "Old title",
+      title: 'Old title',
       description: 'Old Description',
       price: dto.price,
       images: imageNames,
@@ -333,7 +332,6 @@ describe('ProductRepository', () => {
 
     expect(product).toEqual(mockProduct);
   });
-
 
   it('should update images in product', async () => {
     const productId = 1;

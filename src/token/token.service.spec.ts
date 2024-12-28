@@ -68,7 +68,6 @@ describe('TokensService', () => {
 
       expect(result).toEqual({ accessToken, refreshToken });
     });
-
   });
 
   describe('verifyRefreshToken', () => {

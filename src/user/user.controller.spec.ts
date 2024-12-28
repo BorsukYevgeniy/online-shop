@@ -156,13 +156,12 @@ describe('UserController', () => {
 
     jest.spyOn(service, 'delete').mockResolvedValue(mockUser);
 
-    
     const res: Partial<Response> = {
       clearCookie: jest.fn(),
       send: jest.fn(),
     } as any;
-    
-    const req: AuthRequest = {user: {id: userId}} as any;
+
+    const req: AuthRequest = { user: { id: userId } } as any;
 
     const user = await controller.deleteUserById(req, res as any);
 

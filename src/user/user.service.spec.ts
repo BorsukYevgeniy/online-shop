@@ -218,7 +218,7 @@ describe('UserService', () => {
   });
 
   it('should delete a user by id', async () => {
-    const userId = 1
+    const userId = 1;
     const mockUser = {
       id: 1,
       email: 'test',
@@ -243,7 +243,6 @@ describe('UserService', () => {
         },
       ],
     };
-
 
     jest.spyOn(userRepository, 'delete').mockResolvedValue(mockUser);
 

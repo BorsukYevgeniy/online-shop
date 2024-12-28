@@ -38,7 +38,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   async deleteUserById(@Req() req: AuthRequest, @Res() res: Response) {
     const deletedUser = await this.userService.delete(req.user.id);
-    
+
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 

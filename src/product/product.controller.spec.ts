@@ -76,7 +76,7 @@ describe('ProductController', () => {
         title: 'title',
         price: 50,
         description: 'description',
-        images: ['1.png','2.png'],
+        images: ['1.png', '2.png'],
       },
     ];
     jest.spyOn(service, 'findAll').mockResolvedValue(mockProducts);
@@ -95,7 +95,7 @@ describe('ProductController', () => {
         title: 'title',
         price: 50,
         description: 'description',
-        images: ['1.png','2.png'],
+        images: ['1.png', '2.png'],
       },
     ];
 
@@ -114,7 +114,7 @@ describe('ProductController', () => {
         title: 'title',
         price: 50,
         description: 'description',
-        images: ['1.png','2.png'],
+        images: ['1.png', '2.png'],
       },
     ];
 
@@ -139,17 +139,13 @@ describe('ProductController', () => {
         title: 'title',
         price: 50,
         description: 'description',
-        images: ['1.png','2.png'],
+        images: ['1.png', '2.png'],
       },
     ];
 
     jest.spyOn(service, 'findAll').mockResolvedValue(mockProducts);
 
-    const products = await controller.getAllProducts(
-      'Test',
-      '25',
-      '75',
-    );
+    const products = await controller.getAllProducts('Test', '25', '75');
 
     expect(service.findAll).toHaveBeenCalledWith({
       title: 'Test',
@@ -167,7 +163,7 @@ describe('ProductController', () => {
       title: 'title',
       price: 50,
       description: 'description',
-      images: ['1.png','2.png'],
+      images: ['1.png', '2.png'],
     };
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
@@ -186,7 +182,7 @@ describe('ProductController', () => {
       title: 'title',
       price: 50,
       description: 'description',
-      images: ['1.png','2.png'],
+      images: ['1.png', '2.png'],
     };
 
     const createProductDto: CreateProductDto = {
