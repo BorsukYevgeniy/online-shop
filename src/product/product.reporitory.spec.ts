@@ -30,7 +30,9 @@ describe('ProductRepository', () => {
     repository = module.get<ProductRepository>(ProductRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', async () => {
     expect(repository).toBeDefined();
   });

@@ -28,7 +28,9 @@ describe('TokenRepository', () => {
     tokensRepository = module.get<TokenRepository>(TokenRepository);
     prismaService = module.get<PrismaService>(PrismaService);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should find one token by userId', async () => {
     const userId = 1;
     const token: Token = {

@@ -63,7 +63,9 @@ describe('ProductService', () => {
     service = module.get<ProductService>(ProductService);
     repository = module.get<ProductRepository>(ProductRepository);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

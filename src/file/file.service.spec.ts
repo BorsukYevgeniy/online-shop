@@ -11,7 +11,9 @@ describe('FileService', () => {
 
     service = module.get<FileService>(FileService);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

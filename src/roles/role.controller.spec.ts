@@ -33,7 +33,9 @@ describe('RoleController', () => {
     service = module.get<RoleService>(RoleService);
     controller = module.get<RoleController>(RoleController);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });

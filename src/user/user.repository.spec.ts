@@ -28,7 +28,9 @@ describe('UserRepository', () => {
     repository = module.get<UserRepository>(UserRepository);
     prismaService = module.get<PrismaService>(PrismaService);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', async () => {
     expect(repository).toBeDefined();
   });

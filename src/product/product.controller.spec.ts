@@ -60,7 +60,9 @@ describe('ProductController', () => {
     controller = module.get<ProductController>(ProductController);
     service = module.get<ProductService>(ProductService);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });

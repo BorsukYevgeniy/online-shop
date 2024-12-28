@@ -46,7 +46,9 @@ describe('UserService', () => {
     productService = module.get<ProductService>(ProductService);
     roleService = module.get<RoleService>(RoleService);
   });
-
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
