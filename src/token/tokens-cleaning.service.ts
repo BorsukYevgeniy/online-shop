@@ -3,7 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import { TokensRepository } from './tokens.repository';
 
 @Injectable()
-export class TokenCleanupService {
+export class TokenCleaningService {
   constructor(private readonly tokenRepository: TokensRepository) {}
 
   @Cron('0 0 1 * *')
