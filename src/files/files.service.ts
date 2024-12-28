@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { mkdirSync, existsSync, writeFileSync } from 'fs';
+import { promises as fsPromises } from 'fs';
 import {
   join as joinPath,
   resolve as resolvePath,
@@ -11,19 +11,21 @@ import { v4 as uuidV4 } from 'uuid';
 export class FilesService {
   async createImages(images: Express.Multer.File[]): Promise<string[]> {
     try {
-      const fileNames = [];
+      const fileNames: string[] = [];
+      const filePath = resolvePath(__dirname, '..', '..', 'static');
 
-      const filePath = resolvePath(__dirname, '..', 'static');
-
-      if (!existsSync(filePath)) {
-        mkdirSync(filePath, { recursive: true });
+      try {
+        await fsPromises.access(filePath);
+      } catch {
+        await fsPromises.mkdir(filePath, { recursive: true });
       }
 
-      images.forEach((file) => {
+      for (const file of images) {
         const fileName = uuidV4() + fileExtname(file.originalname);
-        writeFileSync(joinPath(filePath, fileName), file.buffer);
+        await fsPromises.writeFile(joinPath(filePath, fileName), file.buffer);
+
         fileNames.push(fileName);
-      });
+      }
 
       return fileNames;
     } catch (e) {
