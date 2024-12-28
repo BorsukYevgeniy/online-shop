@@ -31,7 +31,6 @@ model Token {
   userId    Int
   token     String
   expiresAt DateTime
-  createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

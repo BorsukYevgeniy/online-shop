@@ -1,30 +1,30 @@
 import { Module } from '@nestjs/common';
 
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
-import { ProductModule } from './products/product.module';
+import { ProductModule } from './product/product.module';
 import { AuthModule } from './auth/auth.module';
-import { FilesModule } from './files/files.module';
+import { FileModule } from './file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { TokensModule } from './token/tokens.module';
-import { RolesModule } from './roles/roles.module';
+import { TokenModule } from './token/token.module';
+import { RoleModule } from './roles/role.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { join as joinPath } from 'path';
 @Module({
   imports: [
     PrismaModule,
-    UsersModule,
+    UserModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     ProductModule,
     AuthModule,
-    FilesModule,
+    FileModule,
     ServeStaticModule.forRoot({
       rootPath: joinPath(__dirname,'..', 'static'),
     }),
-    TokensModule,
-    RolesModule,
+    TokenModule,
+    RoleModule,
     ScheduleModule.forRoot(),
   ],
 })
