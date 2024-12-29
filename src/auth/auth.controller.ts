@@ -7,9 +7,9 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
-import { AuthRequest } from 'src/interface/express-requests.interface';
+import { AuthRequest } from '../interface/express-requests.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +19,7 @@ export class AuthController {
   async registraion(@Body() dto: CreateUserDto) {
     return await this.authService.register(dto);
   }
+
   @Post('login')
   async login(@Body() dto: CreateUserDto, @Res() res: Response) {
     console.log();
@@ -44,7 +45,7 @@ export class AuthController {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 
-    res.send('Logouted succesfully');
+    res.send({ message: 'Logouted succesfully' });
   }
 
   @Post('refresh')

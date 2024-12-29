@@ -127,6 +127,7 @@ describe('UserController', () => {
     expect(products).toEqual(mockProducts);
   });
 
+
   it('should delete user', async () => {
     const userId = 1;
     const mockUser = {

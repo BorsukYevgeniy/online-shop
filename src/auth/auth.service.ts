@@ -1,15 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { UserService } from 'src/user/user.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcryptjs';
 import { Token, User } from '@prisma/client';
-import { TokensService } from 'src/token/token.service';
+import { TokenService } from '../token/token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly tokenService: TokensService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async register(dto: CreateUserDto) {
