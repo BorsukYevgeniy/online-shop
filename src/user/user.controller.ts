@@ -14,17 +14,24 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { AuthRequest } from '../interface/express-requests.interface';
+import {
+  UsersWithProductsAndRolesWithoutPassword,
+  UserWithProductsAndRolesWithoutPassword,
+} from './types/user.types';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Get('')
-  async findAll() {
+  async findAll(): Promise<UsersWithProductsAndRolesWithoutPassword> {
     return await this.userService.findAll();
   }
 
   @Get(':userId')
-  async findUserById(@Param('userId', ParseIntPipe) userId: number) {
+  async findUserById(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<UserWithProductsAndRolesWithoutPassword> {
     return await this.userService.findById(userId);
   }
 
@@ -36,7 +43,10 @@ export class UserController {
   // Маршрут для видалення акаунту власиником цього акаунту
   @Delete('')
   @UseGuards(AuthGuard)
-  async deleteUserById(@Req() req: AuthRequest, @Res() res: Response) {
+  async deleteUserById(
+    @Req() req: AuthRequest,
+    @Res() res: Response,
+  ): Promise<void> {
     const deletedUser = await this.userService.delete(req.user.id);
 
     res.clearCookie('accessToken');
@@ -49,7 +59,9 @@ export class UserController {
   @Delete(':userId')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async deleteUserByIdByAdmin(@Param('userId', ParseIntPipe) userId: number) {
+  async deleteUserByIdByAdmin(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<UserWithProductsAndRolesWithoutPassword> {
     return await this.userService.delete(userId);
   }
 }

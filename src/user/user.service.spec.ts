@@ -70,11 +70,9 @@ describe('UserService', () => {
         ],
         roles: [
           {
-            role: {
-              id: 1,
-              value: 'admin',
-              description: 'Administrator role',
-            },
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
           },
         ],
       },
@@ -102,11 +100,9 @@ describe('UserService', () => {
       ],
       roles: [
         {
-          role: {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
         },
       ],
     };
@@ -161,11 +157,9 @@ describe('UserService', () => {
       ],
       roles: [
         {
-          role: {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
         },
       ],
     };
@@ -195,11 +189,9 @@ describe('UserService', () => {
       ],
       roles: [
         {
-          role: {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
         },
       ],
     };
@@ -216,7 +208,6 @@ describe('UserService', () => {
       userRole.id,
     );
   });
-
   it('should delete a user by id', async () => {
     const userId = 1;
     const mockUser = {
@@ -235,11 +226,9 @@ describe('UserService', () => {
       ],
       roles: [
         {
-          role: {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
         },
       ],
     };

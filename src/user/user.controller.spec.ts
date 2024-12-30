@@ -55,11 +55,9 @@ describe('UserController', () => {
         ],
         roles: [
           {
-            role: {
-              id: 1,
-              value: 'admin',
-              description: 'Administrator role',
-            },
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
           },
         ],
       },
@@ -90,11 +88,9 @@ describe('UserController', () => {
       ],
       roles: [
         {
-          role: {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
         },
       ],
     };
@@ -127,7 +123,6 @@ describe('UserController', () => {
     expect(products).toEqual(mockProducts);
   });
 
-
   it('should delete user', async () => {
     const userId = 1;
     const mockUser = {
@@ -146,11 +141,9 @@ describe('UserController', () => {
       ],
       roles: [
         {
-          role: {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
         },
       ],
     };

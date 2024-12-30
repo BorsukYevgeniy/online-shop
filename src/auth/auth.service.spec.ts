@@ -71,7 +71,7 @@ describe('AuthService', () => {
       ...dto,
       id: 1,
       password: hashedPassword,
-      roles: [{ role: { id: 1, value: 'ADMIN', description: 'S' } }],
+      roles: [{ id: 1, value: 'ADMIN', description: 'S'}],
     };
 
     jest.spyOn(userService, 'findByEmail').mockResolvedValue(mockUser);
@@ -90,7 +90,7 @@ describe('AuthService', () => {
       ...dto,
       id: 1,
       password: hashedPassword,
-      roles: [{ role: { id: 1, value: 'ADMIN', description: 'S' } }],
+      roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
     const mockTokens = {
       accessToken: 'accessToken',
@@ -125,7 +125,7 @@ describe('AuthService', () => {
       id: 1,
       email: 'test@gmail.com',
       password: 'hashedPassword',
-      roles: [{ role: { id: 1, value: 'ADMIN', description: 'S' } }],
+      roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
 
     jest.spyOn(userService, 'findByEmail').mockResolvedValue(mockUser);

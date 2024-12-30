@@ -59,7 +59,7 @@ export class AuthService {
 
     return await this.tokenService.generateTokens(
       candidate.id,
-      roles.map((ur) => ur.role.value),
+      roles.map((ur) => ur.value),
     );
   }
 
