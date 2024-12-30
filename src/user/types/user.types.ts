@@ -1,8 +1,4 @@
-export type User = {
-  id: number;
-  email: string;
-  password: string;
-};
+import { User } from '@prisma/client';
 
 export type UserWithRoles = User & {
   roles: { id: number; value: string; description: string }[];

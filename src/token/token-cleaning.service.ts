@@ -7,7 +7,7 @@ export class TokenCleaningService {
   constructor(private readonly tokenRepository: TokenRepository) {}
 
   @Cron('0 0 1 * *')
-  async cleanExpiredTokens() {
+  async cleanExpiredTokens(): Promise<void> {
     const now = new Date();
     const result = await this.tokenRepository.deleteExpiredTokens(now);
     console.log(`Deleted ${result.count} expired tokens`);

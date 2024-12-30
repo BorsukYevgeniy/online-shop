@@ -4,12 +4,12 @@ import { UserRepository } from './user.repository';
 import { ProductService } from '../product/product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../roles/role.service';
+import { User } from '@prisma/client';
 import {
-  User,
   UsersWithProductsAndRolesWithoutPassword,
   UserWithProductsAndRolesWithoutPassword,
   UserWithRoles,
-} from './types/user.interfaces';
+} from './types/user.types';
 
 @Injectable()
 export class UserService {

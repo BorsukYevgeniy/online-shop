@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+
 import { Token } from '@prisma/client';
+import { TokenPayload, Tokens } from './interface/token.interfaces';
+import { DeletingCount } from 'src/interface/deleting-count.interface';
 
 @Injectable()
 export class TokenService {
@@ -18,10 +21,7 @@ export class TokenService {
     this.refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
   }
 
-  async generateTokens(
-    userId: number,
-    roles: string[],
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async generateTokens(userId: number, roles: string[]): Promise<Tokens> {
     const accessToken: string = await this.jwtService.signAsync(
       { id: userId, roles },
       { expiresIn: '1h', secret: this.accessSecret },
@@ -36,24 +36,14 @@ export class TokenService {
     return { accessToken, refreshToken };
   }
 
-  async verifyRefreshToken(
-    refreshToken: string,
-  ): Promise<{ id: number; roles: string[] }> {
-    return await this.jwtService.verifyAsync<{
-      id: number;
-      roles: string[];
-    }>(refreshToken, {
+  async verifyRefreshToken(refreshToken: string): Promise<TokenPayload> {
+    return await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
       secret: this.refreshSecret,
     });
   }
 
-  async verifyAccessToken(
-    accessToken: string,
-  ): Promise<{ id: number; roles: string[] }> {
-    return await this.jwtService.verifyAsync<{
-      id: number;
-      roles: string[];
-    }>(accessToken, {
+  async verifyAccessToken(accessToken: string): Promise<TokenPayload> {
+    return await this.jwtService.verifyAsync<TokenPayload>(accessToken, {
       secret: this.accessSecret,
     });
   }
@@ -62,11 +52,14 @@ export class TokenService {
     return await this.tokenRepositry.findUserTokens(userId);
   }
 
-  async deleteUserTokens(token: string) {
+  async deleteUserTokens(token: string): Promise<DeletingCount> {
     return await this.tokenRepositry.deleteUserTokens(token);
   }
 
-  private async saveToken(userId: number, refreshToken: string) {
+  private async saveToken(
+    userId: number,
+    refreshToken: string,
+  ): Promise<Token> {
     const expiredAt = new Date();
     expiredAt.setDate(expiredAt.getDate() + 7);
     return await this.tokenRepositry.create(userId, refreshToken, expiredAt);

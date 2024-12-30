@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Token } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { DeletingCount } from 'src/interface/deleting-count.interface';
 
 @Injectable()
 export class TokenRepository {
@@ -35,11 +36,11 @@ export class TokenRepository {
     return tokens;
   }
 
-  async deleteUserTokens(token: string) {
+  async deleteUserTokens(token: string): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({ where: { token } });
   }
 
-  async deleteExpiredTokens(now: Date): Promise<{ count: number }> {
+  async deleteExpiredTokens(now: Date): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({
       where: { expiresAt: { lt: now } },
     });

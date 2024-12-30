@@ -71,7 +71,7 @@ describe('AuthService', () => {
       ...dto,
       id: 1,
       password: hashedPassword,
-      roles: [{ id: 1, value: 'ADMIN', description: 'S'}],
+      roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
 
     jest.spyOn(userService, 'findByEmail').mockResolvedValue(mockUser);
