@@ -18,6 +18,7 @@ import {
   UsersWithProductsAndRolesWithoutPassword,
   UserWithProductsAndRolesWithoutPassword,
 } from './types/user.types';
+import { Product } from '@prisma/client';
 
 @Controller('users')
 export class UserController {
@@ -36,7 +37,9 @@ export class UserController {
   }
 
   @Get(':userId/products')
-  async findUserProductsById(@Param('userId', ParseIntPipe) userId: number) {
+  async findUserProductsById(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<Product[]> {
     return await this.userService.findUserProducts(userId);
   }
 
@@ -47,7 +50,8 @@ export class UserController {
     @Req() req: AuthRequest,
     @Res() res: Response,
   ): Promise<void> {
-    const deletedUser = await this.userService.delete(req.user.id);
+    const deletedUser: UserWithProductsAndRolesWithoutPassword =
+      await this.userService.delete(req.user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');

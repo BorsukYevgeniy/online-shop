@@ -2,8 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcryptjs';
-import { Token, User } from '@prisma/client';
+import { Role, Token, User } from '@prisma/client';
 import { TokenService } from '../token/token.service';
+import { Tokens } from '../token/interface/token.interfaces';
+import { UserWithRoles } from 'src/user/types/user.types';
+import { DeletingCount } from 'src/interface/deleting-count.interface';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +15,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async register(dto: CreateUserDto) {
+  async register(dto: CreateUserDto): Promise<User> {
     const candidate: User | null = await this.userService.findByEmail(
       dto.email,
     );
@@ -30,8 +33,10 @@ export class AuthService {
     return user;
   }
 
-  async login(dto: CreateUserDto) {
-    const candidate = await this.userService.findByEmail(dto.email);
+  async login(dto: CreateUserDto): Promise<Tokens> {
+    const candidate: UserWithRoles | null = await this.userService.findByEmail(
+      dto.email,
+    );
 
     if (!candidate) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -59,22 +64,24 @@ export class AuthService {
 
     return await this.tokenService.generateTokens(
       candidate.id,
-      roles.map((ur) => ur.value),
+      roles.map((ur: Role): string => ur.value),
     );
   }
 
-  async logout(token: string) {
+  async logout(token: string): Promise<DeletingCount> {
     return await this.tokenService.deleteUserTokens(token);
   }
 
-  async refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: string): Promise<Tokens> {
     const { id, roles } =
       await this.tokenService.verifyRefreshToken(refreshToken);
 
     const userTokens: Token[] | null =
       await this.tokenService.getUserTokens(id);
 
-    const validToken = userTokens.some((token) => token.token === refreshToken);
+    const validToken: boolean = userTokens.some(
+      (token) => token.token === refreshToken,
+    );
     if (!validToken) throw new Error('Invalid refresh token');
 
     return this.tokenService.generateTokens(id, roles);

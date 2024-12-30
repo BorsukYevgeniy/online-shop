@@ -8,12 +8,11 @@ export class TokenRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findOne(userId: number): Promise<Token | null> {
-    const token = await this.prismaService.token.findFirst({
+    return await this.prismaService.token.findFirst({
       where: {
         userId,
       },
     });
-    return token;
   }
 
   async create(
@@ -21,19 +20,15 @@ export class TokenRepository {
     refreshToken: string,
     expiresAt: Date,
   ): Promise<Token> {
-    const token: Token = await this.prismaService.token.create({
+    return await this.prismaService.token.create({
       data: { userId, expiresAt, token: refreshToken },
     });
-
-    return token;
   }
 
   async findUserTokens(userId: number): Promise<Token[] | null> {
-    const tokens: Token[] = await this.prismaService.token.findMany({
+    return await this.prismaService.token.findMany({
       where: { userId },
     });
-
-    return tokens;
   }
 
   async deleteUserTokens(token: string): Promise<DeletingCount> {

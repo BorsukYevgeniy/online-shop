@@ -10,9 +10,9 @@ export class ProductRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findAll(filter: ProductFilter): Promise<Product[]> {
-    const { title, minPrice, maxPrice } = filter;
+    const { title, minPrice, maxPrice }: ProductFilter = filter;
 
-    const products: Product[] = await this.prismaService.product.findMany({
+    return await this.prismaService.product.findMany({
       where: {
         title: title ? { contains: title, mode: 'insensitive' } : undefined,
         price: {
@@ -21,14 +21,12 @@ export class ProductRepository {
         },
       },
     });
-    return products;
   }
 
   async findById(productId: number): Promise<Product | null> {
-    const product: Product = await this.prismaService.product.findUnique({
+    return await this.prismaService.product.findUnique({
       where: { id: productId },
     });
-    return product;
   }
 
   async findUserProducts(userId: number): Promise<Product[] | null> {
@@ -44,16 +42,16 @@ export class ProductRepository {
     dto: CreateProductDto,
     imageNames: string[],
   ): Promise<Product> {
-    const product: Product = await this.prismaService.product.create({
+    return await this.prismaService.product.create({
       data: { userId, ...dto, images: imageNames, price: Number(dto.price) },
     });
-    return product;
   }
+
   async update(
     productId: number,
     dto: UpdateProductDto,
     imageNames: string[],
-  ): Promise<Product> {
+  ): Promise<Product | null> {
     const updateData: any = {};
 
     if (dto.title) updateData.title = dto.title;
@@ -64,18 +62,15 @@ export class ProductRepository {
       updateData.images = imageNames;
     }
 
-    const product: Product | null = await this.prismaService.product.update({
+    return await this.prismaService.product.update({
       where: { id: productId },
       data: updateData,
     });
-
-    return product;
   }
 
-  async delete(productId: number): Promise<Product> {
-    const product: Product | null = await this.prismaService.product.delete({
+  async delete(productId: number): Promise<Product | null> {
+    return await this.prismaService.product.delete({
       where: { id: productId },
     });
-    return product;
   }
 }

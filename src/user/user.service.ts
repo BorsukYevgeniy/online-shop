@@ -4,7 +4,7 @@ import { UserRepository } from './user.repository';
 import { ProductService } from '../product/product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../roles/role.service';
-import { User } from '@prisma/client';
+import { Product, Role, User } from '@prisma/client';
 import {
   UsersWithProductsAndRolesWithoutPassword,
   UserWithProductsAndRolesWithoutPassword,
@@ -26,14 +26,15 @@ export class UserService {
   async findById(
     userId: number,
   ): Promise<UserWithProductsAndRolesWithoutPassword> {
-    const user = await this.userRepository.findById(userId);
+    const user: UserWithProductsAndRolesWithoutPassword | null =
+      await this.userRepository.findById(userId);
 
     if (!user) throw new NotFoundException('User not found');
 
     return user;
   }
 
-  async findUserProducts(userId: number) {
+  async findUserProducts(userId: number): Promise<Product[]> {
     return await this.productService.findUserProducts(userId);
   }
 
@@ -42,7 +43,7 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const userRole = await this.roleService.getRoleByValue('USER');
+    const userRole: Role = await this.roleService.getRoleByValue('USER');
 
     return await this.userRepository.create(
       dto.email,

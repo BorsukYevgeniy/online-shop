@@ -91,6 +91,7 @@ describe('AuthController', () => {
       },
       cookies: { refreshToken: 'refreshToken' },
     } as any;
+    
     const res: Partial<Response> = {
       clearCookie: jest.fn(),
       send: jest.fn(),

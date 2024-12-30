@@ -12,7 +12,7 @@ export class FileService {
   async createImages(images: Express.Multer.File[]): Promise<string[]> {
     try {
       const fileNames: string[] = [];
-      const filePath = resolvePath(__dirname, '..', '..', 'static');
+      const filePath: string = resolvePath(__dirname, '..', '..', 'static');
 
       try {
         await fsPromises.access(filePath);
@@ -20,15 +20,23 @@ export class FileService {
         await fsPromises.mkdir(filePath, { recursive: true });
       }
 
-      for (const file of images) {
-        const fileName = uuidV4() + fileExtname(file.originalname);
-        await fsPromises.writeFile(joinPath(filePath, fileName), file.buffer);
+      // Маппимо всі файли на проміси запису
+      const writePromises = images.map(
+        (file: Express.Multer.File): Promise<void> => {
+          const fileName: string = uuidV4() + fileExtname(file.originalname);
+          fileNames.push(fileName); // Додаємо ім'я файлу до списку
+          return fsPromises.writeFile(
+            joinPath(filePath, fileName),
+            file.buffer,
+          ); // Повертаємо проміс запису
+        },
+      );
 
-        fileNames.push(fileName);
-      }
+      // Чекаємо завершення всіх промісів запису
+      await Promise.all(writePromises);
 
       return fileNames;
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
       throw new InternalServerErrorException('Error writing files to disk');
     }

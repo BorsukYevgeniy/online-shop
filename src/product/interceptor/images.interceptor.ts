@@ -8,7 +8,11 @@ export function ImagesInterceptor(
 ): ReturnType<typeof FilesInterceptor> {
   const multerOptions: MulterOptions = {
     limits: { files: maxCount },
-    fileFilter: (req, file, callback) => {
+    fileFilter: (
+      req,
+      file: Express.Multer.File,
+      callback: (error: Error | null, acceptFile: boolean) => void,
+    ): void => {
       if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
         return callback(
           new BadRequestException('Only JPG, JPEG, and PNG files are allowed'),

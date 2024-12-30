@@ -5,13 +5,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { TokenService } from '../../token/token.service';
+import { AuthRequest } from '../../interface/express-requests.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly tokenService: TokenService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
+    const req: AuthRequest = context.switchToHttp().getRequest<AuthRequest>();
     const accessToken: string = req.cookies.accessToken;
 
     if (!accessToken) {
@@ -23,7 +24,7 @@ export class AuthGuard implements CanActivate {
         await this.tokenService.verifyAccessToken(accessToken);
       req.user = { id, roles };
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       throw new UnauthorizedException('Invalid token');
     }
   }

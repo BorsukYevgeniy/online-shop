@@ -23,7 +23,8 @@ export class ProductService {
     userId: number,
     productId: number,
   ): Promise<Product> {
-    const product = await this.productRepository.findById(productId);
+    const product: Product | null =
+      await this.productRepository.findById(productId);
 
     if (!product) {
       throw new NotFoundException('Product not found');
@@ -36,7 +37,7 @@ export class ProductService {
   }
 
   async findAll(filter: ProductFilter): Promise<Product[]> {
-    const { maxPrice, minPrice, title } = filter;
+    const { maxPrice, minPrice, title }: ProductFilter = filter;
     const productFilter: ProductFilter = {};
 
     if (title) {
@@ -53,7 +54,8 @@ export class ProductService {
   }
 
   async findById(productId: number): Promise<Product> {
-    const product = await this.productRepository.findById(productId);
+    const product: Product | null =
+      await this.productRepository.findById(productId);
 
     if (!product) throw new NotFoundException('Product not found');
 
@@ -61,7 +63,8 @@ export class ProductService {
   }
 
   async findUserProducts(userId: number): Promise<Product[]> {
-    const userProducts = await this.productRepository.findUserProducts(userId);
+    const userProducts: Product[] | null =
+      await this.productRepository.findUserProducts(userId);
 
     if (!userProducts) throw new NotFoundException('Products not found');
 
@@ -74,11 +77,12 @@ export class ProductService {
     images: Express.Multer.File[],
   ): Promise<Product> {
     try {
-      const imagesNames = await this.fileService.createImages(images);
+      const imagesNames: string[] = await this.fileService.createImages(images);
 
       return await this.productRepository.create(userId, dto, imagesNames);
-    } catch (e) {
+    } catch (e: unknown) {
       console.log(e);
+
       if (e instanceof PrismaClientKnownRequestError) {
         console.log(e);
         throw new BadRequestException(

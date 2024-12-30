@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import {
   UsersWithProductsAndRolesWithoutPassword,
   UserWithRoles,
@@ -33,7 +33,7 @@ export class UserRepository {
 
     return users.map((user) => ({
       ...user,
-      roles: user.roles.map((r) => r.role),
+      roles: user.roles.map((r: {role: Role}): Role => r.role),
     }));
   }
 
@@ -60,11 +60,9 @@ export class UserRepository {
       },
     });
 
-    if (!user) return null;
-
     return {
       ...user,
-      roles: user.roles.map((r) => r.role),
+      roles: user.roles.map((r: {role: Role}): Role => r.role),
     };
   }
   async findOneByEmail(email: string): Promise<UserWithRoles | null> {
@@ -79,11 +77,9 @@ export class UserRepository {
       },
     });
 
-    if (!user) return null;
-
     return {
       ...user,
-      roles: user.roles.map((r) => r.role),
+      roles: user.roles.map((r: {role: Role}): Role => r.role),
     };
   }
 
@@ -97,6 +93,7 @@ export class UserRepository {
         },
       },
     });
+    
     return user;
   }
 
@@ -127,7 +124,7 @@ export class UserRepository {
 
     return {
       ...user,
-      roles: user.roles.map((r) => r.role),
+      roles: user.roles.map((r: {role: Role}): Role => r.role),
     };
   }
 }

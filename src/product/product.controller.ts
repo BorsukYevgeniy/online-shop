@@ -19,6 +19,7 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { AuthRequest } from '../interface/express-requests.interface';
+import { Product } from '@prisma/client';
 
 @Controller('products')
 export class ProductController {
@@ -29,7 +30,7 @@ export class ProductController {
     @Query('title') title?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
-  ) {
+  ): Promise<Product[]> {
     return await this.productService.findAll({
       title,
       minPrice: Number(minPrice),
@@ -38,7 +39,9 @@ export class ProductController {
   }
 
   @Get(':productId')
-  async getProductById(@Param('productId', ParseIntPipe) productId: number) {
+  async getProductById(
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<Product> {
     return await this.productService.findById(productId);
   }
 
@@ -49,7 +52,7 @@ export class ProductController {
     @Req() req: AuthRequest,
     @Body() dto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
-  ) {
+  ): Promise<Product> {
     return await this.productService.create(req.user.id, dto, images);
   }
 
@@ -61,7 +64,7 @@ export class ProductController {
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images?: Express.Multer.File[],
-  ) {
+  ): Promise<Product> {
     return await this.productService.updateProduct(
       req.user.id,
       productId,
@@ -75,7 +78,7 @@ export class ProductController {
   async deleteProduct(
     @Req() req: AuthRequest,
     @Param('productId', ParseIntPipe) productId: number,
-  ) {
+  ): Promise<Product> {
     return await this.productService.deleteProduct(req.user.id, productId);
   }
 }

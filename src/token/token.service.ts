@@ -60,8 +60,9 @@ export class TokenService {
     userId: number,
     refreshToken: string,
   ): Promise<Token> {
-    const expiredAt = new Date();
+    const expiredAt: Date = new Date();
     expiredAt.setDate(expiredAt.getDate() + 7);
+
     return await this.tokenRepositry.create(userId, refreshToken, expiredAt);
   }
 }

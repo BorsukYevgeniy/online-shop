@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { TokenRepository } from './token.repository';
+import { DeletingCount } from 'src/interface/deleting-count.interface';
 
 @Injectable()
 export class TokenCleaningService {
@@ -8,8 +9,10 @@ export class TokenCleaningService {
 
   @Cron('0 0 1 * *')
   async cleanExpiredTokens(): Promise<void> {
-    const now = new Date();
-    const result = await this.tokenRepository.deleteExpiredTokens(now);
+    const now: Date = new Date();
+    const result: DeletingCount =
+      await this.tokenRepository.deleteExpiredTokens(now);
+
     console.log(`Deleted ${result.count} expired tokens`);
   }
 }

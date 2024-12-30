@@ -10,20 +10,22 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { AuthRequest } from '../interface/express-requests.interface';
+import { User } from '@prisma/client';
+import { Tokens } from 'src/token/interface/token.interfaces';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
-  async registraion(@Body() dto: CreateUserDto) {
+  async registraion(@Body() dto: CreateUserDto): Promise<User> {
     return await this.authService.register(dto);
   }
 
   @Post('login')
-  async login(@Body() dto: CreateUserDto, @Res() res: Response) {
-    console.log();
-    const { accessToken, refreshToken } = await this.authService.login(dto);
+  async login(@Body() dto: CreateUserDto, @Res() res: Response): Promise<void> {
+    const { accessToken, refreshToken }: Tokens =
+      await this.authService.login(dto);
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -39,7 +41,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Req() req: AuthRequest, @Res() res: Response) {
+  async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
     await this.authService.logout(req.cookies['refreshToken']);
 
     res.clearCookie('accessToken');
@@ -49,14 +51,14 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  async refresh(@Req() req: Request, @Res() res: Response): Promise<void> {
     const refreshToken: string = req.cookies['refreshToken'];
 
     if (!refreshToken) {
       throw new BadRequestException('Refresh token not found');
     }
 
-    const newTokens = await this.authService.refreshToken(refreshToken);
+    const newTokens: Tokens = await this.authService.refreshToken(refreshToken);
 
     res.cookie('accessToken', newTokens.accessToken, {
       httpOnly: true,
