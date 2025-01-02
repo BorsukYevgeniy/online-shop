@@ -9,7 +9,25 @@ import { ProductFilter } from './interface/product-filter.interface';
 export class ProductRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll(filter: ProductFilter): Promise<Product[]> {
+  async count(filter: ProductFilter) {
+    const { title, minPrice, maxPrice }: ProductFilter = filter;
+
+    return await this.prismaService.product.count({
+      where: {
+        title: title ? { contains: title, mode: 'insensitive' } : undefined,
+        price: {
+          gte: minPrice,
+          lte: maxPrice,
+        },
+      },
+    });
+  }
+
+  async findAll(
+    filter: ProductFilter,
+    skip: number,
+    limit: number,
+  ): Promise<Product[]> {
     const { title, minPrice, maxPrice }: ProductFilter = filter;
 
     return await this.prismaService.product.findMany({
@@ -20,6 +38,8 @@ export class ProductRepository {
           lte: maxPrice,
         },
       },
+      skip,
+      take: limit,
     });
   }
 

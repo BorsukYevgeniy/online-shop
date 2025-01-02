@@ -20,6 +20,10 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { AuthRequest } from '../interface/express-requests.interface';
 import { Product } from '@prisma/client';
+import { PaginationDto } from '../dto/pagination.dto';
+import { ProductFilter } from './interface/product-filter.interface';
+import { ParsePaginationDtoPipe } from './pipe/parse-pagination-dto.pipe';
+import { ParseProductFilterPipe } from './pipe/parse-product-filter.pipe';
 
 @Controller('products')
 export class ProductController {
@@ -27,15 +31,10 @@ export class ProductController {
 
   @Get('')
   async getAllProducts(
-    @Query('title') title?: string,
-    @Query('minPrice') minPrice?: string,
-    @Query('maxPrice') maxPrice?: string,
-  ): Promise<Product[]> {
-    return await this.productService.findAll({
-      title,
-      minPrice: Number(minPrice),
-      maxPrice: Number(maxPrice),
-    });
+    @Query(ParsePaginationDtoPipe) paginationDto: PaginationDto,
+    @Query(ParseProductFilterPipe) filter?: ProductFilter,
+  ) {
+    return await this.productService.findAll(filter, paginationDto);
   }
 
   @Get(':productId')
@@ -61,8 +60,8 @@ export class ProductController {
   @UseInterceptors(ImagesInterceptor())
   async updateProduct(
     @Req() req: AuthRequest,
-    @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
+    @Param('productId', ParseIntPipe) productId: number,
     @UploadedFiles() images?: Express.Multer.File[],
   ): Promise<Product> {
     return await this.productService.updateProduct(

@@ -33,7 +33,7 @@ export class UserRepository {
 
     return users.map((user) => ({
       ...user,
-      roles: user.roles.map((r: {role: Role}): Role => r.role),
+      roles: user.roles.map((r: { role: Role }): Role => r.role),
     }));
   }
 
@@ -62,7 +62,7 @@ export class UserRepository {
 
     return {
       ...user,
-      roles: user.roles.map((r: {role: Role}): Role => r.role),
+      roles: user.roles.map((r: { role: Role }): Role => r.role),
     };
   }
   async findOneByEmail(email: string): Promise<UserWithRoles | null> {
@@ -79,7 +79,7 @@ export class UserRepository {
 
     return {
       ...user,
-      roles: user.roles.map((r: {role: Role}): Role => r.role),
+      roles: user.roles.map((r: { role: Role }): Role => r.role),
     };
   }
 
@@ -93,7 +93,7 @@ export class UserRepository {
         },
       },
     });
-    
+
     return user;
   }
 
@@ -124,7 +124,7 @@ export class UserRepository {
 
     return {
       ...user,
-      roles: user.roles.map((r: {role: Role}): Role => r.role),
+      roles: user.roles.map((r: { role: Role }): Role => r.role),
     };
   }
 }

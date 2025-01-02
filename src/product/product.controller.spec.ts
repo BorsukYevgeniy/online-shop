@@ -60,9 +60,11 @@ describe('ProductController', () => {
     controller = module.get<ProductController>(ProductController);
     service = module.get<ProductService>(ProductService);
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
@@ -79,11 +81,30 @@ describe('ProductController', () => {
         images: ['1.png', '2.png'],
       },
     ];
-    jest.spyOn(service, 'findAll').mockResolvedValue(mockProducts);
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
 
-    const products = await controller.getAllProducts();
+    const products = await controller.getAllProducts(
+      { page: 1, pageSize: 10 },
+      {},
+    );
 
-    expect(products).toEqual(mockProducts);
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
   });
 
   it('should filter products by title', async () => {
@@ -99,10 +120,35 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue(mockProducts);
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
 
-    const products = await controller.getAllProducts('Test');
-    expect(products).toEqual(mockProducts);
+    const products = await controller.getAllProducts(
+      { page: 1, pageSize: 10 },
+      { title: 'Test' },
+    );
+
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
+
+    expect(service.findAll).toHaveBeenCalledWith(
+      { title: 'Test' },
+      { page: 1, pageSize: 10 },
+    );
   });
 
   it('should filter products by price range', async () => {
@@ -118,16 +164,37 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue(mockProducts);
-
-    const products = await controller.getAllProducts(null, '100', '200');
-
-    expect(service.findAll).toHaveBeenCalledWith({
-      title: null,
-      minPrice: 100,
-      maxPrice: 200,
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
     });
-    expect(products).toEqual(mockProducts);
+
+    const products = await controller.getAllProducts(
+      { page: 1, pageSize: 10 },
+      { minPrice: 10, maxPrice: 25 },
+    );
+
+    expect(service.findAll).toHaveBeenCalledWith(
+      {
+        minPrice: 10,
+        maxPrice: 25,
+      },
+      { page: 1, pageSize: 10 },
+    );
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
   });
 
   it('should filter products by title and price range', async () => {
@@ -143,16 +210,39 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue(mockProducts);
-
-    const products = await controller.getAllProducts('Test', '25', '75');
-
-    expect(service.findAll).toHaveBeenCalledWith({
-      title: 'Test',
-      minPrice: 25,
-      maxPrice: 75,
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
     });
-    expect(products).toEqual(mockProducts);
+
+    const products = await controller.getAllProducts(
+      { page: 1, pageSize: 10 },
+      { title: 'Test', minPrice: 25, maxPrice: 75 },
+    );
+
+    expect(service.findAll).toHaveBeenCalledWith(
+      {
+        title: 'Test',
+        minPrice: 25,
+        maxPrice: 75,
+      },
+      { page: 1, pageSize: 10 },
+    );
+
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 10,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
   });
 
   it('should find product by id', async () => {
@@ -230,8 +320,8 @@ describe('ProductController', () => {
 
     const product = await controller.updateProduct(
       req,
-      productId,
       updateProductDto,
+      productId,
       mockFiles,
     );
 
@@ -266,8 +356,8 @@ describe('ProductController', () => {
 
     const product = await controller.updateProduct(
       req,
-      productId,
       updateProductTitleDto,
+      productId,
     );
 
     expect(service.updateProduct).toHaveBeenCalledWith(
@@ -301,8 +391,8 @@ describe('ProductController', () => {
 
     const product = await controller.updateProduct(
       req,
-      productId,
       updateProductPriceDto,
+      productId,
     );
 
     expect(product).toEqual(mockUpdatedPriceProduct);
@@ -325,8 +415,8 @@ describe('ProductController', () => {
 
     const product = await controller.updateProduct(
       req,
-      productId,
       dto,
+      productId,
       mockFiles,
     );
 
@@ -350,7 +440,6 @@ describe('ProductController', () => {
       description: 'Test',
       images: ['13', '14'],
     };
-    const req: AuthRequest = { user: { id: 1, roles: ['1'] } } as any;
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(service, 'deleteProduct').mockResolvedValue(mockProduct);

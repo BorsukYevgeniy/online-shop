@@ -30,9 +30,11 @@ describe('ProductRepository', () => {
     repository = module.get<ProductRepository>(ProductRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
+
   it('should be defined', async () => {
     expect(repository).toBeDefined();
   });
@@ -59,7 +61,7 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll({});
+    const products = await repository.findAll({}, 0, 10);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
@@ -69,6 +71,9 @@ describe('ProductRepository', () => {
           lte: undefined,
         },
       },
+
+      skip: 0,
+      take: 10,
     });
     expect(products).toEqual(mockProducts);
   });
@@ -87,7 +92,7 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll({ title: 'Test' });
+    const products = await repository.findAll({ title: 'Test' }, 0, 10);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
@@ -97,6 +102,9 @@ describe('ProductRepository', () => {
           lte: undefined,
         },
       },
+
+      skip: 0,
+      take: 10,
     });
     expect(products).toEqual(mockProducts);
   });
@@ -115,7 +123,11 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll({ minPrice: 100, maxPrice: 200 });
+    const products = await repository.findAll(
+      { minPrice: 100, maxPrice: 200 },
+      0,
+      10,
+    );
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
@@ -125,6 +137,9 @@ describe('ProductRepository', () => {
           lte: 200,
         },
       },
+
+      skip: 0,
+      take: 10,
     });
     expect(products).toEqual(mockProducts);
   });
@@ -143,11 +158,15 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll({
-      title: 'Test',
-      minPrice: 100,
-      maxPrice: 200,
-    });
+    const products = await repository.findAll(
+      {
+        title: 'Test',
+        minPrice: 100,
+        maxPrice: 200,
+      },
+      0,
+      10,
+    );
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
@@ -157,6 +176,9 @@ describe('ProductRepository', () => {
           lte: 200,
         },
       },
+
+      skip: 0,
+      take: 10,
     });
     expect(products).toEqual(mockProducts);
   });
@@ -288,8 +310,6 @@ describe('ProductRepository', () => {
     jest.spyOn(prisma.product, 'update').mockResolvedValue(mockProduct);
 
     const product = await repository.update(productId, updateDto, imageNames);
-
-    console.log(product);
 
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },

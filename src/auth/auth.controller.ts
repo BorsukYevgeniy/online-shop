@@ -12,6 +12,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../interface/express-requests.interface';
 import { User } from '@prisma/client';
 import { Tokens } from 'src/token/interface/token.interfaces';
+import { access } from 'fs';
 
 @Controller('auth')
 export class AuthController {
