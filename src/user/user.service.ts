@@ -9,6 +9,7 @@ import {
   UsersWithProductsAndRolesWithoutPassword,
   UserWithProductsAndRolesWithoutPassword,
   UserWithRoles,
+  UserWithRolesWithoutPassword,
 } from './types/user.types';
 
 @Injectable()
@@ -42,7 +43,7 @@ export class UserService {
     return await this.userRepository.findOneByEmail(email);
   }
 
-  async create(dto: CreateUserDto): Promise<User> {
+  async create(dto: CreateUserDto): Promise<UserWithRolesWithoutPassword> {
     const userRole: Role = await this.roleService.getRoleByValue('USER');
 
     return await this.userRepository.create(

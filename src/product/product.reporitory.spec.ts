@@ -31,7 +31,7 @@ describe('ProductRepository', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 

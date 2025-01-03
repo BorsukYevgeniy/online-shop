@@ -5,6 +5,7 @@ import {
   UsersWithProductsAndRolesWithoutPassword,
   UserWithRoles,
   UserWithProductsAndRolesWithoutPassword,
+  UserWithRolesWithoutPassword,
 } from './types/user.types';
 
 @Injectable()
@@ -83,7 +84,11 @@ export class UserRepository {
     };
   }
 
-  async create(email: string, password: string, roleId: number): Promise<User> {
+  async create(
+    email: string,
+    password: string,
+    roleId: number,
+  ): Promise<UserWithRolesWithoutPassword> {
     const user = await this.prismaService.user.create({
       data: {
         email,
@@ -92,9 +97,21 @@ export class UserRepository {
           create: [{ role: { connect: { id: roleId } } }],
         },
       },
+      select: {
+        id: true,
+        email: true,
+        roles: {
+          select: {
+            role: { select: { id: true, value: true, description: true } },
+          },
+        },
+      },
     });
 
-    return user;
+    return {
+      ...user,
+      roles: user.roles.map((r: { role: Role }): Role => r.role),
+    };
   }
 
   async delete(

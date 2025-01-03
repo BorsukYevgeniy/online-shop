@@ -176,7 +176,6 @@ describe('UserService', () => {
     const mockUser = {
       id: 1,
       email: 'test',
-      password: 'password',
       products: [
         {
           id: 1,
@@ -195,6 +194,7 @@ describe('UserService', () => {
         },
       ],
     };
+
     jest.spyOn(roleService, 'getRoleByValue').mockResolvedValue(userRole);
     jest.spyOn(userRepository, 'create').mockResolvedValue(mockUser);
 

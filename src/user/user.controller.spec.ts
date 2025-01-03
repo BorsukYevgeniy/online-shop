@@ -30,10 +30,12 @@ describe('UserController', () => {
     controller = module.get<UserController>(UserController);
     service = module.get<UserService>(UserService);
   });
-  afterEach(() => {
+  
+  afterEach(async () => {
     jest.clearAllMocks();
   });
-  it('should be defined', () => {
+
+  it('should be defined',async () => {
     expect(controller).toBeDefined();
   });
 

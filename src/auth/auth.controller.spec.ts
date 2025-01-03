@@ -29,7 +29,7 @@ describe('AuthController', () => {
     service = module.get<AuthService>(AuthService);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 
@@ -40,7 +40,11 @@ describe('AuthController', () => {
   it('should register a user', async () => {
     const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
 
-    const mockUser = { ...dto, id: 1, password: 'hashedPassword' };
+    const mockUser = {
+      id: 1,
+      email: dto.email,
+      roles: [{ id: 1, value: 'USER', description: 'user' }],
+    };
 
     jest.spyOn(service, 'register').mockResolvedValue(mockUser);
 

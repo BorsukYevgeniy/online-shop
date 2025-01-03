@@ -33,10 +33,12 @@ describe('RoleController', () => {
     service = module.get<RoleService>(RoleService);
     controller = module.get<RoleController>(RoleController);
   });
-  afterEach(() => {
+
+  afterEach(async () => {
     jest.clearAllMocks();
   });
-  it('should be defined', () => {
+
+  it('should be defined',async () => {
     expect(controller).toBeDefined();
   });
 

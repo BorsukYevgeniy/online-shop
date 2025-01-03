@@ -65,11 +65,11 @@ describe('ProductService', () => {
     repository = module.get<ProductRepository>(ProductRepository);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  it('should be defined', async () => {
     expect(service).toBeDefined();
   });
 

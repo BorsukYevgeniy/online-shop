@@ -61,11 +61,11 @@ describe('ProductController', () => {
     service = module.get<ProductService>(ProductService);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  it('should be defined', async () => {
     expect(controller).toBeDefined();
   });
 

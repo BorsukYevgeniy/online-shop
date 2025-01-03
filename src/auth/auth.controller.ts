@@ -10,16 +10,17 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { AuthRequest } from '../interface/express-requests.interface';
-import { User } from '@prisma/client';
-import { Tokens } from 'src/token/interface/token.interfaces';
-import { access } from 'fs';
+import { Tokens } from '../token/interface/token.interfaces';
+import { UserWithRolesWithoutPassword } from '../user/types/user.types';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
-  async registraion(@Body() dto: CreateUserDto): Promise<User> {
+  async registraion(
+    @Body() dto: CreateUserDto,
+  ): Promise<UserWithRolesWithoutPassword> {
     return await this.authService.register(dto);
   }
 

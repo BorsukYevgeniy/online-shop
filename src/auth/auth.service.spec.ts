@@ -4,6 +4,7 @@ import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Role } from '@prisma/client';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -42,7 +43,7 @@ describe('AuthService', () => {
     tokenService = module.get<TokenService>(TokenService);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 
@@ -53,7 +54,7 @@ describe('AuthService', () => {
   it('should register a user', async () => {
     const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
     const hashedPassword = 'hashedPassword';
-    const mockUser = { ...dto, id: 1, password: hashedPassword };
+    const mockUser = { id: 1, email: dto.email, roles: [{} as Role] };
 
     jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
     hash.mockResolvedValue(hashedPassword);

@@ -25,9 +25,11 @@ describe('RoleService', () => {
     service = module.get<RoleService>(RoleService);
     repository = module.get<RoleRepository>(RoleRepository);
   });
-  afterEach(() => {
+
+  afterEach(async () => {
     jest.clearAllMocks();
   });
+  
   it('should be defined', async () => {
     expect(service).toBeDefined();
   });

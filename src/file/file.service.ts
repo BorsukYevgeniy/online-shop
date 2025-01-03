@@ -20,19 +20,19 @@ export class FileService {
         await fsPromises.mkdir(filePath, { recursive: true });
       }
 
-      // Маппимо всі файли на проміси запису
       const writePromises = images.map(
         (file: Express.Multer.File): Promise<void> => {
           const fileName: string = uuidV4() + fileExtname(file.originalname);
-          fileNames.push(fileName); // Додаємо ім'я файлу до списку
+          
+          fileNames.push(fileName);
+          
           return fsPromises.writeFile(
             joinPath(filePath, fileName),
             file.buffer,
-          ); // Повертаємо проміс запису
+          );
         },
       );
 
-      // Чекаємо завершення всіх промісів запису
       await Promise.all(writePromises);
 
       return fileNames;

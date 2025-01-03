@@ -4,6 +4,7 @@ export type UserWithRoles = User & {
   roles: { id: number; value: string; description: string }[];
 };
 
+export type UserWithRolesWithoutPassword = Omit<UserWithRoles, 'password'>;
 export type UserWithProductsAndRolesWithoutPassword = Omit<
   UserWithRoles,
   'password'
