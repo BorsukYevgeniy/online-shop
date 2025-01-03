@@ -22,7 +22,7 @@ import { AuthRequest } from '../interface/express-requests.interface';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { ProductFilter } from './interface/product-filter.interface';
-import { ParsePaginationDtoPipe } from './pipe/parse-pagination-dto.pipe';
+import { ParsePaginationDtoPipe } from '../pipe/parse-pagination-dto.pipe';
 import { ParseProductFilterPipe } from './pipe/parse-product-filter.pipe';
 
 @Controller('products')

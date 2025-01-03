@@ -7,6 +7,7 @@ import {
   UseGuards,
   Req,
   Res,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,18 +16,20 @@ import { Response } from 'express';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { AuthRequest } from '../interface/express-requests.interface';
 import {
-  UsersWithProductsAndRolesWithoutPassword,
   UserWithProductsAndRolesWithoutPassword,
 } from './types/user.types';
 import { Product } from '@prisma/client';
+import { PaginationDto } from '../dto/pagination.dto';
+import { ParsePaginationDtoPipe } from '../pipe/parse-pagination-dto.pipe';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('')
-  async findAll(): Promise<UsersWithProductsAndRolesWithoutPassword> {
-    return await this.userService.findAll();
+  @UseGuards(AuthGuard)
+  async findAll(@Query(ParsePaginationDtoPipe) paginationDto: PaginationDto) {
+    return await this.userService.findAll(paginationDto);
   }
 
   @Get(':userId')

@@ -19,7 +19,7 @@ export class AuthService {
   ) {}
 
   async register(dto: CreateUserDto): Promise<UserWithRolesWithoutPassword> {
-    const candidate: User | null = await this.userService.findByEmail(
+    const candidate: UserWithRoles | null = await this.userService.findByEmail(
       dto.email,
     );
 
@@ -85,7 +85,7 @@ export class AuthService {
     const validToken: boolean = userTokens.some(
       (token) => token.token === refreshToken,
     );
-    
+
     if (!validToken) throw new Error('Invalid refresh token');
 
     return this.tokenService.generateTokens(id, roles);

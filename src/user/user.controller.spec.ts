@@ -30,12 +30,12 @@ describe('UserController', () => {
     controller = module.get<UserController>(UserController);
     service = module.get<UserService>(UserService);
   });
-  
+
   afterEach(async () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined',async () => {
+  it('should be defined', async () => {
     expect(controller).toBeDefined();
   });
 
@@ -65,11 +65,29 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue(mockUsers);
+    jest
+      .spyOn(service, 'findAll')
+      .mockResolvedValue({
+        users: mockUsers,
+        page: 1,
+        total: 1,
+        pageSize: 10,
+        totalPages: 1,
+        nextPage: null,
+        prevPage: null,
+      });
 
-    const users = await controller.findAll();
+    const users = await controller.findAll({ page: 1, pageSize: 10 });
 
-    expect(users).toEqual(mockUsers);
+    expect(users).toEqual({
+      users: mockUsers,
+      page: 1,
+      total: 1,
+      pageSize: 10,
+      totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
   });
 
   it('should return user by id', async () => {

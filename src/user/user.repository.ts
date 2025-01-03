@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role, User } from '@prisma/client';
+import { Role } from '@prisma/client';
 import {
-  UsersWithProductsAndRolesWithoutPassword,
   UserWithRoles,
   UserWithProductsAndRolesWithoutPassword,
   UserWithRolesWithoutPassword,
@@ -12,12 +11,15 @@ import {
 export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll(): Promise<UsersWithProductsAndRolesWithoutPassword> {
+  async count(): Promise<number> {
+    return await this.prismaService.user.count();
+  }
+
+  async findAll(skip: number, limit: number) {
     const users = await this.prismaService.user.findMany({
       select: {
         id: true,
         email: true,
-        products: true,
         roles: {
           select: {
             role: {
@@ -30,6 +32,8 @@ export class UserRepository {
           },
         },
       },
+      skip,
+      take: limit,
     });
 
     return users.map((user) => ({
@@ -61,6 +65,8 @@ export class UserRepository {
       },
     });
 
+    if (!user) return null;
+
     return {
       ...user,
       roles: user.roles.map((r: { role: Role }): Role => r.role),
@@ -77,6 +83,8 @@ export class UserRepository {
         },
       },
     });
+
+    if (!user) return null;
 
     return {
       ...user,
@@ -107,6 +115,8 @@ export class UserRepository {
         },
       },
     });
+
+    if (!user) return null;
 
     return {
       ...user,

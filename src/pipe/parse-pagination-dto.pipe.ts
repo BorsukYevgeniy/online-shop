@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
-import { PaginationDto } from '../../dto/pagination.dto';
+import { PaginationDto } from './../dto/pagination.dto';
 
 @Injectable()
 export class ParsePaginationDtoPipe

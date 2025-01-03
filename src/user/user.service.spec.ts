@@ -19,6 +19,7 @@ describe('UserService', () => {
         {
           provide: UserRepository,
           useValue: {
+            count: jest.fn(),
             findAll: jest.fn(),
             findById: jest.fn(),
             findOneByEmail: jest.fn(),
@@ -78,9 +79,20 @@ describe('UserService', () => {
       },
     ];
 
+    jest.spyOn(userRepository, 'count').mockResolvedValue(1);
     jest.spyOn(userRepository, 'findAll').mockResolvedValue(mockUsers);
 
-    expect(await service.findAll()).toBe(mockUsers);
+    const users = await service.findAll({ page: 1, pageSize: 10 });
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
     expect(userRepository.findAll).toHaveBeenCalled();
   });
 

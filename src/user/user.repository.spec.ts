@@ -67,13 +67,12 @@ describe('UserRepository', () => {
       .spyOn(prismaService.user, 'findMany')
       .mockResolvedValue(mockUsersFromDb);
 
-    const users = await repository.findAll();
+    const users = await repository.findAll(0, 10);
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       select: {
         id: true,
         email: true,
-        products: true,
         roles: {
           select: {
             role: {
@@ -86,6 +85,8 @@ describe('UserRepository', () => {
           },
         },
       },
+      skip: 0,
+      take: 10,
     });
 
     expect(users).toEqual(mockUsers);
@@ -188,9 +189,7 @@ describe('UserRepository', () => {
     const mockUserFromDb = {
       id: 1,
       email,
-      roles: [
-        { role: { id: roleId, value: 'admin', description: 'admin' } },
-      ],
+      roles: [{ role: { id: roleId, value: 'admin', description: 'admin' } }],
     };
 
     const mockUser = {
