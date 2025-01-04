@@ -66,6 +66,7 @@ export class UserService {
 
     return await this.userRepository.create(
       dto.email,
+      dto.nickname,
       dto.password,
       userRole.id,
     );

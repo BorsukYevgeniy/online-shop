@@ -44,6 +44,9 @@ describe('UserController', () => {
       {
         id: 1,
         email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
         password: 'password',
         products: [
           {
@@ -95,6 +98,9 @@ describe('UserController', () => {
     const mockUsers = {
       id: userId,
       email: 'test',
+      nickname: 'test',
+      createdAt: new Date(),
+
       password: 'password',
       products: [
         {
@@ -148,6 +154,9 @@ describe('UserController', () => {
     const mockUser = {
       id: userId,
       email: 'test',
+      nickname: 'test',
+      createdAt: new Date(),
+
       password: 'password',
       products: [
         {

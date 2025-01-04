@@ -52,9 +52,19 @@ describe('AuthService', () => {
   });
 
   it('should register a user', async () => {
-    const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
+    const dto: CreateUserDto = {
+      email: 'test@gmail.com',
+      nickname: 'test',
+      password: '12345',
+    };
     const hashedPassword = 'hashedPassword';
-    const mockUser = { id: 1, email: dto.email, roles: [{} as Role] };
+    const mockUser = {
+      id: 1,
+      email: dto.email,
+      nickname: 'test',
+      createdAt: new Date(),
+      roles: [{} as Role],
+    };
 
     jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
     hash.mockResolvedValue(hashedPassword);
@@ -66,11 +76,18 @@ describe('AuthService', () => {
   });
 
   it('should throw an error if user already exists', async () => {
-    const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
+    const dto: CreateUserDto = {
+      email: 'test@gmail.com',
+      nickname: 'test',
+      password: '12345',
+    };
     const hashedPassword = 'hashedPassword';
     const mockUser = {
       ...dto,
       id: 1,
+      nickname: 'test',
+      createdAt: new Date(),
+
       password: hashedPassword,
       roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
@@ -85,12 +102,19 @@ describe('AuthService', () => {
   });
 
   it('should login a user', async () => {
-    const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
+    const dto: CreateUserDto = {
+      email: 'test@gmail.com',
+      nickname: 'test',
+      password: '12345',
+    };
     const hashedPassword = 'hashedPassword';
     const mockUser = {
       ...dto,
       id: 1,
       password: hashedPassword,
+      nickname: 'test',
+      createdAt: new Date(),
+
       roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
     const mockTokens = {
@@ -109,7 +133,11 @@ describe('AuthService', () => {
   });
 
   it('should throw an error if user not found', async () => {
-    const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
+    const dto: CreateUserDto = {
+      email: 'test@gmail.com',
+      nickname: 'test',
+      password: '12345',
+    };
     jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
 
     await expect(service.login(dto)).rejects.toThrow(
@@ -120,11 +148,15 @@ describe('AuthService', () => {
   it('should throw an error if email or password are incorrect', async () => {
     const dto: CreateUserDto = {
       email: 'test@gmail.com',
+      nickname: 'test',
       password: 'wrongPassword',
     };
     const mockUser = {
       id: 1,
       email: 'test@gmail.com',
+      nickname: 'test',
+      createdAt: new Date(),
+
       password: 'hashedPassword',
       roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };

@@ -38,11 +38,18 @@ describe('AuthController', () => {
   });
 
   it('should register a user', async () => {
-    const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
+    const dto: CreateUserDto = {
+      email: 'test@gmail.com',
+      nickname: 'test',
+      password: '12345',
+    };
 
     const mockUser = {
       id: 1,
       email: dto.email,
+      nickname: 'test',
+      createdAt: new Date(),
+
       roles: [{ id: 1, value: 'USER', description: 'user' }],
     };
 
@@ -54,7 +61,11 @@ describe('AuthController', () => {
   });
 
   it('should login a user', async () => {
-    const dto: CreateUserDto = { email: 'test@gmail.com', password: '12345' };
+    const dto: CreateUserDto = {
+      email: 'test@gmail.com',
+      nickname: 'test',
+      password: '12345',
+    };
     const mockTokens = {
       accessToken: 'accessToken',
       refreshToken: 'refreshToken',

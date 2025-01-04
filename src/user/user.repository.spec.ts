@@ -43,6 +43,9 @@ describe('UserRepository', () => {
       {
         id: 1,
         email: 'email',
+        nickname: 'test',
+        createdAt: new Date(),
+
         password: '12345',
         products: [{}],
         roles: [
@@ -57,8 +60,11 @@ describe('UserRepository', () => {
       {
         id: 1,
         email: 'email',
+        nickname: 'test',
+        createdAt: new Date(),
+
         password: '12345',
-        products: [{}],
+        products: [{} as Product],
         roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
       },
     ];
@@ -73,6 +79,8 @@ describe('UserRepository', () => {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        createdAt: true,
         roles: {
           select: {
             role: {
@@ -122,6 +130,8 @@ describe('UserRepository', () => {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        createdAt: true,
         products: true,
         roles: {
           select: {
@@ -146,6 +156,9 @@ describe('UserRepository', () => {
     const mockUserFromDb = {
       id: 1,
       email,
+      nickname: 'test',
+      createdAt: new Date(),
+
       password: '12345',
       products: [{}],
       roles: [
@@ -156,6 +169,9 @@ describe('UserRepository', () => {
     const mockUser = {
       id: 1,
       email,
+      nickname: 'test',
+      createdAt: new Date(),
+
       password: '12345',
       products: [{}],
       roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
@@ -183,6 +199,7 @@ describe('UserRepository', () => {
 
   it('should create a new user', async () => {
     const email = 'email';
+    const nickname = 'test';
     const roleId = 1;
     const password = '12345';
 
@@ -202,12 +219,13 @@ describe('UserRepository', () => {
       .spyOn(prismaService.user, 'create')
       .mockResolvedValue(mockUserFromDb as any);
 
-    const user = await repository.create(email, password, roleId);
+    const user = await repository.create(email, nickname, password, roleId);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
       data: {
         email,
         password,
+        nickname,
         roles: {
           create: [{ role: { connect: { id: roleId } } }],
         },
@@ -215,6 +233,8 @@ describe('UserRepository', () => {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        createdAt: true,
         roles: {
           select: {
             role: { select: { id: true, value: true, description: true } },
@@ -255,6 +275,8 @@ describe('UserRepository', () => {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        createdAt: true,
         products: true,
         roles: {
           select: {

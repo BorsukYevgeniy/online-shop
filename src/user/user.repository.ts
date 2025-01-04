@@ -20,6 +20,9 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
+        nickname: true, 
+        createdAt: true,
+        
         roles: {
           select: {
             role: {
@@ -50,7 +53,10 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
+        nickname: true,
         products: true,
+        createdAt: true,
+        
         roles: {
           select: {
             role: {
@@ -94,12 +100,14 @@ export class UserRepository {
 
   async create(
     email: string,
+    nickname: string,
     password: string,
     roleId: number,
   ): Promise<UserWithRolesWithoutPassword> {
     const user = await this.prismaService.user.create({
       data: {
         email,
+        nickname,
         password,
         roles: {
           create: [{ role: { connect: { id: roleId } } }],
@@ -108,6 +116,8 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        createdAt: true,
         roles: {
           select: {
             role: { select: { id: true, value: true, description: true } },
@@ -132,6 +142,8 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        createdAt: true,
         products: true,
         roles: {
           select: {

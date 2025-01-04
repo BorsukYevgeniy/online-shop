@@ -18,12 +18,14 @@ model Product {
 }
 
 model User {
-  id       Int        @id @default(autoincrement())
-  email    String     @unique
-  password String
-  tokens   Token[]
-  products Product[]
-  roles    UserRole[]
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  nickname  String     @unique
+  password  String
+  tokens    Token[]
+  products  Product[]
+  roles     UserRole[]
+  createdAt DateTime   @default(now())
 }
 
 model Token {

@@ -59,6 +59,9 @@ describe('UserService', () => {
       {
         id: 1,
         email: 'test@example.com',
+        nickname: 'test',
+        createdAt: new Date(),
+
         products: [
           {
             id: 1,
@@ -100,6 +103,8 @@ describe('UserService', () => {
     const mockUser = {
       id: 1,
       email: 'test@example.com',
+      nickname: 'test',
+      createdAt: new Date(),
       products: [
         {
           id: 1,
@@ -157,6 +162,9 @@ describe('UserService', () => {
       id: 1,
       email,
       password: 'password',
+      nickname: 'test',
+      createdAt: new Date(),
+
       products: [
         {
           id: 1,
@@ -183,11 +191,18 @@ describe('UserService', () => {
   });
 
   it('should create a new user', async () => {
-    const dto: CreateUserDto = { email: 'test@test.com', password: 'password' };
+    const dto: CreateUserDto = {
+      email: 'test@test.com',
+      nickname: 'test',
+      password: 'password',
+    };
     const userRole = { id: 1, value: 'USER', description: 'User role' };
     const mockUser = {
       id: 1,
       email: 'test',
+      nickname: 'test',
+      createdAt: new Date(),
+
       products: [
         {
           id: 1,
@@ -216,6 +231,7 @@ describe('UserService', () => {
     expect(roleService.getRoleByValue).toHaveBeenCalledWith('USER');
     expect(userRepository.create).toHaveBeenCalledWith(
       dto.email,
+      dto.nickname,
       dto.password,
       userRole.id,
     );
@@ -226,6 +242,9 @@ describe('UserService', () => {
       id: 1,
       email: 'test',
       password: 'password',
+      nickname: 'test',
+      createdAt: new Date(),
+
       products: [
         {
           id: 1,
