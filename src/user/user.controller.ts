@@ -15,12 +15,12 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { AuthRequest } from '../interface/express-requests.interface';
-import {
-  UserWithProductsAndRolesWithoutPassword,
-} from './types/user.types';
+import { UserWithProductsAndRolesWithoutPassword } from './types/user.types';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { ParsePaginationDtoPipe } from '../pipe/parse-pagination-dto.pipe';
+import { UserFilter } from './types/user-filter.type';
+import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 
 @Controller('users')
 export class UserController {
@@ -28,8 +28,11 @@ export class UserController {
 
   @Get('')
   @UseGuards(AuthGuard)
-  async findAll(@Query(ParsePaginationDtoPipe) paginationDto: PaginationDto) {
-    return await this.userService.findAll(paginationDto);
+  async findAll(
+    @Query(ParsePaginationDtoPipe) paginationDto: PaginationDto,
+    @Query(ParseUserFilterPipe) userFilter: UserFilter,
+  ) {
+    return await this.userService.findAll(paginationDto, userFilter);
   }
 
   @Get(':userId')

@@ -8,7 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 describe('UserService', () => {
   let service: UserService;
-  let userRepository: UserRepository;
+  let repository: UserRepository;
   let productService: ProductService;
   let roleService: RoleService;
 
@@ -43,18 +43,20 @@ describe('UserService', () => {
     }).compile();
 
     service = module.get<UserService>(UserService);
-    userRepository = module.get<UserRepository>(UserRepository);
+    repository = module.get<UserRepository>(UserRepository);
     productService = module.get<ProductService>(ProductService);
     roleService = module.get<RoleService>(RoleService);
   });
-  afterEach(() => {
+
+  afterEach(async () => {
     jest.clearAllMocks();
   });
-  it('should be defined', () => {
+
+  it('should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should find all users', async () => {
+  it('should find all users without filters', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -82,10 +84,10 @@ describe('UserService', () => {
       },
     ];
 
-    jest.spyOn(userRepository, 'count').mockResolvedValue(1);
-    jest.spyOn(userRepository, 'findAll').mockResolvedValue(mockUsers);
+    jest.spyOn(repository, 'count').mockResolvedValue(1);
+    jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
 
-    const users = await service.findAll({ page: 1, pageSize: 10 });
+    const users = await service.findAll({ page: 1, pageSize: 10 }, {});
 
     expect(users).toEqual({
       users: mockUsers,
@@ -96,7 +98,151 @@ describe('UserService', () => {
       nextPage: null,
       prevPage: null,
     });
-    expect(userRepository.findAll).toHaveBeenCalled();
+    expect(repository.findAll).toHaveBeenCalled();
+  });
+
+  it('should return all users filtered by nickname', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: 'password',
+        products: [
+          {
+            id: 1,
+            userId: 1,
+            description: 'Product description',
+            title: 'Product title',
+            price: 100,
+            images: ['image1.jpg', 'image2.jpg'],
+          },
+        ],
+        roles: [
+          {
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
+          },
+        ],
+      },
+    ];
+
+    jest.spyOn(repository, 'count').mockResolvedValue(1);
+    jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
+
+    const users = await service.findAll(
+      { page: 1, pageSize: 10 },
+      { nickname: 'test' },
+    );
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
+  });
+
+  it('should return all users filtered by date range', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: 'password',
+        products: [
+          {
+            id: 1,
+            userId: 1,
+            description: 'Product description',
+            title: 'Product title',
+            price: 100,
+            images: ['image1.jpg', 'image2.jpg'],
+          },
+        ],
+        roles: [
+          {
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
+          },
+        ],
+      },
+    ];
+
+    jest.spyOn(repository,'count',).mockResolvedValue(1);
+    jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
+
+    const users = await service.findAll(
+      { page: 1, pageSize: 10 },
+      { minDate: new Date(), maxDate: new Date() },
+    );
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
+  });
+
+  it('should return all users filtered by nickname and date range', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: 'password',
+        products: [
+          {
+            id: 1,
+            userId: 1,
+            description: 'Product description',
+            title: 'Product title',
+            price: 100,
+            images: ['image1.jpg', 'image2.jpg'],
+          },
+        ],
+        roles: [
+          {
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
+          },
+        ],
+      },
+    ];
+
+    jest.spyOn(repository, 'count').mockResolvedValue(1);
+    jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
+
+    const users = await service.findAll(
+      { page: 1, pageSize: 10 },
+      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
+    );
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
   });
 
   it('should find user by id', async () => {
@@ -124,17 +270,17 @@ describe('UserService', () => {
       ],
     };
 
-    jest.spyOn(userRepository, 'findById').mockResolvedValue(mockUser);
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
 
     const user = await service.findById(1);
     expect(user).toEqual(mockUser);
   });
 
   it('should throw NotFoundException if user not found by id', async () => {
-    jest.spyOn(userRepository, 'findById').mockResolvedValue(null);
+    jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
     await expect(service.findById(1)).rejects.toThrow(NotFoundException);
-    expect(userRepository.findById).toHaveBeenCalledWith(1);
+    expect(repository.findById).toHaveBeenCalledWith(1);
   });
 
   it('should find user products by user id', async () => {
@@ -183,7 +329,7 @@ describe('UserService', () => {
         },
       ],
     };
-    jest.spyOn(userRepository, 'findOneByEmail').mockResolvedValue(mockUser);
+    jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
 
     const user = await service.findByEmail(email);
 
@@ -223,13 +369,13 @@ describe('UserService', () => {
     };
 
     jest.spyOn(roleService, 'getRoleByValue').mockResolvedValue(userRole);
-    jest.spyOn(userRepository, 'create').mockResolvedValue(mockUser);
+    jest.spyOn(repository, 'create').mockResolvedValue(mockUser);
 
     const user = await service.create(dto);
 
     expect(user).toEqual(mockUser);
     expect(roleService.getRoleByValue).toHaveBeenCalledWith('USER');
-    expect(userRepository.create).toHaveBeenCalledWith(
+    expect(repository.create).toHaveBeenCalledWith(
       dto.email,
       dto.nickname,
       dto.password,
@@ -264,11 +410,11 @@ describe('UserService', () => {
       ],
     };
 
-    jest.spyOn(userRepository, 'delete').mockResolvedValue(mockUser);
+    jest.spyOn(repository, 'delete').mockResolvedValue(mockUser);
 
     const user = await service.delete(userId);
 
     expect(user).toEqual(mockUser);
-    expect(userRepository.delete).toHaveBeenCalledWith(1);
+    expect(repository.delete).toHaveBeenCalledWith(1);
   });
 });

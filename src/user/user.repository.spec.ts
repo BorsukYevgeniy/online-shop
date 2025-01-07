@@ -30,7 +30,7 @@ describe('UserRepository', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 
@@ -38,7 +38,7 @@ describe('UserRepository', () => {
     expect(repository).toBeDefined();
   });
 
-  it('should get all users', async () => {
+  it('should get all users without filters', async () => {
     const mockUsersFromDb = [
       {
         id: 1,
@@ -73,14 +73,171 @@ describe('UserRepository', () => {
       .spyOn(prismaService.user, 'findMany')
       .mockResolvedValue(mockUsersFromDb);
 
-    const users = await repository.findAll(0, 10);
+    const users = await repository.findAll({}, 0, 10);
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
+      where: {
+        createdAt: {
+          gte: undefined,
+          lte: undefined,
+        },
+        nickname: {
+          contains: undefined,
+          mode: 'insensitive',
+        },
+      },
+
       select: {
         id: true,
         email: true,
         nickname: true,
         createdAt: true,
+        roles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                value: true,
+                description: true,
+              },
+            },
+          },
+        },
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(users).toEqual(mockUsers);
+  });
+
+  it('should get all users without filters filtered by nickname', async () => {
+    const mockUsersFromDb = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: '12345',
+        products: [{}],
+        roles: [
+          {
+            role: { id: 1, value: 'Admin', description: 'Administrator role' },
+          },
+        ],
+      },
+    ];
+
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: '12345',
+        products: [{} as Product],
+        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+      },
+    ];
+
+    jest
+      .spyOn(prismaService.user, 'findMany')
+      .mockResolvedValue(mockUsersFromDb);
+
+    const users = await repository.findAll({ nickname: 'test' }, 0, 10);
+
+    expect(prismaService.user.findMany).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: 'test', mode: 'insensitive' },
+        createdAt: {
+          gte: undefined,
+          lte: undefined,
+        },
+      },
+
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        createdAt: true,
+
+        roles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                value: true,
+                description: true,
+              },
+            },
+          },
+        },
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(users).toEqual(mockUsers);
+  });
+
+  it('should get all users without filters filtered by nickname and date range', async () => {
+    const mockUsersFromDb = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: '12345',
+        products: [{}],
+        roles: [
+          {
+            role: { id: 1, value: 'Admin', description: 'Administrator role' },
+          },
+        ],
+      },
+    ];
+
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: '12345',
+        products: [{} as Product],
+        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+      },
+    ];
+
+    jest
+      .spyOn(prismaService.user, 'findMany')
+      .mockResolvedValue(mockUsersFromDb);
+
+    const users = await repository.findAll(
+      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
+      0,
+      10,
+    );
+
+    expect(prismaService.user.findMany).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: 'test', mode: 'insensitive' },
+        createdAt: {
+          gte: new Date(),
+          lte: new Date(),
+        },
+      },
+
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        createdAt: true,
+
         roles: {
           select: {
             role: {

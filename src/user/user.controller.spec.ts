@@ -39,7 +39,7 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all users', async () => {
+  it('should return all users without filters', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -68,19 +68,17 @@ describe('UserController', () => {
       },
     ];
 
-    jest
-      .spyOn(service, 'findAll')
-      .mockResolvedValue({
-        users: mockUsers,
-        page: 1,
-        total: 1,
-        pageSize: 10,
-        totalPages: 1,
-        nextPage: null,
-        prevPage: null,
-      });
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      users: mockUsers,
+      page: 1,
+      total: 1,
+      pageSize: 10,
+      totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
 
-    const users = await controller.findAll({ page: 1, pageSize: 10 });
+    const users = await controller.findAll({ page: 1, pageSize: 10 }, {});
 
     expect(users).toEqual({
       users: mockUsers,
@@ -88,6 +86,171 @@ describe('UserController', () => {
       total: 1,
       pageSize: 10,
       totalPages: 1,
+      nextPage: null,
+      prevPage: null,
+    });
+  });
+
+  it('should return all users filtered by nickname', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: 'password',
+        products: [
+          {
+            id: 1,
+            userId: 1,
+            description: 'Product description',
+            title: 'Product title',
+            price: 100,
+            images: ['image1.jpg', 'image2.jpg'],
+          },
+        ],
+        roles: [
+          {
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
+          },
+        ],
+      },
+    ];
+
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 10,
+      nextPage: null,
+      prevPage: null,
+    });
+
+    const users = await controller.findAll(
+      { page: 1, pageSize: 10 },
+      { nickname: 'test' },
+    );
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 10,
+      nextPage: null,
+      prevPage: null,
+    });
+  });
+
+  it('should return all users filtered by date range', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: 'password',
+        products: [
+          {
+            id: 1,
+            userId: 1,
+            description: 'Product description',
+            title: 'Product title',
+            price: 100,
+            images: ['image1.jpg', 'image2.jpg'],
+          },
+        ],
+        roles: [
+          {
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
+          },
+        ],
+      },
+    ];
+
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 10,
+      nextPage: null,
+      prevPage: null,
+    });
+
+    const users = await controller.findAll(
+      { page: 1, pageSize: 10 },
+      { minDate: new Date(), maxDate: new Date() },
+    );
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 10,
+      nextPage: null,
+      prevPage: null,
+    });
+  });
+
+  it('should return all users filtered by nickname and date range', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'test',
+        nickname: 'test',
+        createdAt: new Date(),
+
+        password: 'password',
+        products: [
+          {
+            id: 1,
+            userId: 1,
+            description: 'Product description',
+            title: 'Product title',
+            price: 100,
+            images: ['image1.jpg', 'image2.jpg'],
+          },
+        ],
+        roles: [
+          {
+            id: 1,
+            value: 'admin',
+            description: 'Administrator role',
+          },
+        ],
+      },
+    ];
+
+    jest.spyOn(service, 'findAll').mockResolvedValue({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 10,
+      nextPage: null,
+      prevPage: null,
+    });
+
+    const users = await controller.findAll(
+      { page: 1, pageSize: 10 },
+      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
+    );
+
+    expect(users).toEqual({
+      users: mockUsers,
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 10,
       nextPage: null,
       prevPage: null,
     });

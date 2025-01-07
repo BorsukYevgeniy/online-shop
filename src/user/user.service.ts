@@ -4,13 +4,14 @@ import { UserRepository } from './user.repository';
 import { ProductService } from '../product/product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../roles/role.service';
-import { Product, Role } from '@prisma/client';
+import { Product, Role, User } from '@prisma/client';
 import {
   UserWithProductsAndRolesWithoutPassword,
   UserWithRoles,
   UserWithRolesWithoutPassword,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
+import { UserFilter } from './types/user-filter.type';
 
 @Injectable()
 export class UserService {
@@ -20,15 +21,39 @@ export class UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  async findAll(paginationDto: PaginationDto) {
-    const { page, pageSize }: PaginationDto = paginationDto;
+  private async buildUserFilter(
+    nickname?: string,
+    minDate?: Date,
+    maxDate?: Date,
+  ): Promise<UserFilter> {
+    const userFilter: UserFilter = {};
 
+    if (nickname) {
+      userFilter.nickname = nickname;
+    }
+    if (minDate) {
+      userFilter.minDate = minDate;
+    }
+    if (maxDate) {
+      userFilter.maxDate = maxDate;
+    }
+
+    return userFilter;
+  }
+
+  async findAll(paginationDto: PaginationDto, filter: UserFilter) {
+    const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
-    const users=
-      await this.userRepository.findAll(skip, pageSize);
+    const userFilter: UserFilter = await this.buildUserFilter(
+      filter.nickname,
+      filter.minDate,
+      filter.maxDate,
+    );
 
-    const total = await this.userRepository.count();
+    const users = await this.userRepository.findAll(userFilter, skip, pageSize);
+    const total = await this.userRepository.count(userFilter);
+
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {

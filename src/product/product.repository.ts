@@ -14,7 +14,7 @@ export class ProductRepository {
 
     return await this.prismaService.product.count({
       where: {
-        title: title ? { contains: title, mode: 'insensitive' } : undefined,
+        title: { contains: title, mode: 'insensitive' },
         price: {
           gte: minPrice,
           lte: maxPrice,
@@ -32,7 +32,7 @@ export class ProductRepository {
 
     return await this.prismaService.product.findMany({
       where: {
-        title: title ? { contains: title, mode: 'insensitive' } : undefined,
+        title: { contains: title, mode: 'insensitive' },
         price: {
           gte: minPrice,
           lte: maxPrice,
