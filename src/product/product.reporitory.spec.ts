@@ -16,6 +16,7 @@ describe('ProductRepository', () => {
           provide: PrismaService,
           useValue: {
             product: {
+              count: jest.fn(),
               findMany: jest.fn(),
               findUnique: jest.fn(),
               create: jest.fn(),
@@ -37,6 +38,73 @@ describe('ProductRepository', () => {
 
   it('should be defined', async () => {
     expect(repository).toBeDefined();
+  });
+
+  it('should count all products without filter', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount: number = await repository.count({});
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        title: { contains: undefined, mode: 'insensitive' },
+        price: { lte: undefined, gte: undefined },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should count all products filtered by title', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount: number = await repository.count({ title: 'test' });
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        title: { contains: 'test', mode: 'insensitive' },
+        price: { lte: undefined, gte: undefined },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should count all products filtered by price range', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount: number = await repository.count({
+      minPrice: 20,
+      maxPrice: 100,
+    });
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        title: { contains: undefined, mode: 'insensitive' },
+        price: { lte: 100, gte: 20 },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should count all products filtered by title and price range', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount: number = await repository.count({
+      title: 'test',
+      minPrice: 10,
+      maxPrice: 100,
+    });
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        title: { contains: 'test', mode: 'insensitive' },
+        price: { lte: 100, gte: 10 },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
   });
 
   it('should return all products without filters', async () => {
@@ -65,7 +133,10 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
-        title: undefined,
+        title: {
+          contains: undefined,
+          mode: 'insensitive',
+        },
         price: {
           gte: undefined,
           lte: undefined,
@@ -131,7 +202,10 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
-        title: undefined,
+        title: {
+          contains: undefined,
+          mode: 'insensitive',
+        },
         price: {
           gte: 100,
           lte: 200,

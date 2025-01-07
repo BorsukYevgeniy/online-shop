@@ -4,6 +4,8 @@ import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
 
 describe('UserRepository', () => {
+  const date = new Date();
+
   let repository: UserRepository;
   let prismaService: PrismaService;
 
@@ -15,6 +17,7 @@ describe('UserRepository', () => {
           provide: PrismaService,
           useValue: {
             user: {
+              count: jest.fn(),
               findUnique: jest.fn(),
               findFirst: jest.fn(),
               create: jest.fn(),
@@ -36,6 +39,82 @@ describe('UserRepository', () => {
 
   it('should be defined', async () => {
     expect(repository).toBeDefined();
+  });
+
+  it('should count all users without filters', async () => {
+    jest.spyOn(prismaService.user, 'count').mockResolvedValue(10);
+
+    const result = await repository.count({});
+
+    expect(result).toBe(10);
+    expect(prismaService.user.count).toHaveBeenCalledWith({
+      where: {
+        createdAt: {
+          gte: undefined,
+          lte: undefined,
+        },
+        nickname: {
+          contains: undefined,
+          mode: 'insensitive',
+        },
+      },
+    });
+  });
+
+  it('should count users filtered by nickname', async () => {
+    jest.spyOn(prismaService.user, 'count').mockResolvedValue(5);
+
+    const result = await repository.count({ nickname: 'John' });
+    expect(result).toBe(5);
+    expect(prismaService.user.count).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: 'John', mode: 'insensitive' },
+        createdAt: { lte: undefined, gte: undefined },
+      },
+    });
+  });
+
+  it('should count users filtered by date range', async () => {
+    jest.spyOn(prismaService.user, 'count').mockResolvedValue(3);
+
+    const result = await repository.count({
+      minDate: date,
+      maxDate: date,
+    });
+    expect(result).toBe(3);
+    expect(prismaService.user.count).toHaveBeenCalledWith({
+      where: {
+        nickname: {
+          contains: undefined,
+          mode: 'insensitive',
+        },
+        createdAt: {
+          gte: date,
+          lte: date,
+        },
+      },
+    });
+  });
+
+  it('should count users filtered by nickname and date range', async () => {
+    jest.spyOn(prismaService.user, 'count').mockResolvedValue(2);
+
+    const result = await repository.count({
+      nickname: 'test',
+      minDate: date,
+      maxDate: date,
+    });
+
+    expect(result).toBe(2);
+    expect(prismaService.user.count).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: 'test', mode: 'insensitive' },
+        createdAt: {
+          gte: date,
+          lte: date,
+        },
+      },
+    });
   });
 
   it('should get all users without filters', async () => {
@@ -111,7 +190,7 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should get all users without filters filtered by nickname', async () => {
+  it('should get all users filtered by nickname', async () => {
     const mockUsersFromDb = [
       {
         id: 1,
@@ -182,13 +261,13 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should get all users without filters filtered by nickname and date range', async () => {
+  it('should get all users filtered and date range', async () => {
     const mockUsersFromDb = [
       {
         id: 1,
         email: 'email',
         nickname: 'test',
-        createdAt: new Date(),
+        createdAt: date,
 
         password: '12345',
         products: [{}],
@@ -205,7 +284,7 @@ describe('UserRepository', () => {
         id: 1,
         email: 'email',
         nickname: 'test',
-        createdAt: new Date(),
+        createdAt: date,
 
         password: '12345',
         products: [{} as Product],
@@ -218,7 +297,89 @@ describe('UserRepository', () => {
       .mockResolvedValue(mockUsersFromDb);
 
     const users = await repository.findAll(
-      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
+      {
+        minDate: date,
+        maxDate: date,
+      },
+      0,
+      10,
+    );
+
+    expect(prismaService.user.findMany).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: undefined, mode: 'insensitive' },
+        createdAt: {
+          gte: date,
+          lte: date,
+        },
+      },
+
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        createdAt: true,
+
+        roles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                value: true,
+                description: true,
+              },
+            },
+          },
+        },
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(users).toEqual(mockUsers);
+  });
+
+  it('should get all users filtered by nickname and date range', async () => {
+    const mockUsersFromDb = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: date,
+
+        password: '12345',
+        products: [{}],
+        roles: [
+          {
+            role: { id: 1, value: 'Admin', description: 'Administrator role' },
+          },
+        ],
+      },
+    ];
+
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: date,
+
+        password: '12345',
+        products: [{} as Product],
+        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+      },
+    ];
+
+    jest
+      .spyOn(prismaService.user, 'findMany')
+      .mockResolvedValue(mockUsersFromDb);
+
+    const users = await repository.findAll(
+      {
+        nickname: 'test',
+        minDate: date,
+        maxDate: date,
+      },
       0,
       10,
     );
@@ -227,8 +388,8 @@ describe('UserRepository', () => {
       where: {
         nickname: { contains: 'test', mode: 'insensitive' },
         createdAt: {
-          gte: new Date(),
-          lte: new Date(),
+          gte: date,
+          lte: date,
         },
       },
 
@@ -314,7 +475,7 @@ describe('UserRepository', () => {
       id: 1,
       email,
       nickname: 'test',
-      createdAt: new Date(),
+      createdAt: date,
 
       password: '12345',
       products: [{}],
@@ -327,7 +488,7 @@ describe('UserRepository', () => {
       id: 1,
       email,
       nickname: 'test',
-      createdAt: new Date(),
+      createdAt: date,
 
       password: '12345',
       products: [{}],
