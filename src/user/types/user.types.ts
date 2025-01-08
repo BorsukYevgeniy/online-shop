@@ -18,6 +18,11 @@ export type UserRoles = User & {
 export type UserRolesNoPassword = Omit<UserRoles, 'password'>;
 
 /**
+ * Represents a user with roles but without the `password` and `email` field for security reasons.
+ */
+export type UserRolesNoCreds = Omit<UserRolesNoPassword, 'email'>;
+
+/**
  * Represents a user with roles and a list of products they own.
  * The `password` field is omitted for security reasons.
  */

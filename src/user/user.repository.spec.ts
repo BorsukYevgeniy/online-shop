@@ -168,7 +168,6 @@ describe('UserRepository', () => {
 
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
         roles: {
@@ -238,7 +237,6 @@ describe('UserRepository', () => {
 
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
 
@@ -316,7 +314,6 @@ describe('UserRepository', () => {
 
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
 
@@ -395,7 +392,6 @@ describe('UserRepository', () => {
 
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
 
@@ -592,7 +588,6 @@ describe('UserRepository', () => {
       where: { id: userId },
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
         products: true,

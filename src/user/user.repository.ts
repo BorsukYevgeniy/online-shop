@@ -5,6 +5,8 @@ import {
   UserRoles,
   UserProductsRolesNoPassword,
   UserRolesNoPassword,
+  UserProductsRolesNoCreds,
+  UserRolesNoCreds,
 } from './types/user.types';
 import { UserFilter } from './types/user-filter.type';
 
@@ -23,7 +25,11 @@ export class UserRepository {
     });
   }
 
-  async findAll(filter: UserFilter, skip: number, limit: number) {
+  async findAll(
+    filter: UserFilter,
+    skip: number,
+    limit: number,
+  ): Promise<UserRolesNoCreds[]> {
     const { nickname, minDate, maxDate }: UserFilter = filter;
     const users = await this.prismaService.user.findMany({
       where: {
@@ -33,7 +39,6 @@ export class UserRepository {
 
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
 
@@ -59,9 +64,7 @@ export class UserRepository {
     }));
   }
 
-  async findById(
-    userId: number,
-  ): Promise<UserProductsRolesNoPassword | null> {
+  async findById(userId: number): Promise<UserProductsRolesNoPassword | null> {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: {
@@ -148,14 +151,11 @@ export class UserRepository {
     };
   }
 
-  async delete(
-    userId: number,
-  ): Promise<UserProductsRolesNoPassword> {
+  async delete(userId: number): Promise<UserProductsRolesNoCreds> {
     const user = await this.prismaService.user.delete({
       where: { id: userId },
       select: {
         id: true,
-        email: true,
         nickname: true,
         createdAt: true,
         products: true,

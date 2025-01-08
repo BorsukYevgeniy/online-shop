@@ -8,6 +8,8 @@ import {
   Req,
   Res,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -22,18 +24,19 @@ import {
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { ParsePaginationDtoPipe } from '../pipe/parse-pagination-dto.pipe';
-import { UserFilter } from './types/user-filter.type';
 import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
+import { UserFilterDto } from './dto/user-filter.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('')
+  @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard)
   async findAll(
     @Query(ParsePaginationDtoPipe) paginationDto: PaginationDto,
-    @Query(ParseUserFilterPipe) userFilter: UserFilter,
+    @Query(ParseUserFilterPipe) userFilter: UserFilterDto,
   ) {
     return await this.userService.findAll(paginationDto, userFilter);
   }
@@ -61,7 +64,7 @@ export class UserController {
     @Req() req: AuthRequest,
     @Res() res: Response,
   ): Promise<void> {
-    const deletedUser: UserProductsRolesNoPassword =
+    const deletedUser: UserProductsRolesNoCreds =
       await this.userService.delete(req.user.id);
 
     res.clearCookie('accessToken');
@@ -76,7 +79,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   async deleteUserByIdByAdmin(
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<UserProductsRolesNoPassword> {
+  ): Promise<UserProductsRolesNoCreds> {
     return await this.userService.delete(userId);
   }
 }
