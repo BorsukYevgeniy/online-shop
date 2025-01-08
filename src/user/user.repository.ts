@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
 import {
-  UserWithRoles,
-  UserWithProductsAndRolesWithoutPassword,
-  UserWithRolesWithoutPassword,
+  UserRoles,
+  UserProductsRolesNoPassword,
+  UserRolesNoPassword,
 } from './types/user.types';
 import { UserFilter } from './types/user-filter.type';
 
@@ -61,7 +61,7 @@ export class UserRepository {
 
   async findById(
     userId: number,
-  ): Promise<UserWithProductsAndRolesWithoutPassword | null> {
+  ): Promise<UserProductsRolesNoPassword | null> {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: {
@@ -92,7 +92,7 @@ export class UserRepository {
       roles: user.roles.map((r: { role: Role }): Role => r.role),
     };
   }
-  async findOneByEmail(email: string): Promise<UserWithRoles | null> {
+  async findOneByEmail(email: string): Promise<UserRoles | null> {
     const user = await this.prismaService.user.findUnique({
       where: { email },
       include: {
@@ -117,7 +117,7 @@ export class UserRepository {
     nickname: string,
     password: string,
     roleId: number,
-  ): Promise<UserWithRolesWithoutPassword> {
+  ): Promise<UserRolesNoPassword> {
     const user = await this.prismaService.user.create({
       data: {
         email,
@@ -150,7 +150,7 @@ export class UserRepository {
 
   async delete(
     userId: number,
-  ): Promise<UserWithProductsAndRolesWithoutPassword> {
+  ): Promise<UserProductsRolesNoPassword> {
     const user = await this.prismaService.user.delete({
       where: { id: userId },
       select: {

@@ -14,8 +14,11 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
-import { AuthRequest } from '../interface/express-requests.interface';
-import { UserWithProductsAndRolesWithoutPassword } from './types/user.types';
+import { AuthRequest } from '../interfaces/express-requests.interface';
+import {
+  UserProductsRolesNoCreds,
+  UserProductsRolesNoPassword,
+} from './types/user.types';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { ParsePaginationDtoPipe } from '../pipe/parse-pagination-dto.pipe';
@@ -36,10 +39,12 @@ export class UserController {
   }
 
   @Get(':userId')
+  @UseGuards(AuthGuard)
   async findUserById(
+    @Req() req: AuthRequest,
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<UserWithProductsAndRolesWithoutPassword> {
-    return await this.userService.findById(userId);
+  ): Promise<UserProductsRolesNoPassword | UserProductsRolesNoCreds> {
+    return await this.userService.findById(userId, req.user.id);
   }
 
   @Get(':userId/products')
@@ -56,7 +61,7 @@ export class UserController {
     @Req() req: AuthRequest,
     @Res() res: Response,
   ): Promise<void> {
-    const deletedUser: UserWithProductsAndRolesWithoutPassword =
+    const deletedUser: UserProductsRolesNoPassword =
       await this.userService.delete(req.user.id);
 
     res.clearCookie('accessToken');
@@ -71,7 +76,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   async deleteUserByIdByAdmin(
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<UserWithProductsAndRolesWithoutPassword> {
+  ): Promise<UserProductsRolesNoPassword> {
     return await this.userService.delete(userId);
   }
 }

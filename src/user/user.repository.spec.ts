@@ -123,7 +123,7 @@ describe('UserRepository', () => {
         id: 1,
         email: 'email',
         nickname: 'test',
-        createdAt: new Date(),
+        createdAt: date,
 
         password: '12345',
         products: [{}],
@@ -140,7 +140,7 @@ describe('UserRepository', () => {
         id: 1,
         email: 'email',
         nickname: 'test',
-        createdAt: new Date(),
+        createdAt: date,
 
         password: '12345',
         products: [{} as Product],

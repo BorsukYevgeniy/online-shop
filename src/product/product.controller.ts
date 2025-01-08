@@ -18,7 +18,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
-import { AuthRequest } from '../interface/express-requests.interface';
+import { AuthRequest } from '../interfaces/express-requests.interface';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { ProductFilter } from './interface/product-filter.interface';

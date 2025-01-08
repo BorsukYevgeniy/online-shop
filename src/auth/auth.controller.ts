@@ -9,9 +9,9 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
-import { AuthRequest } from '../interface/express-requests.interface';
+import { AuthRequest } from '../interfaces/express-requests.interface';
 import { Tokens } from '../token/interface/token.interfaces';
-import { UserWithRolesWithoutPassword } from '../user/types/user.types';
+import { UserRolesNoPassword } from '../user/types/user.types';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +20,7 @@ export class AuthController {
   @Post('registration')
   async registraion(
     @Body() dto: CreateUserDto,
-  ): Promise<UserWithRolesWithoutPassword> {
+  ): Promise<UserRolesNoPassword> {
     return await this.authService.register(dto);
   }
 

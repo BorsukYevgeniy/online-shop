@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Token } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { DeletingCount } from 'src/interface/deleting-count.interface';
+import { DeletingCount } from 'src/interfaces/deleting-count.interface';
 
 @Injectable()
 export class TokenRepository {

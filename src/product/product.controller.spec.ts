@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { TokenService } from '../token/token.service';
-import { AuthRequest } from '../interface/express-requests.interface';
+import { AuthRequest } from '../interfaces/express-requests.interface';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 

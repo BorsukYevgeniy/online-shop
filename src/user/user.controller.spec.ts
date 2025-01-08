@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
-import { AuthRequest } from '../interface/express-requests.interface';
+import { AuthRequest } from '../interfaces/express-requests.interface';
 import { Response } from 'express';
 
 describe('UserController', () => {
@@ -256,8 +256,9 @@ describe('UserController', () => {
     });
   });
 
-  it('should return user by id', async () => {
+  it('should return user by id with email', async () => {
     const userId = 1;
+    const req = { user: { id: userId, roles: ['USER'] } } as AuthRequest;
     const mockUsers = {
       id: userId,
       email: 'test',
@@ -286,11 +287,49 @@ describe('UserController', () => {
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockUsers);
 
-    const user = await service.findById(userId);
+    const user = await controller.findUserById(req,userId);
 
-    expect(service.findById).toHaveBeenCalledWith(userId);
+    expect(service.findById).toHaveBeenCalledWith(userId , req.user.id);
     expect(user).toEqual(mockUsers);
   });
+
+
+  it('should return user by id without email', async () => {
+    const userId = 2
+    const req = { user: { id: 1, roles: ['USER'] } } as AuthRequest;
+    const mockUsers = {
+      id: userId,
+      nickname: 'test',
+      createdAt: new Date(),
+
+      password: 'password',
+      products: [
+        {
+          id: 1,
+          userId: 1,
+          description: 'Product description',
+          title: 'Product title',
+          price: 100,
+          images: ['image1.jpg', 'image2.jpg'],
+        },
+      ],
+      roles: [
+        {
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
+        },
+      ],
+    };
+
+    jest.spyOn(service, 'findById').mockResolvedValue(mockUsers);
+
+    const user = await controller.findUserById(req,userId);
+
+    expect(service.findById).toHaveBeenCalledWith(userId, req.user.id);
+    expect(user).toEqual(mockUsers);
+  });
+
 
   it('should return user products', async () => {
     const userId = 1;

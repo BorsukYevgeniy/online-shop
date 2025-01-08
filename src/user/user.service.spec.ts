@@ -178,7 +178,7 @@ describe('UserService', () => {
       },
     ];
 
-    jest.spyOn(repository,'count',).mockResolvedValue(1);
+    jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
 
     const users = await service.findAll(
@@ -245,7 +245,7 @@ describe('UserService', () => {
     });
   });
 
-  it('should find user by id', async () => {
+  it('should find user by id with email', async () => {
     const mockUser = {
       id: 1,
       email: 'test@example.com',
@@ -272,14 +272,49 @@ describe('UserService', () => {
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
 
-    const user = await service.findById(1);
+    const user = await service.findById(1, 1);
     expect(user).toEqual(mockUser);
   });
+
+
+  it('should find user by id without email', async () => {
+    const mockUser = {
+      id: 1,
+      nickname: 'test',
+      email: '1',
+      
+      createdAt: new Date(),
+      products: [
+        {
+          id: 1,
+          userId: 1,
+          description: 'Product description',
+          title: 'Product title',
+          price: 100,
+          images: ['image1.jpg', 'image2.jpg'],
+        },
+      ],
+      roles: [
+        {
+          id: 1,
+          value: 'admin',
+          description: 'Administrator role',
+        },
+      ],
+    };
+
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
+
+    const user = await service.findById(2, 1);
+    expect(user).toEqual({...mockUser, email: undefined});
+  });
+
+
 
   it('should throw NotFoundException if user not found by id', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
-    await expect(service.findById(1)).rejects.toThrow(NotFoundException);
+    await expect(service.findById(1, 1)).rejects.toThrow(NotFoundException);
     expect(repository.findById).toHaveBeenCalledWith(1);
   });
 
@@ -382,6 +417,7 @@ describe('UserService', () => {
       userRole.id,
     );
   });
+
   it('should delete a user by id', async () => {
     const userId = 1;
     const mockUser = {

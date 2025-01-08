@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import { AuthRequest } from 'src/interface/express-requests.interface';
+import { AuthRequest } from 'src/interfaces/express-requests.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;

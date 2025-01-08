@@ -6,9 +6,10 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../roles/role.service';
 import { Product, Role, User } from '@prisma/client';
 import {
-  UserWithProductsAndRolesWithoutPassword,
-  UserWithRoles,
-  UserWithRolesWithoutPassword,
+  UserProductsRolesNoPassword,
+  UserProductsRolesNoCreds,
+  UserRoles,
+  UserRolesNoPassword,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { UserFilter } from './types/user-filter.type';
@@ -69,11 +70,18 @@ export class UserService {
 
   async findById(
     userId: number,
-  ): Promise<UserWithProductsAndRolesWithoutPassword> {
-    const user: UserWithProductsAndRolesWithoutPassword | null =
+    requesterId: number,
+  ): Promise<UserProductsRolesNoPassword | UserProductsRolesNoCreds> {
+    const user: UserProductsRolesNoPassword | null =
       await this.userRepository.findById(userId);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (requesterId !== userId) {
+      delete user.email;
+    }
 
     return user;
   }
@@ -82,11 +90,11 @@ export class UserService {
     return await this.productService.findUserProducts(userId);
   }
 
-  async findByEmail(email: string): Promise<UserWithRoles | null> {
+  async findByEmail(email: string): Promise<UserRoles | null> {
     return await this.userRepository.findOneByEmail(email);
   }
 
-  async create(dto: CreateUserDto): Promise<UserWithRolesWithoutPassword> {
+  async create(dto: CreateUserDto): Promise<UserRolesNoPassword> {
     const userRole: Role = await this.roleService.getRoleByValue('USER');
 
     return await this.userRepository.create(
@@ -97,9 +105,7 @@ export class UserService {
     );
   }
 
-  async delete(
-    userId: number,
-  ): Promise<UserWithProductsAndRolesWithoutPassword> {
+  async delete(userId: number): Promise<UserProductsRolesNoPassword> {
     try {
       return await this.userRepository.delete(userId);
     } catch (e) {

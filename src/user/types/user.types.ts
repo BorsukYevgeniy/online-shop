@@ -1,23 +1,40 @@
 import { User } from '@prisma/client';
 
-export type UserWithRoles = User & {
-  roles: { id: number; value: string; description: string }[];
+/**
+ * Represents a user with their assigned roles.
+ * Includes the `roles` field containing an array of role objects.
+ */
+export type UserRoles = User & {
+  roles: {
+    id: number;
+    value: string;
+    description: string;
+  }[];
 };
 
-export type UserWithRolesWithoutPassword = Omit<UserWithRoles, 'password'>;
-export type UserWithProductsAndRolesWithoutPassword = Omit<
-  UserWithRoles,
-  'password'
-> & {
+/**
+ * Represents a user with roles but without the `password` field for security reasons.
+ */
+export type UserRolesNoPassword = Omit<UserRoles, 'password'>;
+
+/**
+ * Represents a user with roles and a list of products they own.
+ * The `password` field is omitted for security reasons.
+ */
+export type UserProductsRolesNoPassword = Omit<UserRoles, 'password'> & {
   products: {
     id: number;
     userId: number;
     description: string;
     title: string;
     price: number;
-    images: string[];
   }[];
 };
 
-export type UsersWithProductsAndRolesWithoutPassword =
-  UserWithProductsAndRolesWithoutPassword[];
+/**
+ * Represents a user with roles and products, but without sensitive fields (`password` and `email`).
+ */
+export type UserProductsRolesNoCreds = Omit<
+  UserProductsRolesNoPassword,
+  'email'
+>;
