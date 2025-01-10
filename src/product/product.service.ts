@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -9,7 +8,6 @@ import { ProductRepository } from './product.repository';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ProductFilter } from './interface/product-filter.interface';
 import { PaginationDto } from 'src/dto/pagination.dto';
 
@@ -34,27 +32,8 @@ export class ProductService {
     if (product.userId !== userId) {
       throw new ForbiddenException();
     }
+
     return product;
-  }
-
-  private async buildProductFilter(
-    title?: string,
-    minPrice?: number,
-    maxPrice?: number,
-  ): Promise<ProductFilter> {
-    const newFilter: ProductFilter = {};
-
-    if (title) {
-      newFilter.title = title;
-    }
-    if (minPrice) {
-      newFilter.minPrice = minPrice;
-    }
-    if (maxPrice) {
-      newFilter.maxPrice = maxPrice;
-    }
-
-    return newFilter;
   }
 
   async findAll(filter: ProductFilter, paginationDto: PaginationDto) {
@@ -62,19 +41,13 @@ export class ProductService {
 
     const skip: number = (page - 1) * pageSize;
 
-    const productFilter: ProductFilter = await this.buildProductFilter(
-      filter.title,
-      filter.minPrice,
-      filter.maxPrice,
-    );
-
     const products: Product[] = await this.productRepository.findAll(
-      productFilter,
+      filter,
       skip,
       pageSize,
     );
 
-    const total: number = await this.productRepository.count(productFilter);
+    const total: number = await this.productRepository.count(filter);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -97,34 +70,14 @@ export class ProductService {
     return product;
   }
 
-  async findUserProducts(userId: number): Promise<Product[]> {
-    const userProducts: Product[] | null =
-      await this.productRepository.findUserProducts(userId);
-
-    if (!userProducts) throw new NotFoundException('Products not found');
-
-    return userProducts;
-  }
-
   async create(
     userId: number,
     dto: CreateProductDto,
     images: Express.Multer.File[],
   ): Promise<Product> {
-    try {
-      const imagesNames: string[] = await this.fileService.createImages(images);
+    const imagesNames: string[] = await this.fileService.createImages(images);
 
-      return await this.productRepository.create(userId, dto, imagesNames);
-    } catch (e: unknown) {
-      console.error(e);
-
-      if (e instanceof PrismaClientKnownRequestError) {
-        console.error(e);
-        throw new BadRequestException(
-          'Product with same name created.Please change the name!',
-        );
-      }
-    }
+    return await this.productRepository.create(userId, dto, imagesNames);
   }
 
   async updateProduct(

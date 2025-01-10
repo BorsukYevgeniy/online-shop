@@ -31,6 +31,7 @@ describe('AuthService', () => {
           useValue: {
             generateTokens: jest.fn(),
             deleteUserTokens: jest.fn(),
+            deleteAllUsersTokens: jest.fn(),
             verifyRefreshToken: jest.fn(),
             getUserTokens: jest.fn(),
           },
@@ -182,6 +183,18 @@ describe('AuthService', () => {
     await service.logout(refreshToken);
 
     expect(tokenService.deleteUserTokens).toHaveBeenCalledWith(refreshToken);
+  });
+
+  it('should logout all users', async () => {
+    const userId = 1;
+
+    jest
+      .spyOn(tokenService, 'deleteUserTokens')
+      .mockResolvedValue({ count: 1 });
+
+    await service.logoutAll(userId);
+
+    expect(tokenService.deleteAllUsersTokens).toHaveBeenCalledWith(userId);
   });
 
   it('should refresh tokens', async () => {

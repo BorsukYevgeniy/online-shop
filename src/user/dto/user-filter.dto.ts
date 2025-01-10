@@ -1,27 +1,27 @@
 import {
   IsOptional,
   IsString,
-  IsNotEmpty,
-  IsDateString,
   MaxLength,
   MinLength,
+  IsDate,
 } from 'class-validator';
+import { ToDate, Trim } from '../../decorators';
 
 export class UserFilterDto {
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
+  @Trim()
   @MinLength(3)
   @MaxLength(15)
   readonly nickname?: string;
 
   @IsOptional()
-  @IsDateString({strict: true})
-  @IsNotEmpty()
+  @IsDate({ message: 'Date should be in YYYY-MM-DD format' })
+  @ToDate()
   readonly minDate?: Date;
 
   @IsOptional()
-  @IsDateString({strict: true})
-  @IsNotEmpty()
+  @IsDate({ message: 'Date should be in YYYY-MM-DD format1' })
+  @ToDate()
   readonly maxDate?: Date;
 }

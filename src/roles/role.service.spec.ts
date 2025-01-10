@@ -29,7 +29,7 @@ describe('RoleService', () => {
   afterEach(async () => {
     jest.clearAllMocks();
   });
-  
+
   it('should be defined', async () => {
     expect(service).toBeDefined();
   });

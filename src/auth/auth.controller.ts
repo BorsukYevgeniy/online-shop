@@ -5,6 +5,7 @@ import {
   Res,
   Req,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -12,20 +13,20 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../interfaces/express-requests.interface';
 import { Tokens } from '../token/interface/token.interfaces';
 import { UserRolesNoPassword } from '../user/types/user.types';
+import { LoginUserDto } from './dto/login-user.dto';
+import { AuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
-  async registraion(
-    @Body() dto: CreateUserDto,
-  ): Promise<UserRolesNoPassword> {
+  async registraion(@Body() dto: CreateUserDto): Promise<UserRolesNoPassword> {
     return await this.authService.register(dto);
   }
 
   @Post('login')
-  async login(@Body() dto: CreateUserDto, @Res() res: Response): Promise<void> {
+  async login(@Body() dto: LoginUserDto, @Res() res: Response): Promise<void> {
     const { accessToken, refreshToken }: Tokens =
       await this.authService.login(dto);
 
@@ -50,6 +51,17 @@ export class AuthController {
     res.clearCookie('refreshToken');
 
     res.send({ message: 'Logouted succesfully' });
+  }
+
+  @Post('logout-all')
+  @UseGuards(AuthGuard)
+  async logoutAll(@Req() req: AuthRequest, @Res() res: Response) {
+    await this.authService.logoutAll(req.user.id);
+
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    res.send({ message: 'Logouted in all devices' });
   }
 
   @Post('refresh')

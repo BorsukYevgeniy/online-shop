@@ -1,16 +1,25 @@
-import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
-import { ProductFilter } from '../interface/product-filter.interface';
+import {
+  PipeTransform,
+  Injectable,
+  ArgumentMetadata,
+  BadRequestException,
+} from '@nestjs/common';
+import { ProductFilterDto } from '../dto/product-filter.dto';
 
 @Injectable()
 export class ParseProductFilterPipe
-  implements PipeTransform<ProductFilter, ProductFilter>
+  implements PipeTransform<ProductFilterDto, ProductFilterDto>
 {
-  transform(value: ProductFilter, metadata: ArgumentMetadata): ProductFilter {
-    let { title, minPrice, maxPrice }: ProductFilter = value;
+  transform(
+    value: ProductFilterDto,
+    metadata: ArgumentMetadata,
+  ): ProductFilterDto {
+    const { minPrice, maxPrice }: ProductFilterDto = value;
 
-    minPrice = minPrice !== undefined ? Number(minPrice) : undefined;
-    maxPrice = maxPrice !== undefined ? Number(maxPrice) : undefined;
+    if (maxPrice < minPrice) {
+      throw new BadRequestException('Max price must be greater than min price');
+    }
 
-    return { title, minPrice, maxPrice };
+    return value;
   }
 }

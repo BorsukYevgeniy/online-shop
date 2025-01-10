@@ -35,6 +35,10 @@ export class TokenRepository {
     return await this.prismaService.token.deleteMany({ where: { token } });
   }
 
+  async deleteAllUsersTokens(userId: number): Promise<DeletingCount> {
+    return await this.prismaService.token.deleteMany({ where: { userId } });
+  }
+
   async deleteExpiredTokens(now: Date): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({
       where: { expiresAt: { lt: now } },

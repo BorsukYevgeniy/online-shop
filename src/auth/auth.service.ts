@@ -2,14 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcryptjs';
-import { Role, Token, User } from '@prisma/client';
+import { Role, Token } from '@prisma/client';
 import { TokenService } from '../token/token.service';
 import { Tokens } from '../token/interface/token.interfaces';
-import {
-  UserRoles,
-  UserRolesNoPassword,
-} from '../user/types/user.types';
+import { UserRoles, UserRolesNoPassword } from '../user/types/user.types';
 import { DeletingCount } from '../interfaces/deleting-count.interface';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +34,7 @@ export class AuthService {
     return user;
   }
 
-  async login(dto: CreateUserDto): Promise<Tokens> {
+  async login(dto: LoginUserDto): Promise<Tokens> {
     const candidate: UserRoles | null = await this.userService.findByEmail(
       dto.email,
     );
@@ -67,12 +65,16 @@ export class AuthService {
 
     return await this.tokenService.generateTokens(
       candidate.id,
-      roles.map((ur: Role): string => ur.value),
+      roles.map((r: Role): string => r.value),
     );
   }
 
   async logout(token: string): Promise<DeletingCount> {
     return await this.tokenService.deleteUserTokens(token);
+  }
+
+  async logoutAll(userId: number): Promise<DeletingCount> {
+    return await this.tokenService.deleteAllUsersTokens(userId);
   }
 
   async refreshToken(refreshToken: string): Promise<Tokens> {

@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
-import { ProductService } from '../product/product.service';
 import { RoleService } from '../roles/role.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -9,7 +8,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 describe('UserService', () => {
   let service: UserService;
   let repository: UserRepository;
-  let productService: ProductService;
   let roleService: RoleService;
 
   beforeEach(async () => {
@@ -19,18 +17,16 @@ describe('UserService', () => {
         {
           provide: UserRepository,
           useValue: {
+            assignAdmin: jest.fn(),
             count: jest.fn(),
             findAll: jest.fn(),
             findById: jest.fn(),
+            findUserProducts: jest.fn(),
+            findUserProfile: jest.fn(),
             findOneByEmail: jest.fn(),
+            findUserRoles: jest.fn(),
             create: jest.fn(),
             delete: jest.fn(),
-          },
-        },
-        {
-          provide: ProductService,
-          useValue: {
-            findUserProducts: jest.fn(),
           },
         },
         {
@@ -44,7 +40,6 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     repository = module.get<UserRepository>(UserRepository);
-    productService = module.get<ProductService>(ProductService);
     roleService = module.get<RoleService>(RoleService);
   });
 
@@ -54,6 +49,28 @@ describe('UserService', () => {
 
   it('should be defined', async () => {
     expect(service).toBeDefined();
+  });
+
+  it('should assing new admin', async () => {
+    const mockUser = {
+      id: 1,
+      nickname: 'test',
+      createdAt: new Date(),
+      roles: [
+        {
+          id: 1,
+          value: 'USER',
+          description: 'user role',
+        },
+      ],
+    };
+
+    jest.spyOn(repository, 'findUserRoles').mockResolvedValue(mockUser.roles);
+    jest.spyOn(repository, 'assignAdmin').mockResolvedValue(mockUser);
+
+    const user = await service.assignAdmin(1);
+
+    expect(user).toEqual(mockUser);
   });
 
   it('should find all users without filters', async () => {
@@ -272,17 +289,15 @@ describe('UserService', () => {
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
 
-    const user = await service.findById(1, 1);
+    const user = await service.findById(1);
     expect(user).toEqual(mockUser);
   });
 
-
-  it('should find user by id without email', async () => {
+  it('should find user profile', async () => {
     const mockUser = {
       id: 1,
+      email: 'test@example.com',
       nickname: 'test',
-      email: '1',
-      
       createdAt: new Date(),
       products: [
         {
@@ -303,18 +318,16 @@ describe('UserService', () => {
       ],
     };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
+    jest.spyOn(repository, 'findUserProfile').mockResolvedValue(mockUser);
 
-    const user = await service.findById(2, 1);
-    expect(user).toEqual({...mockUser, email: undefined});
+    const user = await service.findUserProfile(1);
+    expect(user).toEqual(mockUser);
   });
-
-
 
   it('should throw NotFoundException if user not found by id', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
-    await expect(service.findById(1, 1)).rejects.toThrow(NotFoundException);
+    await expect(service.findById(1)).rejects.toThrow(NotFoundException);
     expect(repository.findById).toHaveBeenCalledWith(1);
   });
 
@@ -330,7 +343,7 @@ describe('UserService', () => {
         images: ['1'],
       },
     ];
-    jest.spyOn(productService, 'findUserProducts').mockResolvedValue(products);
+    jest.spyOn(repository, 'findUserProducts').mockResolvedValue(products);
 
     const userProducts = await service.findUserProducts(1);
 

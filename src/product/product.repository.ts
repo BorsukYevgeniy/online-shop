@@ -49,14 +49,6 @@ export class ProductRepository {
     });
   }
 
-  async findUserProducts(userId: number): Promise<Product[] | null> {
-    const products: Product[] | null =
-      await this.prismaService.product.findMany({
-        where: { userId },
-      });
-    return products;
-  }
-
   async create(
     userId: number,
     dto: CreateProductDto,

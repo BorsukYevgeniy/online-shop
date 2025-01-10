@@ -246,27 +246,6 @@ describe('ProductService', () => {
     expect(product).toEqual(mockProduct);
   });
 
-  it('should return user products', async () => {
-    const userId = 1;
-    const mockProducts = [
-      {
-        id: 3,
-        userId,
-        title: 'TEST',
-        price: 52,
-        description: 'Test description',
-        images: ['11', '12'],
-      },
-    ];
-
-    jest.spyOn(repository, 'findUserProducts').mockResolvedValue(mockProducts);
-
-    const products = await service.findUserProducts(userId);
-
-    expect(repository.findUserProducts).toHaveBeenCalledWith(userId);
-    expect(products).toEqual(mockProducts);
-  });
-
   it('should create product', async () => {
     const userId = 1;
     const dto: CreateProductDto = {

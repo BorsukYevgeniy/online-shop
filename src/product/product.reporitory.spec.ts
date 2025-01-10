@@ -279,30 +279,6 @@ describe('ProductRepository', () => {
     expect(product).toEqual(mockProduct);
   });
 
-  it('should return user products', async () => {
-    const userId = 1;
-    const mockProducts = [
-      {
-        id: 3,
-        userId,
-        title: 'TEST',
-        price: 52,
-        description: 'Test description',
-        images: ['11', '12'],
-      },
-    ];
-
-    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
-
-    const products = await repository.findUserProducts(userId);
-
-    expect(prisma.product.findMany).toHaveBeenCalledWith({
-      where: { userId },
-    });
-
-    expect(products).toEqual(mockProducts);
-  });
-
   it('should create product', async () => {
     const userId = 1;
     const dto: CreateProductDto = {

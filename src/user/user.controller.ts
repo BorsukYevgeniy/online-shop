@@ -3,13 +3,11 @@ import {
   Get,
   Delete,
   Param,
-  ParseIntPipe,
   UseGuards,
   Req,
   Res,
   Query,
-  UsePipes,
-  ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -23,36 +21,48 @@ import {
 } from './types/user.types';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
-import { ParsePaginationDtoPipe } from '../pipe/parse-pagination-dto.pipe';
-import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 import { UserFilterDto } from './dto/user-filter.dto';
+import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('')
-  @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard)
   async findAll(
-    @Query(ParsePaginationDtoPipe) paginationDto: PaginationDto,
+    @Query() paginationDto: PaginationDto,
     @Query(ParseUserFilterPipe) userFilter: UserFilterDto,
   ) {
     return await this.userService.findAll(paginationDto, userFilter);
   }
 
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  async findUserProfile(
+    @Req() req: AuthRequest,
+  ): Promise<UserProductsRolesNoPassword> {
+    return await this.userService.findUserProfile(req.user.id);
+  }
+
   @Get(':userId')
   @UseGuards(AuthGuard)
   async findUserById(
+    @Param('userId') userId: number,
     @Req() req: AuthRequest,
-    @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<UserProductsRolesNoPassword | UserProductsRolesNoCreds> {
-    return await this.userService.findById(userId, req.user.id);
+    @Res() res: Response,
+  ): Promise<UserProductsRolesNoCreds | void> {
+    if (userId === req.user.id) {
+      return res.redirect('/api/users/profile');
+    } else {
+      const user = await this.userService.findById(userId);
+      res.send(user);
+    }
   }
 
   @Get(':userId/products')
   async findUserProductsById(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: number,
   ): Promise<Product[]> {
     return await this.userService.findUserProducts(userId);
   }
@@ -64,8 +74,9 @@ export class UserController {
     @Req() req: AuthRequest,
     @Res() res: Response,
   ): Promise<void> {
-    const deletedUser: UserProductsRolesNoCreds =
-      await this.userService.delete(req.user.id);
+    const deletedUser: UserProductsRolesNoCreds = await this.userService.delete(
+      req.user.id,
+    );
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -78,8 +89,15 @@ export class UserController {
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   async deleteUserByIdByAdmin(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: number,
   ): Promise<UserProductsRolesNoCreds> {
     return await this.userService.delete(userId);
+  }
+
+  @Patch('assing-admin/:userId')
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
+  async assignAdmin(@Param('userId') userId: number) {
+    return await this.userService.assignAdmin(userId);
   }
 }

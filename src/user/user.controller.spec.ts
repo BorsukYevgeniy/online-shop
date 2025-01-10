@@ -4,6 +4,7 @@ import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
 import { AuthRequest } from '../interfaces/express-requests.interface';
 import { Response } from 'express';
+import { mock } from 'node:test';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -16,9 +17,11 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: {
+            assignAdmin: jest.fn(),
             findAll: jest.fn(),
             findById: jest.fn(),
             findUserProducts: jest.fn(),
+            findUserProfile: jest.fn(),
             delete: jest.fn(),
           },
         },
@@ -37,6 +40,27 @@ describe('UserController', () => {
 
   it('should be defined', async () => {
     expect(controller).toBeDefined();
+  });
+
+  it('should assing new admin', async () => {
+    const mockUser = {
+      id: 1,
+      nickname: 'test',
+      createdAt: new Date(),
+      roles: [
+        {
+          id: 1,
+          value: 'USER',
+          description: 'user role',
+        },
+      ],
+    };
+
+    jest.spyOn(service, 'assignAdmin').mockResolvedValue(mockUser);
+
+    const user = await controller.assignAdmin(1);
+
+    expect(user).toEqual(mockUser);
   });
 
   it('should return all users without filters', async () => {
@@ -256,16 +280,17 @@ describe('UserController', () => {
     });
   });
 
-  it('should return user by id with email', async () => {
+  it('should return user by id', async () => {
     const userId = 1;
-    const req = { user: { id: userId, roles: ['USER'] } } as AuthRequest;
+    const req = { user: { id: 2, roles: ['USER'] } } as AuthRequest;
+    const res = { send: jest.fn() } as unknown as Response;
+
     const mockUsers = {
       id: userId,
       email: 'test',
       nickname: 'test',
       createdAt: new Date(),
 
-      password: 'password',
       products: [
         {
           id: 1,
@@ -287,22 +312,21 @@ describe('UserController', () => {
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockUsers);
 
-    const user = await controller.findUserById(req,userId);
+    const user = await controller.findUserById(userId, req, {
+      send: jest.fn(),
+    } as unknown as Response);
 
-    expect(service.findById).toHaveBeenCalledWith(userId , req.user.id);
-    expect(user).toEqual(mockUsers);
+    expect(service.findById).toHaveBeenCalledWith(userId);
   });
 
-
-  it('should return user by id without email', async () => {
-    const userId = 2
+  it('should return user profile', async () => {
     const req = { user: { id: 1, roles: ['USER'] } } as AuthRequest;
-    const mockUsers = {
-      id: userId,
+    const mockUser = {
+      id: 1,
       nickname: 'test',
       createdAt: new Date(),
+      email: 'test',
 
-      password: 'password',
       products: [
         {
           id: 1,
@@ -322,14 +346,13 @@ describe('UserController', () => {
       ],
     };
 
-    jest.spyOn(service, 'findById').mockResolvedValue(mockUsers);
+    jest.spyOn(service, 'findUserProfile').mockResolvedValue(mockUser);
 
-    const user = await controller.findUserById(req,userId);
+    const user = await controller.findUserProfile(req);
 
-    expect(service.findById).toHaveBeenCalledWith(userId, req.user.id);
-    expect(user).toEqual(mockUsers);
+    expect(user).toEqual(mockUser);
+    expect(service.findUserProfile).toHaveBeenCalledWith(1);
   });
-
 
   it('should return user products', async () => {
     const userId = 1;

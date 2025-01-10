@@ -4,24 +4,25 @@ import {
   IsNumber,
   Min,
   MaxLength,
-  Max,
 } from 'class-validator';
+import { ToNumber, Trim } from '../../decorators';
 
 export class CreateProductDto {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
+  @Trim()
   @MaxLength(100)
-  @IsNotEmpty()
-  title: string;
+  title!: string;
 
+  @IsNotEmpty()
   @IsString()
-  @IsNotEmpty()
+  @Trim()
   @MaxLength(500)
-  @IsNotEmpty()
-  description: string;
+  description!: string;
 
-  @IsNumber()
-  @Min(0)
   @IsNotEmpty()
-  price: number;
+  @IsNumber()
+  @ToNumber()
+  @Min(0)
+  price!: number;
 }

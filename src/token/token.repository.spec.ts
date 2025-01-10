@@ -35,7 +35,7 @@ describe('TokenRepository', () => {
 
   it('should be defined', async () => {
     expect(tokensRepository).toBeDefined();
-  })
+  });
 
   it('should find one token by userId', async () => {
     const userId = 1;
@@ -87,6 +87,20 @@ describe('TokenRepository', () => {
 
     expect(await tokensRepository.findUserTokens(userId)).toBe(tokens);
     expect(prismaService.token.findMany).toHaveBeenCalledWith({
+      where: { userId },
+    });
+  });
+
+  it('should delete all user tokens by user id', async () => {
+    const userId = 1;
+    jest
+      .spyOn(prismaService.token, 'deleteMany')
+      .mockResolvedValue({ count: 1 });
+
+    expect(await tokensRepository.deleteAllUsersTokens(userId)).toEqual({
+      count: 1,
+    });
+    expect(prismaService.token.deleteMany).toHaveBeenCalledWith({
       where: { userId },
     });
   });

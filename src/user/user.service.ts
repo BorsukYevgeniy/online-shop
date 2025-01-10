@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
 import { ProductService } from '../product/product.service';
@@ -10,6 +14,7 @@ import {
   UserProductsRolesNoCreds,
   UserRoles,
   UserRolesNoPassword,
+  UserRolesNoProductsCreds,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { UserFilter } from './types/user-filter.type';
@@ -18,7 +23,6 @@ import { UserFilter } from './types/user-filter.type';
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly productService: ProductService,
     private readonly roleService: RoleService,
   ) {}
 
@@ -42,26 +46,23 @@ export class UserService {
     };
   }
 
-  async findById(
-    userId: number,
-    requesterId: number,
-  ): Promise<UserProductsRolesNoPassword | UserProductsRolesNoCreds> {
-    const user: UserProductsRolesNoPassword | null =
+  async findById(userId: number): Promise<UserProductsRolesNoCreds> {
+    const user: UserProductsRolesNoCreds | null =
       await this.userRepository.findById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    if (requesterId !== userId) {
-      delete user.email;
-    }
-
     return user;
   }
 
+  async findUserProfile(userId: number): Promise<UserProductsRolesNoPassword> {
+    return await this.userRepository.findUserProfile(userId);
+  }
+
   async findUserProducts(userId: number): Promise<Product[]> {
-    return await this.productService.findUserProducts(userId);
+    return await this.userRepository.findUserProducts(userId);
   }
 
   async findByEmail(email: string): Promise<UserRoles | null> {
@@ -85,6 +86,22 @@ export class UserService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         throw new NotFoundException('User not found');
+      }
+    }
+  }
+
+  async assignAdmin(userId: number): Promise<UserRolesNoProductsCreds> {
+    const candidate: Role[] = await this.userRepository.findUserRoles(userId);
+
+    if (!candidate) {
+      throw new NotFoundException('User not found');
+    }
+
+    try {
+      return await this.userRepository.assignAdmin(userId);
+    } catch (e: unknown) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException('User already has admin role');
       }
     }
   }

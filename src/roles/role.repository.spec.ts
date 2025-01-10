@@ -27,7 +27,7 @@ describe('RoleRepository', () => {
     repository = module.get<RoleRepository>(RoleRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
-  
+
   afterEach(async () => {
     jest.clearAllMocks();
   });

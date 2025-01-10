@@ -1,28 +1,30 @@
 import {
   IsOptional,
   IsString,
-  IsNumberString,
-  MaxLength,
   Min,
-  IsNotEmpty
+  MaxLength,
+  MinLength,
+  IsNumber,
 } from 'class-validator';
+import { ToNumber, Trim } from '../../decorators';
 
 export class ProductFilterDto {
   @IsOptional()
   @IsString()
+  @Trim()
+  @MinLength(1)
   @MaxLength(100)
-  @IsNotEmpty()
-  title?: string;
+  readonly title?: string;
 
   @IsOptional()
-  @IsNumberString()
+  @IsNumber({}, { message: 'minPrice must be a valid number' })
+  @ToNumber()
   @Min(0)
-  @IsNotEmpty()
-  minPrice?: number;
+  readonly minPrice?: number;
 
   @IsOptional()
-  @IsNumberString()
+  @IsNumber({}, { message: 'maxPrice must be a valid number' })
+  @ToNumber()
   @Min(0)
-  @IsNotEmpty()
-  maxPrice?: number;
+  readonly maxPrice?: number;
 }

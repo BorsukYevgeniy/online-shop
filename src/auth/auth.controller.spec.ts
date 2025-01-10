@@ -3,7 +3,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import { AuthRequest } from 'src/interfaces/express-requests.interface';
+import { AuthRequest } from '../interfaces/express-requests.interface';
+import { TokenService } from '../token/token.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -19,9 +20,11 @@ describe('AuthController', () => {
             register: jest.fn(),
             login: jest.fn(),
             logout: jest.fn(),
+            logoutAll: jest.fn(),
             refreshToken: jest.fn(),
           },
         },
+        { provide: TokenService, useValue: { verifyAccessToken: jest.fn() } },
       ],
     }).compile();
 
@@ -120,6 +123,32 @@ describe('AuthController', () => {
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
     expect(res.send).toHaveBeenCalledWith({ message: 'Logouted succesfully' });
+  });
+
+  it('should logout all users', async () => {
+    const req: AuthRequest = {
+      user: {
+        id: 1,
+        roles: ['USER'],
+      },
+      cookies: { refreshToken: 'refreshToken' },
+    } as any;
+
+    const res: Partial<Response> = {
+      clearCookie: jest.fn(),
+      send: jest.fn(),
+    } as any;
+
+    jest.spyOn(service, 'logoutAll').mockResolvedValue({ count: 1 });
+
+    await controller.logoutAll(req, res as Response);
+
+    expect(service.logoutAll).toHaveBeenCalledWith(req.user.id);
+    expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
+    expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
+    expect(res.send).toHaveBeenCalledWith({
+      message: 'Logouted in all devices',
+    });
   });
 
   it('should refresh tokens', async () => {
