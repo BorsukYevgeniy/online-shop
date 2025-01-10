@@ -21,29 +21,16 @@ export class UserRepository {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
       data: {
         roles: {
-          create: [{ role: { connect: { id: 2 } } }],
+          connect: { id: 2 },
         },
       },
     });
 
-    return {
-      ...updatedUser,
-      roles: updatedUser.roles.map((r: { role: Role }): Role => r.role),
-    };
+    return updatedUser;
   }
 
   async count(filter: UserFilter): Promise<number> {
@@ -74,26 +61,13 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
 
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
       skip,
       take: limit,
     });
 
-    return users.map((user) => ({
-      ...user,
-      roles: user.roles.map((r: { role: Role }): Role => r.role),
-    }));
+    return users;
   }
 
   async findById(userId: number): Promise<UserProductsRolesNoCreds | null> {
@@ -104,26 +78,13 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
         products: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
     });
 
     if (!user) return null;
 
-    return {
-      ...user,
-      roles: user.roles.map((r: { role: Role }): Role => r.role),
-    };
+    return user;
   }
 
   async findUserProfile(id: number): Promise<UserProductsRolesNoPassword> {
@@ -136,46 +97,26 @@ export class UserRepository {
         products: true,
         createdAt: true,
 
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
     });
 
     if (!user) return null;
 
-    return {
-      ...user,
-      roles: user.roles.map((r: { role: Role }): Role => r.role),
-    };
+    return user;
   }
 
   async findOneByEmail(email: string): Promise<UserRoles | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
       include: {
-        roles: {
-          select: {
-            role: { select: { id: true, value: true, description: true } },
-          },
-        },
+        roles: true,
       },
     });
 
     if (!user) return null;
 
-    return {
-      ...user,
-      roles: user.roles.map((r: { role: Role }): Role => r.role),
-    };
+    return user;
   }
 
   async findUserProducts(userId: number): Promise<Product[] | null> {
@@ -192,18 +133,12 @@ export class UserRepository {
   async findUserRoles(userId: number): Promise<Role[]> {
     const userRoles = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        roles: {
-          select: {
-            role: { select: { id: true, value: true, description: true } },
-          },
-        },
-      },
+      select: { roles: true },
     });
 
     if (!userRoles) return null;
 
-    return userRoles.roles.map((r: { role: Role }): Role => r.role);
+    return userRoles.roles;
   }
 
   async create(
@@ -218,7 +153,7 @@ export class UserRepository {
         nickname,
         password,
         roles: {
-          create: [{ role: { connect: { id: roleId } } }],
+          connect: [{ id: roleId }],
         },
       },
       select: {
@@ -226,20 +161,13 @@ export class UserRepository {
         email: true,
         nickname: true,
         createdAt: true,
-        roles: {
-          select: {
-            role: { select: { id: true, value: true, description: true } },
-          },
-        },
+        roles: true,
       },
     });
 
     if (!user) return null;
 
-    return {
-      ...user,
-      roles: user.roles.map((r: { role: Role }): Role => r.role),
-    };
+    return user;
   }
 
   async delete(userId: number): Promise<UserProductsRolesNoCreds> {
@@ -250,25 +178,12 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
         products: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
     });
 
     if (!user) return null;
 
-    return {
-      ...user,
-      roles: user.roles.map((r: { role: Role }): Role => r.role),
-    };
+    return user;
   }
 }

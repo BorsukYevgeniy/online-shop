@@ -37,7 +37,7 @@ export class UserController {
     return await this.userService.findAll(paginationDto, userFilter);
   }
 
-  @Get('profile')
+  @Get('me')
   @UseGuards(AuthGuard)
   async findUserProfile(
     @Req() req: AuthRequest,
@@ -68,7 +68,7 @@ export class UserController {
   }
 
   // Маршрут для видалення акаунту власиником цього акаунту
-  @Delete('')
+  @Delete('me')
   @UseGuards(AuthGuard)
   async deleteUserById(
     @Req() req: AuthRequest,

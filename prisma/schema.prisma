@@ -18,14 +18,14 @@ model Product {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  nickname  String     @unique
+  id        Int       @id @default(autoincrement())
+  nickname  String    @unique
+  email     String    @unique
   password  String
+  createdAt DateTime  @default(now())
   tokens    Token[]
   products  Product[]
-  roles     UserRole[]
-  createdAt DateTime   @default(now())
+  roles     Role[]
 }
 
 model Token {
@@ -37,17 +37,8 @@ model Token {
 }
 
 model Role {
-  id          Int        @id @default(autoincrement())
-  value       String     @unique
+  id          Int    @id @default(autoincrement())
+  value       String @unique
   description String
-  user        UserRole[]
-}
-
-model UserRole {
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  roleId Int
-
-  @@id([userId, roleId])
+  user        User[]
 }

@@ -1,8 +1,7 @@
-import { Product } from '@prisma/client';
+import { Product, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
-import { AnyARecord } from 'node:dns';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -44,17 +43,6 @@ describe('UserRepository', () => {
   });
 
   it('should assing new admin', async () => {
-    const mockUsersFromDb = {
-      id: 1,
-      nickname: 'test',
-      createdAt: date,
-      roles: [
-        {
-          role: { id: 1, value: 'Admin', description: 'Administrator role' },
-        },
-      ],
-    };
-
     const mockUsers = {
       id: 1,
       nickname: 'test',
@@ -64,7 +52,7 @@ describe('UserRepository', () => {
 
     jest
       .spyOn(prismaService.user, 'update')
-      .mockResolvedValue(mockUsersFromDb as any);
+      .mockResolvedValue(mockUsers as any);
 
     const user = await repository.assignAdmin(1);
 
@@ -177,42 +165,21 @@ describe('UserRepository', () => {
   });
 
   it('should get user roles', async () => {
-    const mockRoles = [{ id: 1, value: 'USER', description: 'User role' }];
+    const mockRoles: Role[] = [
+      { id: 1, value: 'USER', description: 'User role' },
+    ];
 
-    const mockUserRolesFromDb = {
-      roles: [
-        {
-          role: { id: 1, value: 'USER', description: 'User role' },
-        },
-      ],
-    };
     jest
       .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUserRolesFromDb as any);
+      .mockResolvedValue({ roles: mockRoles } as any);
 
     const roles = await repository.findUserRoles(1);
 
-    expect(mockRoles).toEqual(roles);
+    expect(roles).toEqual(mockRoles);
   });
 
+
   it('should get all users without filters', async () => {
-    const mockUsersFromDb = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-
-        password: '12345',
-        products: [{}],
-        roles: [
-          {
-            role: { id: 1, value: 'Admin', description: 'Administrator role' },
-          },
-        ],
-      },
-    ];
-
     const mockUsers = [
       {
         id: 1,
@@ -226,9 +193,7 @@ describe('UserRepository', () => {
       },
     ];
 
-    jest
-      .spyOn(prismaService.user, 'findMany')
-      .mockResolvedValue(mockUsersFromDb);
+    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
     const users = await repository.findAll({}, 0, 10);
 
@@ -248,17 +213,7 @@ describe('UserRepository', () => {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
       skip: 0,
       take: 10,
@@ -268,23 +223,6 @@ describe('UserRepository', () => {
   });
 
   it('should get all users filtered by nickname', async () => {
-    const mockUsersFromDb = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-
-        password: '12345',
-        products: [{}],
-        roles: [
-          {
-            role: { id: 1, value: 'Admin', description: 'Administrator role' },
-          },
-        ],
-      },
-    ];
-
     const mockUsers = [
       {
         id: 1,
@@ -298,9 +236,7 @@ describe('UserRepository', () => {
       },
     ];
 
-    jest
-      .spyOn(prismaService.user, 'findMany')
-      .mockResolvedValue(mockUsersFromDb);
+    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
     const users = await repository.findAll({ nickname: 'test' }, 0, 10);
 
@@ -318,17 +254,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
 
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
       skip: 0,
       take: 10,
@@ -338,23 +264,6 @@ describe('UserRepository', () => {
   });
 
   it('should get all users filtered and date range', async () => {
-    const mockUsersFromDb = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-
-        password: '12345',
-        products: [{}],
-        roles: [
-          {
-            role: { id: 1, value: 'Admin', description: 'Administrator role' },
-          },
-        ],
-      },
-    ];
-
     const mockUsers = [
       {
         id: 1,
@@ -368,9 +277,7 @@ describe('UserRepository', () => {
       },
     ];
 
-    jest
-      .spyOn(prismaService.user, 'findMany')
-      .mockResolvedValue(mockUsersFromDb);
+    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
     const users = await repository.findAll(
       {
@@ -395,17 +302,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
 
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
       skip: 0,
       take: 10,
@@ -415,23 +312,6 @@ describe('UserRepository', () => {
   });
 
   it('should get all users filtered by nickname and date range', async () => {
-    const mockUsersFromDb = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-
-        password: '12345',
-        products: [{}],
-        roles: [
-          {
-            role: { id: 1, value: 'Admin', description: 'Administrator role' },
-          },
-        ],
-      },
-    ];
-
     const mockUsers = [
       {
         id: 1,
@@ -445,9 +325,7 @@ describe('UserRepository', () => {
       },
     ];
 
-    jest
-      .spyOn(prismaService.user, 'findMany')
-      .mockResolvedValue(mockUsersFromDb);
+    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
     const users = await repository.findAll(
       {
@@ -473,17 +351,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
 
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
       skip: 0,
       take: 10,
@@ -494,16 +362,6 @@ describe('UserRepository', () => {
 
   it('should find user by id', async () => {
     const userId = 1;
-
-    const mockUserFromDb = {
-      id: userId,
-      email: 'email',
-      products: [{}],
-      roles: [
-        { role: { id: 1, value: 'Admin', description: 'Administrator role' } },
-      ],
-    };
-
     const mockUser = {
       id: userId,
       email: 'email',
@@ -513,7 +371,7 @@ describe('UserRepository', () => {
 
     jest
       .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUserFromDb as any);
+      .mockResolvedValue(mockUser as any);
 
     const user = await repository.findById(userId);
 
@@ -524,17 +382,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
         products: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
     });
 
@@ -543,16 +391,6 @@ describe('UserRepository', () => {
 
   it('should find user profile', async () => {
     const userId = 1;
-
-    const mockUserFromDb = {
-      id: userId,
-      email: 'email',
-      products: [{}],
-      roles: [
-        { role: { id: 1, value: 'Admin', description: 'Administrator role' } },
-      ],
-    };
-
     const mockUser = {
       id: userId,
       email: 'email',
@@ -562,7 +400,7 @@ describe('UserRepository', () => {
 
     jest
       .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUserFromDb as any);
+      .mockResolvedValue(mockUser as any);
 
     const user = await repository.findUserProfile(userId);
 
@@ -574,17 +412,7 @@ describe('UserRepository', () => {
         email: true,
         createdAt: true,
         products: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
     });
 
@@ -593,20 +421,6 @@ describe('UserRepository', () => {
 
   it('should find user by email', async () => {
     const email = 'email';
-
-    const mockUserFromDb = {
-      id: 1,
-      email,
-      nickname: 'test',
-      createdAt: date,
-
-      password: '12345',
-      products: [{}],
-      roles: [
-        { role: { id: 1, value: 'Admin', description: 'Administrator role' } },
-      ],
-    };
-
     const mockUser = {
       id: 1,
       email,
@@ -618,20 +432,14 @@ describe('UserRepository', () => {
       roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
     };
 
-    jest
-      .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUserFromDb);
+    jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
 
     const user = await repository.findOneByEmail(email);
 
     expect(prismaService.user.findUnique).toHaveBeenCalledWith({
       where: { email },
       include: {
-        roles: {
-          select: {
-            role: { select: { id: true, value: true, description: true } },
-          },
-        },
+        roles: true,
       },
     });
 
@@ -644,31 +452,23 @@ describe('UserRepository', () => {
     const roleId = 1;
     const password = '12345';
 
-    const mockUserFromDb = {
-      id: 1,
-      email,
-      roles: [{ role: { id: roleId, value: 'admin', description: 'admin' } }],
-    };
-
     const mockUser = {
       id: 1,
       email,
       roles: [{ id: roleId, value: 'admin', description: 'admin' }],
     };
 
-    jest
-      .spyOn(prismaService.user, 'create')
-      .mockResolvedValue(mockUserFromDb as any);
+    jest.spyOn(prismaService.user, 'create').mockResolvedValue(mockUser as any);
 
     const user = await repository.create(email, nickname, password, roleId);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
       data: {
         email,
-        password,
         nickname,
+        password,
         roles: {
-          create: [{ role: { connect: { id: roleId } } }],
+          connect: [{ id: roleId }],
         },
       },
       select: {
@@ -676,27 +476,15 @@ describe('UserRepository', () => {
         email: true,
         nickname: true,
         createdAt: true,
-        roles: {
-          select: {
-            role: { select: { id: true, value: true, description: true } },
-          },
-        },
+        roles: true,
       },
     });
+
     expect(user).toEqual(mockUser);
   });
 
   it('should delete user by id', async () => {
     const userId = 1;
-
-    const mockUserFromDb = {
-      id: userId,
-      email: 'user@example.com',
-      products: [{}],
-      roles: [
-        { role: { id: 1, value: 'Admin', description: 'Administrator role' } },
-      ],
-    };
 
     const mockUser = {
       id: userId,
@@ -705,9 +493,7 @@ describe('UserRepository', () => {
       roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
     };
 
-    jest
-      .spyOn(prismaService.user, 'delete')
-      .mockResolvedValue(mockUserFromDb as any);
+    jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser as any);
 
     const user = await repository.delete(userId);
 
@@ -718,17 +504,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
         products: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                value: true,
-                description: true,
-              },
-            },
-          },
-        },
+        roles: true,
       },
     });
 
