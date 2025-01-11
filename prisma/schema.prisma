@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   title       String
   description String
   price       Float
   images      String[]
   userId      Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories  Category[]
 }
 
 model User {
@@ -41,4 +42,11 @@ model Role {
   value       String @unique
   description String
   user        User[]
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  products    Product[]
 }

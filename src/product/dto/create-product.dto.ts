@@ -4,8 +4,9 @@ import {
   IsNumber,
   Min,
   MaxLength,
+  IsArray,
 } from 'class-validator';
-import { ToNumber, Trim } from '../../decorators';
+import { ToNumber, Trim, ToNumberArray } from '../../decorators';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -25,4 +26,9 @@ export class CreateProductDto {
   @ToNumber()
   @Min(0)
   price!: number;
+
+  @IsNotEmpty()
+  @IsArray()
+  @ToNumberArray()
+  categoryIds!: number[];
 }

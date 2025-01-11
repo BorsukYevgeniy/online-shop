@@ -8,8 +8,9 @@ import { ProductRepository } from './product.repository';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
-import { ProductFilter } from './interface/product-filter.interface';
+import { ProductFilter } from './types/product-filter.interface';
 import { PaginationDto } from 'src/dto/pagination.dto';
+import { ProductCategory } from './types/product.type';
 
 @Injectable()
 export class ProductService {
@@ -21,8 +22,8 @@ export class ProductService {
   private async validateProductOwnership(
     userId: number,
     productId: number,
-  ): Promise<Product> {
-    const product: Product | null =
+  ): Promise<ProductCategory> {
+    const product: ProductCategory | null =
       await this.productRepository.findById(productId);
 
     if (!product) {
@@ -61,8 +62,8 @@ export class ProductService {
     };
   }
 
-  async findById(productId: number): Promise<Product> {
-    const product: Product | null =
+  async findById(productId: number): Promise<ProductCategory> {
+    const product: ProductCategory | null =
       await this.productRepository.findById(productId);
 
     if (!product) throw new NotFoundException('Product not found');
@@ -74,7 +75,7 @@ export class ProductService {
     userId: number,
     dto: CreateProductDto,
     images: Express.Multer.File[],
-  ): Promise<Product> {
+  ): Promise<ProductCategory> {
     const imagesNames: string[] = await this.fileService.createImages(images);
 
     return await this.productRepository.create(userId, dto, imagesNames);
@@ -85,7 +86,7 @@ export class ProductService {
     productId: number,
     dto: UpdateProductDto,
     images?: Express.Multer.File[],
-  ): Promise<Product> {
+  ): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
 
     let imagesNames: string[] = [];
@@ -99,7 +100,7 @@ export class ProductService {
     return await this.productRepository.update(productId, dto, imagesNames);
   }
 
-  async deleteProduct(userId: number, productId: number): Promise<Product> {
+  async deleteProduct(userId: number, productId: number): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
 
     return await this.productRepository.delete(productId);

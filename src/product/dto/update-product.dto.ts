@@ -4,25 +4,32 @@ import {
   IsNumber,
   Min,
   MaxLength,
+  IsArray,
 } from 'class-validator';
-import { ToNumber, Trim } from '../../decorators';
+import { ToNumber, Trim, ToNumberArray } from '../../decorators';
 
 export class UpdateProductDto {
   @IsOptional()
   @IsString()
   @Trim()
   @MaxLength(100)
-  title?: string;
+  readonly title?: string;
 
   @IsOptional()
   @IsString()
   @Trim()
   @MaxLength(500)
-  description?: string;
+  readonly description?: string;
 
   @IsOptional()
   @IsNumber()
   @ToNumber()
   @Min(0)
-  price?: number;
+  readonly price?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ToNumberArray()
+  readonly categoryIds?: number[]
+
 }

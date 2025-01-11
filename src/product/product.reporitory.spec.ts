@@ -142,7 +142,9 @@ describe('ProductRepository', () => {
           lte: undefined,
         },
       },
-
+      include: {
+        categories: true,
+      },
       skip: 0,
       take: 10,
     });
@@ -173,7 +175,9 @@ describe('ProductRepository', () => {
           lte: undefined,
         },
       },
-
+      include: {
+        categories: true,
+      },
       skip: 0,
       take: 10,
     });
@@ -211,7 +215,9 @@ describe('ProductRepository', () => {
           lte: 200,
         },
       },
-
+      include: {
+        categories: true,
+      },
       skip: 0,
       take: 10,
     });
@@ -250,7 +256,9 @@ describe('ProductRepository', () => {
           lte: 200,
         },
       },
-
+      include: {
+        categories: true,
+      },
       skip: 0,
       take: 10,
     });
@@ -274,6 +282,9 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.findUnique).toHaveBeenCalledWith({
       where: { id: productId },
+      include: {
+        categories: true,
+      },
     });
 
     expect(product).toEqual(mockProduct);
@@ -285,14 +296,18 @@ describe('ProductRepository', () => {
       title: 'TEST',
       description: 'Test description',
       price: 69,
+      categoryIds: [1],
     };
     const images = ['1'];
 
     const mockProduct = {
       id: 1,
+      title: dto.title,
+      price: dto.price,
       userId,
+      description: dto.description,
       images,
-      ...dto,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(prisma.product, 'create').mockResolvedValue(mockProduct);
@@ -300,7 +315,23 @@ describe('ProductRepository', () => {
     const product = await repository.create(userId, dto, images);
 
     expect(prisma.product.create).toHaveBeenCalledWith({
-      data: { userId, ...dto, images },
+      data: {
+        userId,
+        title: dto.title,
+        price: dto.price,
+        description: dto.description,
+        images,
+        categories: {
+          connect: [
+            {
+              id: 1,
+            },
+          ],
+        },
+      },
+      include: {
+        categories: true,
+      },
     });
 
     expect(product).toEqual(mockProduct);
@@ -336,6 +367,9 @@ describe('ProductRepository', () => {
         price: 100,
         images: imageNames,
       },
+      include: {
+        categories: true,
+      },
     });
 
     expect(product).toEqual(mockProduct);
@@ -346,7 +380,6 @@ describe('ProductRepository', () => {
     const updateDto: UpdateProductDto = {
       title: 'Updated Title',
     };
-    const imageNames = ['image1.jpg'];
 
     const mockProduct = {
       id: productId,
@@ -354,18 +387,24 @@ describe('ProductRepository', () => {
       title: updateDto.title,
       description: 'Old Description',
       price: 50,
-      images: imageNames,
+      images: ['image1.jpg'],
     };
 
     jest.spyOn(prisma.product, 'update').mockResolvedValue(mockProduct);
 
-    const product = await repository.update(productId, updateDto, imageNames);
+    const product = await repository.update(productId, updateDto);
 
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },
       data: {
+        categories: undefined,
+        description: undefined,
+        price: undefined,
         title: updateDto.title,
-        images: imageNames,
+        images: undefined,
+      },
+      include: {
+        categories: true,
       },
     });
 
@@ -377,7 +416,6 @@ describe('ProductRepository', () => {
     const dto: UpdateProductDto = {
       price: 52,
     };
-    const imageNames = ['image1.jpg'];
 
     const mockProduct = {
       id: productId,
@@ -385,19 +423,22 @@ describe('ProductRepository', () => {
       title: 'Old title',
       description: 'Old Description',
       price: dto.price,
-      images: imageNames,
+      images: ['image1.jpg'],
     };
 
     jest.spyOn(prisma.product, 'update').mockResolvedValue(mockProduct);
 
-    const product = await repository.update(productId, dto, imageNames);
+    const product = await repository.update(productId, dto);
 
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },
       data: {
+        categories: undefined,
         price: dto.price,
-        images: imageNames,
+        title: undefined,
+        images: undefined,
       },
+      include: { categories: true },
     });
 
     expect(product).toEqual(mockProduct);
@@ -405,7 +446,8 @@ describe('ProductRepository', () => {
 
   it('should update images in product', async () => {
     const productId = 1;
-    const imageName = ['1.jpg'];
+    const images = ['1.jpg'];
+
     const dto: UpdateProductDto = {};
     const mockProduct = {
       id: productId,
@@ -413,17 +455,22 @@ describe('ProductRepository', () => {
       title: 'Old title',
       description: 'Old Description',
       price: 50,
-      images: imageName,
+      images,
     };
 
     jest.spyOn(prisma.product, 'update').mockResolvedValue(mockProduct);
 
-    const product = await repository.update(productId, dto, imageName);
+    const product = await repository.update(productId, dto, images);
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },
       data: {
-        images: imageName,
+        categories: undefined,
+        description: undefined,
+        images: images,
+        price: undefined,
+        title: undefined,
       },
+      include: { categories: true },
     });
 
     expect(product).toEqual(mockProduct);
@@ -447,6 +494,9 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.delete).toHaveBeenCalledWith({
       where: { id: productId },
+      include: {
+        categories: true,
+      },
     });
 
     expect(product).toEqual(mockProduct);

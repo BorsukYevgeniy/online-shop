@@ -5,6 +5,7 @@ import { TokenService } from '../token/token.service';
 import { AuthRequest } from '../interfaces/express-requests.interface';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { runInThisContext } from 'vm';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -74,13 +75,15 @@ describe('ProductController', () => {
     const mockProducts = [
       {
         id: productId,
-        userId: 1,
         title: 'title',
         price: 50,
+        userId: 1,
         description: 'description',
-        images: ['1.png', '2.png'],
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
+
     jest.spyOn(service, 'findAll').mockResolvedValue({
       products: mockProducts,
       total: 1,
@@ -112,11 +115,12 @@ describe('ProductController', () => {
     const mockProducts = [
       {
         id: productId,
-        userId: 1,
         title: 'title',
         price: 50,
+        userId: 1,
         description: 'description',
-        images: ['1.png', '2.png'],
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -156,11 +160,12 @@ describe('ProductController', () => {
     const mockProducts = [
       {
         id: productId,
-        userId: 1,
         title: 'title',
         price: 50,
+        userId: 1,
         description: 'description',
-        images: ['1.png', '2.png'],
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -202,11 +207,12 @@ describe('ProductController', () => {
     const mockProducts = [
       {
         id: productId,
-        userId: 1,
         title: 'title',
         price: 50,
+        userId: 1,
         description: 'description',
-        images: ['1.png', '2.png'],
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -248,12 +254,13 @@ describe('ProductController', () => {
   it('should find product by id', async () => {
     const productId = 1;
     const mockProduct = {
-      id: productId,
-      userId: 1,
+      id: 1,
       title: 'title',
       price: 50,
+      userId: 1,
       description: 'description',
-      images: ['1.png', '2.png'],
+      images: ['1', '2'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
@@ -266,150 +273,50 @@ describe('ProductController', () => {
 
   it('should create product', async () => {
     const productId = 1;
+    const dto: CreateProductDto = {
+      title: 'Test Product',
+      description: 'Test Description',
+      price: 100,
+      categoryIds: [1],
+    };
     const mockProduct = {
       id: productId,
+      title: dto.title,
+      price: dto.price,
       userId: 1,
-      title: 'title',
-      price: 50,
-      description: 'description',
-      images: ['1.png', '2.png'],
+      description: dto.description,
+      images: ['1'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
-    const createProductDto: CreateProductDto = {
-      title: 'title',
-      description: 'title',
-      price: 100,
-    };
     jest.spyOn(service, 'create').mockResolvedValue(mockProduct);
 
-    const product = await controller.createProduct(
-      req,
-      createProductDto,
-      mockFiles,
-    );
+    const product = await controller.createProduct(req, dto, mockFiles);
 
-    expect(service.create).toHaveBeenCalledWith(
-      req.user.id,
-      createProductDto,
-      mockFiles,
-    );
+    expect(service.create).toHaveBeenCalledWith(req.user.id, dto, mockFiles);
     expect(product).toEqual(mockProduct);
   });
 
   it('should update all fields in product', async () => {
     const productId = 1;
     const userId = 1;
-    const updateProductDto: UpdateProductDto = {
-      title: 'updated title',
-      description: 'new description',
-      price: 200,
-    };
-    const mockUpdatedAllProduct = {
-      id: productId,
-      userId,
-      title: updateProductDto.title,
-      description: updateProductDto.description,
-      price: updateProductDto.price,
-      images: ['1.png', '2.png'],
+    const dto: UpdateProductDto = {
+      title: 'Updated Title',
+      description: 'Updated Description',
+      price: 100,
+      categoryIds: [1],
     };
 
-    jest.spyOn(service, 'findById').mockResolvedValue(mockUpdatedAllProduct);
-    jest
-      .spyOn(service, 'updateProduct')
-      .mockResolvedValue(mockUpdatedAllProduct);
-
-    const product = await controller.updateProduct(
-      req,
-      updateProductDto,
-      productId,
-      mockFiles,
-    );
-
-    expect(service.updateProduct).toHaveBeenCalledWith(
-      req.user.id,
-      productId,
-      updateProductDto,
-      mockFiles,
-    );
-    expect(product).toEqual(mockUpdatedAllProduct);
-  });
-
-  it('should update only title in product', async () => {
-    const productId = 1;
-    const userId = 1;
-    const updateProductTitleDto: UpdateProductDto = {
-      title: 'updated title',
-    };
-    const mockUpdatedTitleProduct = {
-      id: productId,
-      userId,
-      title: updateProductTitleDto.title,
-      description: 'Old Description',
-      price: 50,
-      images: ['1.png', '2.png'],
-    };
-
-    jest.spyOn(service, 'findById').mockResolvedValue(mockUpdatedTitleProduct);
-    jest
-      .spyOn(service, 'updateProduct')
-      .mockResolvedValue(mockUpdatedTitleProduct);
-
-    const product = await controller.updateProduct(
-      req,
-      updateProductTitleDto,
-      productId,
-    );
-
-    expect(service.updateProduct).toHaveBeenCalledWith(
-      req.user.id,
-      productId,
-      updateProductTitleDto,
-      undefined,
-    );
-    expect(product).toEqual(mockUpdatedTitleProduct);
-  });
-
-  it('should update only price in product', async () => {
-    const productId = 1;
-    const userId = 1;
-    const updateProductPriceDto: UpdateProductDto = {
-      price: 52,
-    };
-    const mockUpdatedPriceProduct = {
-      id: productId,
-      userId,
-      title: 'Old title',
-      description: 'Old Description',
-      price: updateProductPriceDto.price,
-      images: ['1.png', '2.png'],
-    };
-
-    jest.spyOn(service, 'findById').mockResolvedValue(mockUpdatedPriceProduct);
-    jest
-      .spyOn(service, 'updateProduct')
-      .mockResolvedValue(mockUpdatedPriceProduct);
-
-    const product = await controller.updateProduct(
-      req,
-      updateProductPriceDto,
-      productId,
-    );
-
-    expect(product).toEqual(mockUpdatedPriceProduct);
-  });
-
-  it('should update images in product', async () => {
-    const productId = 1;
-    const userId = 1;
-    const dto: UpdateProductDto = {};
     const mockProduct = {
       id: productId,
       userId,
-      title: 'Old title',
-      description: 'Old Description',
-      price: 50,
-      images: ['1.png', '2.png'],
+      title: dto.title,
+      description: dto.description,
+      price: dto.price,
+      images: ['1'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
+
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(service, 'updateProduct').mockResolvedValue(mockProduct);
 
@@ -429,6 +336,100 @@ describe('ProductController', () => {
     expect(product).toEqual(mockProduct);
   });
 
+  it('should update only title in product', async () => {
+    const productId = 1;
+    const userId = 1;
+    const dto: UpdateProductDto = {
+      title: 'Updated Title',
+    };
+
+    const mockProduct = {
+      id: productId,
+      userId: 1,
+      title: dto.title,
+      description: 'Old Description',
+      price: 50,
+      images: ['1'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
+    };
+
+    jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
+    jest.spyOn(service, 'updateProduct').mockResolvedValue(mockProduct);
+
+    const product = await controller.updateProduct(req, dto, productId);
+
+    expect(service.updateProduct).toHaveBeenCalledWith(
+      req.user.id,
+      productId,
+      dto,
+      undefined,
+    );
+    expect(product).toEqual(mockProduct);
+  });
+
+  it('should update only price in product', async () => {
+    const productId = 1;
+    const dto: UpdateProductDto = {
+      price: 52,
+    };
+    const imageNames = ['image1.jpg'];
+
+    const mockProduct = {
+      id: productId,
+      userId: 1,
+      title: 'Old title',
+      description: 'Old Description',
+      price: dto.price,
+      images: imageNames,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
+    };
+    jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
+    jest
+      .spyOn(service, 'updateProduct')
+      .mockResolvedValue(mockProduct);
+
+    const product = await controller.updateProduct(
+      req,
+      dto,
+      productId,
+    );
+
+    expect(product).toEqual(mockProduct);
+  });
+
+  it('should update images in product', async () => {
+    const images = ['1.jpg'];
+
+    const dto: UpdateProductDto = {};
+    const mockProduct = {
+      id: 1,
+      userId: 1,
+      title: 'Old title',
+      description: 'Old Description',
+      price: 50,
+      images,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
+    };
+
+    jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
+    jest.spyOn(service, 'updateProduct').mockResolvedValue(mockProduct);
+
+    const product = await controller.updateProduct(
+      req,
+      dto,
+      1,
+      mockFiles,
+    );
+
+    expect(service.updateProduct).toHaveBeenCalledWith(
+      req.user.id,
+      1,
+      dto,
+      mockFiles,
+    );
+    expect(product).toEqual(mockProduct);
+  });
+
   it('should delete product by id', async () => {
     const productId = 1;
     const userId = 1;
@@ -439,7 +440,9 @@ describe('ProductController', () => {
       title: 'TEST',
       description: 'Test',
       images: ['13', '14'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
+
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(service, 'deleteProduct').mockResolvedValue(mockProduct);

@@ -11,6 +11,7 @@ import { RoleModule } from './roles/role.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { join as joinPath } from 'path';
+import { CategoryModule } from './category/category.module';
 @Module({
   imports: [
     PrismaModule,
@@ -25,6 +26,7 @@ import { join as joinPath } from 'path';
     TokenModule,
     RoleModule,
     ScheduleModule.forRoot(),
+    CategoryModule,
   ],
 })
 export class AppModule {}

@@ -82,14 +82,7 @@ describe('ProductService', () => {
         userId: 1,
         description: 'description',
         images: ['1', '2'],
-      },
-      {
-        id: 2,
-        title: 'title2',
-        price: 100,
-        userId: 2,
-        description: 'description2',
-        images: ['3', '4'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -116,9 +109,10 @@ describe('ProductService', () => {
         id: 1,
         title: 'title',
         price: 50,
+        userId: 1,
         description: 'description',
-        userId: 2,
-        images: ['9', '10'],
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -146,11 +140,12 @@ describe('ProductService', () => {
     const mockProducts = [
       {
         id: 1,
-        title: 'Product A',
-        price: 150,
-        userId: 4,
-        description: 'Test description',
-        images: ['7', '8'],
+        title: 'title',
+        price: 50,
+        userId: 1,
+        description: 'description',
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -186,11 +181,12 @@ describe('ProductService', () => {
     const mockProducts = [
       {
         id: 1,
-        title: 'Test Product',
-        price: 150,
-        userId: 3,
-        images: ['5', '6'],
-        description: 'Test description',
+        title: 'title',
+        price: 50,
+        userId: 1,
+        description: 'description',
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
 
@@ -229,12 +225,13 @@ describe('ProductService', () => {
   it('should find product by id', async () => {
     const productId = 3;
     const mockProduct = {
-      id: productId,
-      userId: 2,
-      title: 'TEST',
-      price: 52,
-      description: 'Test description',
-      images: ['11', '12'],
+      id: 1,
+      title: 'title',
+      price: 50,
+      userId: 1,
+      description: 'description',
+      images: ['1', '2'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
@@ -248,13 +245,23 @@ describe('ProductService', () => {
 
   it('should create product', async () => {
     const userId = 1;
+    const images = ['1', '2'];
+
     const dto: CreateProductDto = {
       title: 'Test Product',
       description: 'Test Description',
       price: 100,
+      categoryIds: [1],
     };
-    const imagesNames = ['1', '2'];
-    const mockProduct = { id: 1, userId, ...dto, images: imagesNames };
+    const mockProduct = {
+      id: 1,
+      title: dto.title,
+      price: dto.price,
+      userId,
+      description: dto.description,
+      images,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
+    };
 
     jest.spyOn(repository, 'create').mockResolvedValue(mockProduct);
 
@@ -266,11 +273,12 @@ describe('ProductService', () => {
   it('should update all fields in product', async () => {
     const productId = 2;
     const userId = 1;
-    const imageNames = ['image1.jpg', 'image2.jpg'];
+    const images = ['image1.jpg', 'image2.jpg'];
     const dto: UpdateProductDto = {
       title: 'Updated Title',
       description: 'Updated Description',
       price: 100,
+      categoryIds: [1],
     };
 
     const mockProduct = {
@@ -279,7 +287,8 @@ describe('ProductService', () => {
       title: dto.title,
       description: dto.description,
       price: dto.price,
-      images: imageNames,
+      images,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
@@ -310,6 +319,7 @@ describe('ProductService', () => {
       description: 'Old Description',
       price: 50,
       images: imageNames,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
@@ -335,6 +345,7 @@ describe('ProductService', () => {
       description: 'Old Description',
       price: dto.price,
       images: imageNames,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
@@ -357,6 +368,7 @@ describe('ProductService', () => {
       description: 'Old Description',
       price: 50,
       images: imageName,
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
@@ -382,6 +394,7 @@ describe('ProductService', () => {
       title: 'TEST',
       description: 'Test',
       images: ['13', '14'],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
