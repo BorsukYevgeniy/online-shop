@@ -16,6 +16,7 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { PaginationDto } from '../dto/pagination.dto';
 import { Category } from '@prisma/client';
+import { SearchCategoryDto } from './dto/search-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -26,9 +27,28 @@ export class CategoryController {
     return await this.categoryService.findAll(pagination);
   }
 
+  @Get('search')
+  async searchCategory(
+    @Query() searchCategoryDto: SearchCategoryDto,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return await this.categoryService.searchCategory(
+      searchCategoryDto,
+      paginationDto,
+    );
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Category> {
     return this.categoryService.findOne(id);
+  }
+
+  @Get(':id/products')
+  async getCategoryProduct(
+    @Param('id') categoryId: number,
+    @Query() pagination: PaginationDto,
+  ) {
+    return await this.categoryService.findCategoryProducts(categoryId, pagination);
   }
 
   @Post()

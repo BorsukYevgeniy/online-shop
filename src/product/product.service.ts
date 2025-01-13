@@ -8,9 +8,9 @@ import { ProductRepository } from './product.repository';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
-import { ProductFilter } from './types/product-filter.interface';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { ProductCategory } from './types/product.type';
+import { SearchProductDto } from './dto/search-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -37,18 +37,42 @@ export class ProductService {
     return product;
   }
 
-  async findAll(filter: ProductFilter, paginationDto: PaginationDto) {
-    let { pageSize, page }: PaginationDto = paginationDto;
+  async findAll(paginationDto: PaginationDto) {
+    const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
 
     const products: Product[] = await this.productRepository.findAll(
-      filter,
       skip,
       pageSize,
     );
 
-    const total: number = await this.productRepository.count(filter);
+    const total: number = await this.productRepository.count();
+    const totalPages: number = Math.ceil(total / pageSize);
+
+    return {
+      products,
+      total,
+      pageSize,
+      page,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
+  }
+
+  async searchProducts(dto: SearchProductDto, pagination: PaginationDto){
+    const { pageSize, page }: PaginationDto = pagination;
+
+    const skip: number = (page - 1) * pageSize;
+
+    const products: Product[] = await this.productRepository.findProducts(
+      dto,
+      skip,
+      pageSize,
+    );
+
+    const total: number = await this.productRepository.count(dto);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -100,7 +124,10 @@ export class ProductService {
     return await this.productRepository.update(productId, dto, imagesNames);
   }
 
-  async deleteProduct(userId: number, productId: number): Promise<ProductCategory> {
+  async deleteProduct(
+    userId: number,
+    productId: number,
+  ): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
 
     return await this.productRepository.delete(productId);

@@ -5,7 +5,6 @@ import { TokenService } from '../token/token.service';
 import { AuthRequest } from '../interfaces/express-requests.interface';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
-import { runInThisContext } from 'vm';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -48,6 +47,7 @@ describe('ProductController', () => {
           useValue: {
             findAll: jest.fn(),
             findById: jest.fn(),
+            searchProducts: jest.fn(),
             findUserProducts: jest.fn(),
             create: jest.fn(),
             updateProduct: jest.fn(),
@@ -70,11 +70,10 @@ describe('ProductController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all products without filters', async () => {
-    const productId = 1;
+  it('should return all products', async () => {
     const mockProducts = [
       {
-        id: productId,
+        id: 1,
         title: 'title',
         price: 50,
         userId: 1,
@@ -94,10 +93,7 @@ describe('ProductController', () => {
       nextPage: null,
     });
 
-    const products = await controller.getAllProducts(
-      { page: 1, pageSize: 10 },
-      {},
-    );
+    const products = await controller.getAllProducts({ page: 1, pageSize: 10 });
 
     expect(products).toEqual({
       products: mockProducts,
@@ -110,11 +106,10 @@ describe('ProductController', () => {
     });
   });
 
-  it('should filter products by title', async () => {
-    const productId = 1;
+  it('should products searched by title', async () => {
     const mockProducts = [
       {
-        id: productId,
+        id: 1,
         title: 'title',
         price: 50,
         userId: 1,
@@ -124,7 +119,7 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue({
+    jest.spyOn(service, 'searchProducts').mockResolvedValue({
       products: mockProducts,
       total: 1,
       pageSize: 10,
@@ -134,9 +129,9 @@ describe('ProductController', () => {
       nextPage: null,
     });
 
-    const products = await controller.getAllProducts(
-      { page: 1, pageSize: 10 },
+    const products = await controller.searchProducts(
       { title: 'Test' },
+      { page: 1, pageSize: 10 },
     );
 
     expect(products).toEqual({
@@ -149,17 +144,16 @@ describe('ProductController', () => {
       nextPage: null,
     });
 
-    expect(service.findAll).toHaveBeenCalledWith(
+    expect(service.searchProducts).toHaveBeenCalledWith(
       { title: 'Test' },
       { page: 1, pageSize: 10 },
     );
   });
 
-  it('should filter products by price range', async () => {
-    const productId = 1;
+  it('should products searched by price range and title', async () => {
     const mockProducts = [
       {
-        id: productId,
+        id: 1,
         title: 'title',
         price: 50,
         userId: 1,
@@ -169,7 +163,7 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue({
+    jest.spyOn(service, 'searchProducts').mockResolvedValue({
       products: mockProducts,
       total: 1,
       pageSize: 10,
@@ -179,18 +173,11 @@ describe('ProductController', () => {
       nextPage: null,
     });
 
-    const products = await controller.getAllProducts(
+    const products = await controller.searchProducts(
+      { title: 'title', minPrice: 20, maxPrice: 60 },
       { page: 1, pageSize: 10 },
-      { minPrice: 10, maxPrice: 25 },
     );
 
-    expect(service.findAll).toHaveBeenCalledWith(
-      {
-        minPrice: 10,
-        maxPrice: 25,
-      },
-      { page: 1, pageSize: 10 },
-    );
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
@@ -200,13 +187,17 @@ describe('ProductController', () => {
       prevPage: null,
       nextPage: null,
     });
+
+    expect(service.searchProducts).toHaveBeenCalledWith(
+      { title: 'title', minPrice: 20, maxPrice: 60 },
+      { page: 1, pageSize: 10 },
+    );
   });
 
-  it('should filter products by title and price range', async () => {
-    const productId = 1;
+  it('should products searched by price range, title and categories', async () => {
     const mockProducts = [
       {
-        id: productId,
+        id: 1,
         title: 'title',
         price: 50,
         userId: 1,
@@ -216,7 +207,7 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue({
+    jest.spyOn(service, 'searchProducts').mockResolvedValue({
       products: mockProducts,
       total: 1,
       pageSize: 10,
@@ -226,17 +217,8 @@ describe('ProductController', () => {
       nextPage: null,
     });
 
-    const products = await controller.getAllProducts(
-      { page: 1, pageSize: 10 },
-      { title: 'Test', minPrice: 25, maxPrice: 75 },
-    );
-
-    expect(service.findAll).toHaveBeenCalledWith(
-      {
-        title: 'Test',
-        minPrice: 25,
-        maxPrice: 75,
-      },
+    const products = await controller.searchProducts(
+      { title: 'title', minPrice: 20, maxPrice: 60, categoryIds: [1] },
       { page: 1, pageSize: 10 },
     );
 
@@ -249,6 +231,11 @@ describe('ProductController', () => {
       prevPage: null,
       nextPage: null,
     });
+
+    expect(service.searchProducts).toHaveBeenCalledWith(
+      { title: 'title', minPrice: 20, maxPrice: 60, categoryIds: [1] },
+      { page: 1, pageSize: 10 },
+    );
   });
 
   it('should find product by id', async () => {
@@ -384,15 +371,9 @@ describe('ProductController', () => {
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
-    jest
-      .spyOn(service, 'updateProduct')
-      .mockResolvedValue(mockProduct);
+    jest.spyOn(service, 'updateProduct').mockResolvedValue(mockProduct);
 
-    const product = await controller.updateProduct(
-      req,
-      dto,
-      productId,
-    );
+    const product = await controller.updateProduct(req, dto, productId);
 
     expect(product).toEqual(mockProduct);
   });
@@ -414,12 +395,7 @@ describe('ProductController', () => {
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(service, 'updateProduct').mockResolvedValue(mockProduct);
 
-    const product = await controller.updateProduct(
-      req,
-      dto,
-      1,
-      mockFiles,
-    );
+    const product = await controller.updateProduct(req, dto, 1, mockFiles);
 
     expect(service.updateProduct).toHaveBeenCalledWith(
       req.user.id,
@@ -442,7 +418,6 @@ describe('ProductController', () => {
       images: ['13', '14'],
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
-
 
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(service, 'deleteProduct').mockResolvedValue(mockProduct);

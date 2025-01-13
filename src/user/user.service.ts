@@ -18,6 +18,7 @@ import {
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { UserFilter } from './types/user-filter.type';
+import { SearchUserDto } from './dto/search-user.dto';
 
 @Injectable()
 export class UserService {
@@ -26,12 +27,32 @@ export class UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  async findAll(paginationDto: PaginationDto, userFilter: UserFilter) {
+  async findAll(paginationDto: PaginationDto) {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
-    const users = await this.userRepository.findAll(userFilter, skip, pageSize);
-    const total = await this.userRepository.count(userFilter);
+    const users = await this.userRepository.findAll(skip, pageSize);
+    const total = await this.userRepository.count();
+
+    const totalPages: number = Math.ceil(total / pageSize);
+
+    return {
+      users,
+      total,
+      page,
+      pageSize,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
+  }
+
+  async searchUsers(dto: SearchUserDto, pagination: PaginationDto) {
+    const { page, pageSize }: PaginationDto = pagination;
+    const skip: number = pageSize * (page - 1);
+
+    const users = await this.userRepository.findUsers(dto, skip, pageSize);
+    const total = await this.userRepository.count();
 
     const totalPages: number = Math.ceil(total / pageSize);
 

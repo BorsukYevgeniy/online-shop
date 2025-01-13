@@ -9,6 +9,7 @@ import {
   UserRolesNoProductsCreds,
 } from './types/user.types';
 import { UserFilter } from './types/user-filter.type';
+import { SearchUserDto } from './dto/search-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -33,29 +34,25 @@ export class UserRepository {
     return updatedUser;
   }
 
-  async count(filter: UserFilter): Promise<number> {
-    const { nickname, minDate, maxDate }: UserFilter = filter;
-
+  async count(filter?: UserFilter): Promise<number> {
     return await this.prisma.user.count({
       where: {
-        nickname: { contains: nickname, mode: 'insensitive' },
-        createdAt: { gte: minDate, lte: maxDate },
+        nickname: filter
+          ? { contains: filter.nickname, mode: 'insensitive' }
+          : undefined,
+        createdAt: {
+          gte: filter ? filter.minDate : undefined,
+          lte: filter ? filter.maxDate : undefined,
+        },
       },
     });
   }
 
   async findAll(
-    filter: UserFilter,
     skip: number,
     limit: number,
   ): Promise<UserRolesNoProductsCreds[]> {
-    const { nickname, minDate, maxDate }: UserFilter = filter;
     const users = await this.prisma.user.findMany({
-      where: {
-        nickname: { contains: nickname, mode: 'insensitive' },
-        createdAt: { gte: minDate, lte: maxDate },
-      },
-
       select: {
         id: true,
         nickname: true,
@@ -68,6 +65,20 @@ export class UserRepository {
     });
 
     return users;
+  }
+
+  async findUsers(dto: SearchUserDto, skip: number, limit: number) {
+    const { nickname, minDate, maxDate }: SearchUserDto = dto;
+
+    return await this.prisma.user.findMany({
+      where: {
+        nickname: { contains: nickname, mode: 'insensitive' },
+        createdAt: { lte: maxDate, gte: minDate },
+      },
+      skip,
+      take: limit,
+      select: { id: true, nickname: true, roles: true, createdAt: true },
+    });
   }
 
   async findById(userId: number): Promise<UserProductsRolesNoCreds | null> {

@@ -5,16 +5,18 @@ import {
   MaxLength,
   MinLength,
   IsNumber,
+  IsNotEmpty,
+  IsArray,
 } from 'class-validator';
-import { ToNumber, Trim } from '../../decorators';
+import { ToNumber, ToNumberArray, Trim } from '../../decorators';
 
-export class ProductFilterDto {
-  @IsOptional()
+export class SearchProductDto {
+  @IsNotEmpty()
   @IsString()
   @Trim()
   @MinLength(1)
   @MaxLength(100)
-  readonly title?: string;
+  readonly title: string;
 
   @IsOptional()
   @IsNumber({}, { message: 'minPrice must be a valid number' })
@@ -27,4 +29,9 @@ export class ProductFilterDto {
   @ToNumber()
   @Min(0)
   readonly maxPrice?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ToNumberArray()
+  readonly categoryIds?: number[]
 }

@@ -13,22 +13,22 @@ export class CreateProductDto {
   @IsString()
   @Trim()
   @MaxLength(100)
-  title!: string;
+  readonly title: string;
 
   @IsNotEmpty()
   @IsString()
   @Trim()
   @MaxLength(500)
-  description!: string;
+  readonly description: string;
 
   @IsNotEmpty()
   @IsNumber()
   @ToNumber()
   @Min(0)
-  price!: number;
+  readonly price: number;
 
   @IsNotEmpty()
   @IsArray()
   @ToNumberArray()
-  categoryIds!: number[];
+  readonly categoryIds: number[];
 }

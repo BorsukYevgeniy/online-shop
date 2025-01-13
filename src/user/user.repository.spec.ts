@@ -179,15 +179,14 @@ describe('UserRepository', () => {
   });
 
 
-  it('should get all users without filters', async () => {
+  it('should get all users', async () => {
     const mockUsers = [
       {
         id: 1,
         email: 'email',
         nickname: 'test',
+        password: 'test',
         createdAt: date,
-
-        password: '12345',
         products: [{} as Product],
         roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
       },
@@ -195,20 +194,9 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findAll({}, 0, 10);
+    const users = await repository.findAll( 0, 10);
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: {
-        createdAt: {
-          gte: undefined,
-          lte: undefined,
-        },
-        nickname: {
-          contains: undefined,
-          mode: 'insensitive',
-        },
-      },
-
       select: {
         id: true,
         nickname: true,
@@ -222,15 +210,14 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should get all users filtered by nickname', async () => {
+  it('should get all users searched by nickname', async () => {
     const mockUsers = [
       {
         id: 1,
         email: 'email',
         nickname: 'test',
+        password: 'password',
         createdAt: date,
-
-        password: '12345',
         products: [{} as Product],
         roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
       },
@@ -238,7 +225,7 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findAll({ nickname: 'test' }, 0, 10);
+    const users = await repository.findUsers({ nickname: 'test' }, 0, 10);
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       where: {
@@ -263,15 +250,14 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should get all users filtered and date range', async () => {
+  it('should get all users searched nickname and date range', async () => {
     const mockUsers = [
       {
         id: 1,
         email: 'email',
         nickname: 'test',
         createdAt: date,
-
-        password: '12345',
+        password: 'password',
         products: [{} as Product],
         roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
       },
@@ -279,8 +265,9 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findAll(
+    const users = await repository.findUsers(
       {
+        nickname: "test",
         minDate: date,
         maxDate: date,
       },
@@ -290,56 +277,7 @@ describe('UserRepository', () => {
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       where: {
-        nickname: { contains: undefined, mode: 'insensitive' },
-        createdAt: {
-          gte: date,
-          lte: date,
-        },
-      },
-
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-
-        roles: true,
-      },
-      skip: 0,
-      take: 10,
-    });
-
-    expect(users).toEqual(mockUsers);
-  });
-
-  it('should get all users filtered by nickname and date range', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-
-        password: '12345',
-        products: [{} as Product],
-        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
-      },
-    ];
-
-    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-
-    const users = await repository.findAll(
-      {
-        nickname: 'test',
-        minDate: date,
-        maxDate: date,
-      },
-      0,
-      10,
-    );
-
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'test', mode: 'insensitive' },
+        nickname: { contains: "test", mode: 'insensitive' },
         createdAt: {
           gte: date,
           lte: date,
@@ -425,9 +363,8 @@ describe('UserRepository', () => {
       id: 1,
       email,
       nickname: 'test',
+      password: 'test',
       createdAt: date,
-
-      password: '12345',
       products: [{}],
       roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
     };

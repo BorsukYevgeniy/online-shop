@@ -4,39 +4,45 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductFilter } from './types/product-filter.interface';
 import { ProductCategory } from './types/product.type';
+import { SearchProductDto } from './dto/search-product.dto';
 
 @Injectable()
 export class ProductRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async count(filter: ProductFilter): Promise<number> {
-    const { title, minPrice, maxPrice }: ProductFilter = filter;
-
-    return await this.prismaService.product.count({
+  async count(filter?: ProductFilter): Promise<number> {
+    return await this.prisma.product.count({
       where: {
-        title: { contains: title, mode: 'insensitive' },
+        title: filter
+          ? { contains: filter.title, mode: 'insensitive' }
+          : undefined,
         price: {
-          gte: minPrice,
-          lte: maxPrice,
+          gte: filter ? filter.minPrice : undefined,
+          lte: filter ? filter.maxPrice : undefined,
         },
       },
     });
   }
 
-  async findAll(
-    filter: ProductFilter,
-    skip: number,
-    limit: number,
-  ): Promise<ProductCategory[]> {
-    const { title, minPrice, maxPrice }: ProductFilter = filter;
+  async findAll(skip: number, limit: number): Promise<ProductCategory[]> {
+    return await this.prisma.product.findMany({
+      include: { categories: true },
+      skip,
+      take: limit,
+    });
+  }
 
-    return await this.prismaService.product.findMany({
+  async findProducts(dto: SearchProductDto, skip: number, limit: number) {
+    const { title, maxPrice, minPrice, categoryIds }: SearchProductDto = dto;
+
+    return await this.prisma.product.findMany({
       where: {
         title: { contains: title, mode: 'insensitive' },
         price: {
           gte: minPrice,
           lte: maxPrice,
         },
+        categories: { some: { id: { in: categoryIds } } },
       },
       include: { categories: true },
       skip,
@@ -45,7 +51,7 @@ export class ProductRepository {
   }
 
   async findById(productId: number): Promise<ProductCategory> {
-    return await this.prismaService.product.findUnique({
+    return await this.prisma.product.findUnique({
       where: { id: productId },
       include: { categories: true },
     });
@@ -56,7 +62,7 @@ export class ProductRepository {
     dto: CreateProductDto,
     imageNames: string[],
   ): Promise<ProductCategory> {
-    return await this.prismaService.product.create({
+    return await this.prisma.product.create({
       data: {
         userId,
         title: dto.title,
@@ -76,7 +82,7 @@ export class ProductRepository {
     dto: UpdateProductDto,
     imageNames?: string[],
   ): Promise<ProductCategory | null> {
-    return await this.prismaService.product.update({
+    return await this.prisma.product.update({
       where: { id: productId },
       data: {
         images: imageNames,
@@ -92,7 +98,7 @@ export class ProductRepository {
   }
 
   async delete(productId: number): Promise<ProductCategory | null> {
-    return await this.prismaService.product.delete({
+    return await this.prisma.product.delete({
       where: { id: productId },
       include: { categories: true },
     });

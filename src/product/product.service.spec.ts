@@ -45,6 +45,7 @@ describe('ProductService', () => {
           useValue: {
             count: jest.fn(),
             findAll: jest.fn(),
+            findProducts: jest.fn(),
             findById: jest.fn(),
             findUserProducts: jest.fn(),
             create: jest.fn(),
@@ -86,16 +87,16 @@ describe('ProductService', () => {
       },
     ];
 
-    jest.spyOn(repository, 'count').mockResolvedValue(2);
+    jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
 
-    const products = await service.findAll({}, { pageSize: 10, page: 1 });
+    const products = await service.findAll({ page: 1, pageSize: 1 });
 
-    expect(repository.findAll).toHaveBeenCalledWith({}, 0, 10);
+    expect(repository.findAll).toHaveBeenCalledWith(0, 1);
     expect(products).toEqual({
       products: mockProducts,
-      total: 2,
-      pageSize: 10,
+      total: 1,
+      pageSize: 1,
       page: 1,
       totalPages: 1,
       prevPage: null,
@@ -117,59 +118,22 @@ describe('ProductService', () => {
     ];
 
     jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
+    jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.findAll(
+    const products = await service.searchProducts(
       { title: 'Test' },
       { pageSize: 1, page: 1 },
     );
 
-    expect(repository.findAll).toHaveBeenCalledWith({ title: 'Test' }, 0, 1);
+    expect(repository.findProducts).toHaveBeenCalledWith(
+      { title: 'Test' },
+      0,
+      1,
+    );
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
       pageSize: 1,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-  });
-
-  it('should filter products by price range', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'title',
-        price: 50,
-        userId: 1,
-        description: 'description',
-        images: ['1', '2'],
-        categories: [{ id: 1, name: 'test', description: 'test' }],
-      },
-    ];
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
-
-    const products = await service.findAll(
-      { minPrice: 100, maxPrice: 200 },
-      { page: 1, pageSize: 10 },
-    );
-
-    expect(repository.findAll).toHaveBeenCalledWith(
-      {
-        minPrice: 100,
-        maxPrice: 200,
-      },
-      0,
-      10,
-    );
-
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 10,
       page: 1,
       totalPages: 1,
       prevPage: null,
@@ -191,30 +155,59 @@ describe('ProductService', () => {
     ];
 
     jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
+    jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.findAll(
-      {
-        title: 'Test',
-        minPrice: 100,
-        maxPrice: 200,
-      },
-      { pageSize: 2, page: 1 },
+    const products = await service.searchProducts(
+      { title: 'Test', minPrice: 20, maxPrice: 20 },
+      { pageSize: 1, page: 1 },
     );
 
-    expect(repository.findAll).toHaveBeenCalledWith(
-      {
-        title: 'Test',
-        minPrice: 100,
-        maxPrice: 200,
-      },
+    expect(repository.findProducts).toHaveBeenCalledWith(
+      { title: 'Test', minPrice: 20, maxPrice: 20 },
       0,
-      2,
+      1,
     );
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
-      pageSize: 2,
+      pageSize: 1,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
+  });
+
+  it('should filter products by title and price, range  and category ids', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'title',
+        price: 50,
+        userId: 1,
+        description: 'description',
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
+      },
+    ];
+
+    jest.spyOn(repository, 'count').mockResolvedValue(1);
+    jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
+
+    const products = await service.searchProducts(
+      { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
+      { pageSize: 1, page: 1 },
+    );
+
+    expect(repository.findProducts).toHaveBeenCalledWith(
+      { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
+      0,
+      1,
+    );
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 1,
       page: 1,
       totalPages: 1,
       prevPage: null,

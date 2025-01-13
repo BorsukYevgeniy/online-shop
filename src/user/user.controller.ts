@@ -21,7 +21,7 @@ import {
 } from './types/user.types';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
-import { UserFilterDto } from './dto/user-filter.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 
 @Controller('users')
@@ -29,12 +29,18 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('')
-  @UseGuards(AuthGuard)
-  async findAll(
-    @Query() paginationDto: PaginationDto,
-    @Query(ParseUserFilterPipe) userFilter: UserFilterDto,
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
+  async findAll(@Query() paginationDto: PaginationDto) {
+    return await this.userService.findAll(paginationDto);
+  }
+
+  @Get('search')
+  async searchUsers(
+    @Query(ParseUserFilterPipe) dto: SearchUserDto,
+    @Query() pagination: PaginationDto,
   ) {
-    return await this.userService.findAll(paginationDto, userFilter);
+    return await this.userService.searchUsers(dto, pagination);
   }
 
   @Get('me')

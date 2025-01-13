@@ -129,19 +129,9 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll({}, 0, 10);
+    const products = await repository.findAll(0, 10);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
-      where: {
-        title: {
-          contains: undefined,
-          mode: 'insensitive',
-        },
-        price: {
-          gte: undefined,
-          lte: undefined,
-        },
-      },
       include: {
         categories: true,
       },
@@ -151,7 +141,7 @@ describe('ProductRepository', () => {
     expect(products).toEqual(mockProducts);
   });
 
-  it('should filter products by title', async () => {
+  it('should search products by title', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -165,7 +155,7 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll({ title: 'Test' }, 0, 10);
+    const products = await repository.findProducts({ title: 'Test' }, 0, 10);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
@@ -174,45 +164,12 @@ describe('ProductRepository', () => {
           gte: undefined,
           lte: undefined,
         },
-      },
-      include: {
-        categories: true,
-      },
-      skip: 0,
-      take: 10,
-    });
-    expect(products).toEqual(mockProducts);
-  });
-
-  it('should filter products by price range', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'Product A',
-        price: 150,
-        userId: 4,
-        description: 'Test description',
-        images: ['7', '8'],
-      },
-    ];
-
-    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
-
-    const products = await repository.findAll(
-      { minPrice: 100, maxPrice: 200 },
-      0,
-      10,
-    );
-
-    expect(prisma.product.findMany).toHaveBeenCalledWith({
-      where: {
-        title: {
-          contains: undefined,
-          mode: 'insensitive',
-        },
-        price: {
-          gte: 100,
-          lte: 200,
+        categories: {
+          some: {
+            id: {
+              in: undefined,
+            },
+          },
         },
       },
       include: {
@@ -224,26 +181,22 @@ describe('ProductRepository', () => {
     expect(products).toEqual(mockProducts);
   });
 
-  it('should filter products by title and price range', async () => {
+  it('should search products by title and price range', async () => {
     const mockProducts = [
       {
         id: 1,
         title: 'Test Product',
         price: 150,
-        userId: 3,
-        images: ['5', '6'],
         description: 'Test description',
+        userId: 5,
+        images: ['9', '10'],
       },
     ];
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll(
-      {
-        title: 'Test',
-        minPrice: 100,
-        maxPrice: 200,
-      },
+    const products = await repository.findProducts(
+      { title: 'Test', minPrice: 100, maxPrice: 200 },
       0,
       10,
     );
@@ -254,6 +207,57 @@ describe('ProductRepository', () => {
         price: {
           gte: 100,
           lte: 200,
+        },
+        categories: {
+          some: {
+            id: {
+              in: undefined,
+            },
+          },
+        },
+      },
+      include: {
+        categories: true,
+      },
+      skip: 0,
+      take: 10,
+    });
+    expect(products).toEqual(mockProducts);
+  });
+
+  it('should search products by title ,price range and category ids', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'Test Product',
+        price: 150,
+        description: 'Test description',
+        userId: 5,
+        images: ['9', '10'],
+      },
+    ];
+
+    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
+
+    const products = await repository.findProducts(
+      { title: 'Test', minPrice: 100, maxPrice: 200, categoryIds: [1] },
+      0,
+      10,
+    );
+
+    expect(prisma.product.findMany).toHaveBeenCalledWith({
+      where: {
+        title: { contains: 'Test', mode: 'insensitive' },
+        price: {
+          gte: 100,
+          lte: 200,
+        },
+        categories: {
+          some: {
+            id: {
+              in: [1],
+            },
+          },
         },
       },
       include: {

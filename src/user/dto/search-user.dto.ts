@@ -4,16 +4,17 @@ import {
   MaxLength,
   MinLength,
   IsDate,
+  IsNotEmpty,
 } from 'class-validator';
 import { ToDate, Trim } from '../../decorators';
 
-export class UserFilterDto {
-  @IsOptional()
+export class SearchUserDto {
+  @IsNotEmpty()
   @IsString()
   @Trim()
   @MinLength(3)
   @MaxLength(15)
-  readonly nickname?: string;
+  readonly nickname: string;
 
   @IsOptional()
   @IsDate({ message: 'Date should be in YYYY-MM-DD format' })

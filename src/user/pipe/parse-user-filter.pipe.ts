@@ -5,14 +5,14 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { UserFilter } from '../types/user-filter.type';
-import { UserFilterDto } from '../dto/user-filter.dto';
+import { SearchUserDto } from '../dto/search-user.dto';
 
 @Injectable()
 export class ParseUserFilterPipe
-  implements PipeTransform<UserFilterDto, UserFilter>
+  implements PipeTransform<SearchUserDto, UserFilter>
 {
-  transform(value: UserFilterDto, metadata: ArgumentMetadata): UserFilter {
-    const { minDate, maxDate }: UserFilterDto = value;
+  transform(value: SearchUserDto, metadata: ArgumentMetadata): UserFilter {
+    const { minDate, maxDate }: SearchUserDto = value;
 
     if (minDate > maxDate) {
       throw new BadRequestException('Max date must be greater than min date');

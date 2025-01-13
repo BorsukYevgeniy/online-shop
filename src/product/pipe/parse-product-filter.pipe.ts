@@ -4,17 +4,17 @@ import {
   ArgumentMetadata,
   BadRequestException,
 } from '@nestjs/common';
-import { ProductFilterDto } from '../dto/product-filter.dto';
+import { SearchProductDto } from '../dto/search-product.dto';
 
 @Injectable()
-export class ParseProductFilterPipe
-  implements PipeTransform<ProductFilterDto, ProductFilterDto>
+export class ParseProductDtoPipe
+  implements PipeTransform<SearchProductDto, SearchProductDto>
 {
   transform(
-    value: ProductFilterDto,
+    value: SearchProductDto,
     metadata: ArgumentMetadata,
-  ): ProductFilterDto {
-    const { minPrice, maxPrice }: ProductFilterDto = value;
+  ): SearchProductDto {
+    const { minPrice, maxPrice }: SearchProductDto = value;
 
     if (maxPrice < minPrice) {
       throw new BadRequestException('Max price must be greater than min price');
