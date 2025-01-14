@@ -422,9 +422,8 @@ describe('ProductController', () => {
     jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(service, 'deleteProduct').mockResolvedValue(mockProduct);
 
-    const product = await controller.deleteProduct(req, productId);
+    await controller.deleteProduct(req, productId);
 
     expect(service.deleteProduct).toHaveBeenCalledWith(req.user.id, productId);
-    expect(product).toEqual(mockProduct);
   });
 });

@@ -8,6 +8,7 @@ import {
   Res,
   Query,
   Patch,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -27,6 +28,13 @@ import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Patch('assing-admin/:userId')
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
+  async assignAdmin(@Param('userId') userId: number) {
+    return await this.userService.assignAdmin(userId);
+  }
 
   @Get('')
   @Roles('ADMIN')
@@ -76,34 +84,24 @@ export class UserController {
   // Маршрут для видалення акаунту власиником цього акаунту
   @Delete('me')
   @UseGuards(AuthGuard)
+  @HttpCode(204)
   async deleteUserById(
     @Req() req: AuthRequest,
     @Res() res: Response,
   ): Promise<void> {
-    const deletedUser: UserProductsRolesNoCreds = await this.userService.delete(
-      req.user.id,
-    );
+    await this.userService.delete(req.user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-
-    res.send(deletedUser);
   }
 
   // Видалення акаунту адміністратором
   @Delete(':userId')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async deleteUserByIdByAdmin(
-    @Param('userId') userId: number,
-  ): Promise<UserProductsRolesNoCreds> {
-    return await this.userService.delete(userId);
-  }
-
-  @Patch('assing-admin/:userId')
-  @Roles('ADMIN')
-  @UseGuards(RolesGuard)
-  async assignAdmin(@Param('userId') userId: number) {
-    return await this.userService.assignAdmin(userId);
+  @HttpCode(204)
+  async deleteUserByIdByAdmin(@Param('userId') userId: number): Promise<void> {
+    await this.userService.delete(userId);
+    return;
   }
 }

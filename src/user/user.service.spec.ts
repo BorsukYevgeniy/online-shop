@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
-import { RoleService } from '../roles/role.service';
+import { RoleService } from '../role/role.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -391,25 +391,7 @@ describe('UserService', () => {
       email: 'test',
       password: 'password',
       nickname: 'test',
-      createdAt: new Date(),
-
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      createdAt: new Date()
     };
 
     jest.spyOn(repository, 'delete').mockResolvedValue(mockUser);

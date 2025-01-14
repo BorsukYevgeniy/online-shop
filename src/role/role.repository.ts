@@ -6,14 +6,18 @@ import { Role } from '@prisma/client';
 export class RoleRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async findByValue(value: string): Promise<Role> {
+    return await this.prismaService.role.findUnique({ where: { value } });
+  }
+
+  async findById(id: number) {
+    return await this.prismaService.role.findUnique({ where: { id } });
+  }
+
   async createRole(value: string, description: string): Promise<Role> {
     return await this.prismaService.role.create({
       data: { value, description },
     });
-  }
-
-  async findByValue(value: string): Promise<Role> {
-    return await this.prismaService.role.findUnique({ where: { value } });
   }
 
   async deleteRoleByValue(value: string): Promise<Role> {

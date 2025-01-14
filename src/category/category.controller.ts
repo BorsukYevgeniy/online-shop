@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  HttpCode,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -48,7 +49,10 @@ export class CategoryController {
     @Param('id') categoryId: number,
     @Query() pagination: PaginationDto,
   ) {
-    return await this.categoryService.findCategoryProducts(categoryId, pagination);
+    return await this.categoryService.findCategoryProducts(
+      categoryId,
+      pagination,
+    );
   }
 
   @Post()
@@ -71,7 +75,9 @@ export class CategoryController {
   @Delete(':id')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async remove(@Param('id') id: number): Promise<Category> {
-    return await this.categoryService.remove(id);
+  @HttpCode(204)
+  async remove(@Param('id') id: number): Promise<void> {
+    await this.categoryService.remove(id);
+    return;
   }
 }

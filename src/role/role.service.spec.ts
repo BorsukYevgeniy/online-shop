@@ -1,37 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RoleController } from './role.controller';
 import { RoleService } from './role.service';
+import { RoleRepository } from './role.repository';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { TokenService } from '../token/token.service';
 
-describe('RoleController', () => {
-  let controller: RoleController;
+describe('RoleService', () => {
   let service: RoleService;
+  let repository: RoleRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RoleController],
       providers: [
+        RoleService,
         {
-          provide: RoleService,
+          provide: RoleRepository,
           useValue: {
-            getRoleByValue: jest.fn(),
             createRole: jest.fn(),
+            findById: jest.fn(),
+            findByValue: jest.fn(),
             deleteRoleByValue: jest.fn(),
-          },
-        },
-
-        {
-          provide: TokenService,
-          useValue: {
-            verifyAccessToken: jest.fn(),
           },
         },
       ],
     }).compile();
 
     service = module.get<RoleService>(RoleService);
-    controller = module.get<RoleController>(RoleController);
+    repository = module.get<RoleRepository>(RoleRepository);
   });
 
   afterEach(async () => {
@@ -39,7 +32,7 @@ describe('RoleController', () => {
   });
 
   it('should be defined', async () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   it('should get a role by value', async () => {
@@ -50,14 +43,32 @@ describe('RoleController', () => {
       description: 'Test description',
     };
 
-    jest.spyOn(service, 'getRoleByValue').mockResolvedValue(mockRole);
+    jest.spyOn(repository, 'findByValue').mockResolvedValue(mockRole);
 
-    const role = await controller.getRoleByValue(getRoleData.value);
+    const role = await service.getRoleByValue(getRoleData.value);
 
-    expect(service.getRoleByValue).toHaveBeenCalledWith(getRoleData.value);
+    expect(repository.findByValue).toHaveBeenCalledWith(getRoleData.value);
 
     expect(role).toEqual(mockRole);
   });
+
+
+  it('should get a role by id', async () => {
+    const mockRole = {
+      id: 1,
+      value: "TEST",
+      description: 'Test description',
+    };
+
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockRole);
+
+    const role = await service.getRoleById(1);
+
+    expect(repository.findById).toHaveBeenCalledWith(1);
+
+    expect(role).toEqual(mockRole);
+  });
+
 
   it('should create a new role', async () => {
     const roleDto: CreateRoleDto = {
@@ -71,14 +82,14 @@ describe('RoleController', () => {
       description: roleDto.description,
     };
 
-    jest.spyOn(service, 'createRole').mockResolvedValue(mockRole);
+    jest.spyOn(repository, 'createRole').mockResolvedValue(mockRole);
 
-    const role = await controller.createRole(roleDto);
+    const role = await service.createRole(roleDto);
 
-    expect(service.createRole).toHaveBeenCalledWith({
-      description: roleDto.description,
-      value: roleDto.value,
-    });
+    expect(repository.createRole).toHaveBeenCalledWith(
+      roleDto.value,
+      roleDto.description,
+    );
 
     expect(role).toEqual(mockRole);
   });
@@ -91,12 +102,10 @@ describe('RoleController', () => {
       description: 'Test description',
     };
 
-    jest.spyOn(service, 'deleteRoleByValue').mockResolvedValue(mockRole);
+    jest.spyOn(repository, 'deleteRoleByValue').mockResolvedValue(mockRole);
 
-    const deletedRole = await controller.deleteRoleByValue(
-      deleteRoleData.value,
-    );
-    expect(service.deleteRoleByValue).toHaveBeenCalledWith(
+    const deletedRole = await service.deleteRoleByValue(deleteRoleData.value);
+    expect(repository.deleteRoleByValue).toHaveBeenCalledWith(
       deleteRoleData.value,
     );
 

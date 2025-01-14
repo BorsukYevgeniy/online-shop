@@ -11,6 +11,7 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -22,17 +23,13 @@ import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { ParseProductDtoPipe } from './pipe/parse-product-filter.pipe';
-import { Roles } from '../auth/decorator/roles-auth.decorator';
-import { RolesGuard } from '../auth/guards/roles-auth.guard';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('')
-  async getAllProducts(
-    @Query() paginationDto: PaginationDto,
-  ) {
+  async getAllProducts(@Query() paginationDto: PaginationDto) {
     return await this.productService.findAll(paginationDto);
   }
 
@@ -41,7 +38,7 @@ export class ProductController {
     @Query(ParseProductDtoPipe) dto: SearchProductDto,
     @Query() pagination: PaginationDto,
   ) {
-    return await this.productService.searchProducts(dto, pagination)
+    return await this.productService.searchProducts(dto, pagination);
   }
 
   @Get(':productId')
@@ -81,10 +78,12 @@ export class ProductController {
 
   @Delete(':productId')
   @UseGuards(AuthGuard)
+  @HttpCode(204)
   async deleteProduct(
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
-  ): Promise<Product> {
-    return await this.productService.deleteProduct(req.user.id, productId);
+  ): Promise<void> {
+    await this.productService.deleteProduct(req.user.id, productId);
+    return;
   }
 }

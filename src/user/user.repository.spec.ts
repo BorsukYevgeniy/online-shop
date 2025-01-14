@@ -436,13 +436,6 @@ describe('UserRepository', () => {
 
     expect(prismaService.user.delete).toHaveBeenCalledWith({
       where: { id: userId },
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-        products: true,
-        roles: true,
-      },
     });
 
     expect(user).toEqual(mockUser);

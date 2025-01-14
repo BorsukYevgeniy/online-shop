@@ -6,6 +6,7 @@ import {
   Req,
   BadRequestException,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -26,6 +27,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(200)
   async login(@Body() dto: LoginUserDto, @Res() res: Response): Promise<void> {
     const { accessToken, refreshToken }: Tokens =
       await this.authService.login(dto);
@@ -44,6 +46,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(200)
   async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
     await this.authService.logout(req.cookies['refreshToken']);
 
@@ -54,6 +57,7 @@ export class AuthController {
   }
 
   @Post('logout-all')
+  @HttpCode(200)
   @UseGuards(AuthGuard)
   async logoutAll(@Req() req: AuthRequest, @Res() res: Response) {
     await this.authService.logoutAll(req.user.id);
@@ -65,6 +69,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @HttpCode(200)
   async refresh(@Req() req: Request, @Res() res: Response): Promise<void> {
     const refreshToken: string = req.cookies['refreshToken'];
 

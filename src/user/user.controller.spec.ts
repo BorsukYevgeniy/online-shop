@@ -409,11 +409,10 @@ describe('UserController', () => {
 
     const req: AuthRequest = { user: { id: userId } } as any;
 
-    const user = await controller.deleteUserById(req, res as any);
+    await controller.deleteUserById(req, res as any);
 
     expect(service.delete).toHaveBeenCalledWith(userId);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
-    expect(res.send).toHaveBeenCalledWith(mockUser);
   });
 });

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product, Role } from '@prisma/client';
+import { Product, Role, User } from '@prisma/client';
 import {
   UserRoles,
   UserProductsRolesNoPassword,
@@ -181,16 +181,9 @@ export class UserRepository {
     return user;
   }
 
-  async delete(userId: number): Promise<UserProductsRolesNoCreds> {
+  async delete(userId: number): Promise<User> {
     const user = await this.prisma.user.delete({
       where: { id: userId },
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-        products: true,
-        roles: true,
-      },
     });
 
     if (!user) return null;

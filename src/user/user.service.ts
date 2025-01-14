@@ -7,8 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
 import { ProductService } from '../product/product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { RoleService } from '../roles/role.service';
-import { Product, Role } from '@prisma/client';
+import { RoleService } from '../role/role.service';
+import { Product, Role, User } from '@prisma/client';
 import {
   UserProductsRolesNoPassword,
   UserProductsRolesNoCreds,
@@ -101,7 +101,7 @@ export class UserService {
     );
   }
 
-  async delete(userId: number): Promise<UserProductsRolesNoCreds> {
+  async delete(userId: number): Promise<User> {
     try {
       return await this.userRepository.delete(userId);
     } catch (e) {

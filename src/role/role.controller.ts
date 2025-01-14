@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   UseGuards,
@@ -17,9 +18,9 @@ import { Role } from '@prisma/client';
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
-  @Get(':value')
-  async getRoleByValue(@Param('value') value: string): Promise<Role> {
-    return await this.roleService.getRoleByValue(value);
+  @Get(':id')
+  async getRoleById(@Param('id') id: number): Promise<Role> {
+    return await this.roleService.getRoleById(id);
   }
 
   @Post('')
@@ -32,7 +33,9 @@ export class RoleController {
   @Delete(':value')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async deleteRoleByValue(@Param('value') roleValue: string): Promise<Role> {
-    return await this.roleService.deleteRoleByValue(roleValue);
+  @HttpCode(204)
+  async deleteRoleByValue(@Param('value') roleValue: string): Promise<void> {
+    await this.roleService.deleteRoleByValue(roleValue);
+    return;
   }
 }
