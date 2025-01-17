@@ -33,6 +33,10 @@ describe('CategoryService', () => {
     repository = module.get<CategoryRepository>(CategoryRepository);
   });
 
+  afterEach(async () => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', async () => {
     expect(service).toBeDefined();
   });
@@ -116,7 +120,7 @@ describe('CategoryService', () => {
       totalPages: 1,
     };
 
-    jest.spyOn(repository, 'countProductsInCategory').mockResolvedValue(1);
+    jest.spyOn(repository, 'countProductsInCategory').mockResolvedValue(1)
     jest
       .spyOn(repository, 'findCategoryProducts')
       .mockResolvedValue(mockProducts.products);

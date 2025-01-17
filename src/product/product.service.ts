@@ -61,7 +61,7 @@ export class ProductService {
     };
   }
 
-  async searchProducts(dto: SearchProductDto, pagination: PaginationDto){
+  async searchProducts(dto: SearchProductDto, pagination: PaginationDto) {
     const { pageSize, page }: PaginationDto = pagination;
 
     const skip: number = (page - 1) * pageSize;
@@ -131,5 +131,13 @@ export class ProductService {
     await this.validateProductOwnership(userId, productId);
 
     return await this.productRepository.delete(productId);
+  }
+
+  async getCategoryProducts(categoryId: number, skip: number, limit: number) {
+    return await this.productRepository.findCategoryProducts(categoryId, skip, limit);
+  }
+
+  async countProductsInCategory(categoryId: number) {
+    return await this.productRepository.countProductsInCategory(categoryId);
   }
 }

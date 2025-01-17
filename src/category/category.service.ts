@@ -3,14 +3,13 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryRepository } from './category.repository';
 import { PaginationDto } from 'src/dto/pagination.dto';
-import { Product, Category } from '@prisma/client';
+import { Category, Product } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private readonly categoryRepository: CategoryRepository) {}
 
   async findAll(pagination: PaginationDto) {
     const { page, pageSize }: PaginationDto = pagination;
@@ -67,13 +66,13 @@ export class CategoryService {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
-    const total: number =
-      await this.categoryRepository.countProductsInCategory(id);
-
-    const totalPages: number = Math.ceil(total / pageSize);
-
     const products: Product[] =
       await this.categoryRepository.findCategoryProducts(id, skip, pageSize);
+
+    const total: number =
+      await this.categoryRepository.countProductsInCategory(id);
+      
+    const totalPages: number = Math.ceil(total / pageSize);
 
     return {
       products,

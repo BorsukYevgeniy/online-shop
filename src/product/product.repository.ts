@@ -5,6 +5,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductFilter } from './types/product-filter.interface';
 import { ProductCategory } from './types/product.type';
 import { SearchProductDto } from './dto/search-product.dto';
+import { Product } from '@prisma/client';
 
 @Injectable()
 export class ProductRepository {
@@ -101,6 +102,26 @@ export class ProductRepository {
     return await this.prisma.product.delete({
       where: { id: productId },
       include: { categories: true },
+    });
+  }
+
+  async findCategoryProducts(
+    id: number,
+    skip: number,
+    limit: number,
+  ): Promise<Product[]> {
+    const products = await this.prisma.product.findMany({
+      where: { categories: { some: { id } } },
+      skip,
+      take: limit,
+    });
+
+    return products;
+  }
+
+  async countProductsInCategory(categoryId: number): Promise<number> {
+    return await this.prisma.product.count({
+      where: { categories: { some: { id: categoryId } } },
     });
   }
 }
