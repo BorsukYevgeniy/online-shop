@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
-import { ProductService } from '../product/product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../role/role.service';
 import { Product, Role, User } from '@prisma/client';
@@ -17,7 +16,6 @@ import {
   UserRolesNoProductsCreds,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
-import { UserFilter } from './types/user-filter.type';
 import { SearchUserDto } from './dto/search-user.dto';
 
 @Injectable()

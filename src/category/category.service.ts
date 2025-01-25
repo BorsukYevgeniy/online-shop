@@ -5,7 +5,6 @@ import { CategoryRepository } from './category.repository';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { Category, Product } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
-import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class CategoryService {
