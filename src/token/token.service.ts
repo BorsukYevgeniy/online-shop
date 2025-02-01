@@ -5,12 +5,15 @@ import { ConfigService } from '@nestjs/config';
 
 import { Token } from '@prisma/client';
 import { TokenPayload, Tokens } from './interface/token.interfaces';
-import { DeletingCount } from 'src/interfaces/deleting-count.interface';
+import { DeletingCount } from '../interfaces/deleting-count.interface';
 
 @Injectable()
 export class TokenService {
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
+
+  private readonly accessTokenExpirationTime: string;
+  private readonly refreshTokenExpirationTime: string;
 
   constructor(
     private readonly tokenRepositry: TokenRepository,
@@ -19,17 +22,27 @@ export class TokenService {
   ) {
     this.accessSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
     this.refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
+
+    this.accessTokenExpirationTime = this.configService.get<string>(
+      'ACCESS_TOKEN_EXPIRATION_TIME',
+    );
+    this.refreshTokenExpirationTime = this.configService.get<string>(
+      'REFRESH_TOKEN_EXPIRATION_TIME',
+    );
   }
 
   async generateTokens(userId: number, roles: string[]): Promise<Tokens> {
     const accessToken: string = await this.jwtService.signAsync(
       { id: userId, roles },
-      { expiresIn: '1h', secret: this.accessSecret },
+      { expiresIn: this.accessTokenExpirationTime, secret: this.accessSecret },
     );
 
     const refreshToken: string = await this.jwtService.signAsync(
       { id: userId, roles },
-      { expiresIn: '1d', secret: this.refreshSecret },
+      {
+        expiresIn: this.refreshTokenExpirationTime,
+        secret: this.refreshSecret,
+      },
     );
 
     await this.saveToken(userId, refreshToken);

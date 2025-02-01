@@ -34,12 +34,12 @@ export class AuthController {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      maxAge: 60 * 60 * 1000,
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
     res.send('Loggined succesfully');
