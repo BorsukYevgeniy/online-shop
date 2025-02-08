@@ -391,7 +391,7 @@ describe('UserService', () => {
       email: 'test',
       password: 'password',
       nickname: 'test',
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     jest.spyOn(repository, 'delete').mockResolvedValue(mockUser);

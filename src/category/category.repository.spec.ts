@@ -3,12 +3,10 @@ import { CategoryRepository } from './category.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ProductService } from '../product/product.service';
 
 describe('CategoryRepository', () => {
   let repository: CategoryRepository;
   let prisma: PrismaService;
-  let productService: ProductService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,16 +25,11 @@ describe('CategoryRepository', () => {
             },
           },
         },
-        {
-          provide: ProductService,
-          useValue: { getCategoryProducts: jest.fn() },
-        },
       ],
     }).compile();
 
     repository = module.get<CategoryRepository>(CategoryRepository);
     prisma = module.get<PrismaService>(PrismaService);
-    productService = module.get<ProductService>(ProductService);
   });
 
   afterEach(async () => {
@@ -56,14 +49,6 @@ describe('CategoryRepository', () => {
   });
 
   it('should count categories finded by name', async () => {
-    jest.spyOn(prisma.category, 'count').mockResolvedValue(1);
-
-    const count = await repository.count('test');
-
-    expect(count).toEqual(1);
-  });
-
-  it('should count products in categories', async () => {
     jest.spyOn(prisma.category, 'count').mockResolvedValue(1);
 
     const count = await repository.count('test');
@@ -111,29 +96,6 @@ describe('CategoryRepository', () => {
       where: { id: 1 },
     });
     expect(categories).toEqual(mockCategories);
-  });
-
-  it('should return category products', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'test',
-        description: 'test',
-        price: 1,
-        userId: 1,
-        images: ['1'],
-        categories: [1, 2],
-      },
-    ];
-
-    jest
-      .spyOn(productService, 'getCategoryProducts')
-      .mockResolvedValue(mockProducts);
-
-    const products = await repository.findCategoryProducts(1, 0, 1);
-
-    expect(productService.getCategoryProducts).toHaveBeenCalledWith(1, 0, 1);
-    expect(products).toEqual(mockProducts);
   });
 
   it('should create category', async () => {

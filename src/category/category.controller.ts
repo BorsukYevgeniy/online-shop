@@ -18,10 +18,14 @@ import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { PaginationDto } from '../dto/pagination.dto';
 import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
+import { ProductService } from '../product/product.service';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly productService: ProductService,
+  ) {}
 
   @Get()
   async findAll(@Query() pagination: PaginationDto) {
@@ -49,7 +53,7 @@ export class CategoryController {
     @Param('id') categoryId: number,
     @Query() pagination: PaginationDto,
   ) {
-    return await this.categoryService.findCategoryProducts(
+    return await this.productService.getCategoryProducts(
       categoryId,
       pagination,
     );

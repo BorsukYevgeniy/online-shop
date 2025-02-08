@@ -33,5 +33,5 @@ export class SearchProductDto {
   @IsOptional()
   @IsArray()
   @ToNumberArray()
-  readonly categoryIds?: number[]
+  readonly categoryIds?: number[];
 }

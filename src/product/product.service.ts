@@ -133,11 +133,34 @@ export class ProductService {
     return await this.productRepository.delete(productId);
   }
 
-  async getCategoryProducts(categoryId: number, skip: number, limit: number) {
-    return await this.productRepository.findCategoryProducts(categoryId, skip, limit);
+  async getCategoryProducts(categoryId: number, pagination: PaginationDto) {
+    const { pageSize, page }: PaginationDto = pagination;
+
+    const skip: number = (page - 1) * pageSize;
+
+    const products: Product[] =
+      await this.productRepository.findCategoryProducts(
+        categoryId,
+        skip,
+        pageSize,
+      );
+
+    const total: number =
+      await this.productRepository.countProductsInCategory(categoryId);
+    const totalPages: number = Math.ceil(total / pageSize);
+
+    return {
+      products,
+      total,
+      pageSize,
+      page,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
   }
 
-  async countProductsInCategory(categoryId: number) {
+  async countProductsInCategory(categoryId: number): Promise<number> {
     return await this.productRepository.countProductsInCategory(categoryId);
   }
 }

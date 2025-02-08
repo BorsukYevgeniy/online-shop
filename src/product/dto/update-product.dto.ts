@@ -30,6 +30,5 @@ export class UpdateProductDto {
   @IsOptional()
   @IsArray()
   @ToNumberArray()
-  readonly categoryIds?: number[]
-
+  readonly categoryIds?: number[];
 }

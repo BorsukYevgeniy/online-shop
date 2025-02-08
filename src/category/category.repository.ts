@@ -3,14 +3,10 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Category } from '@prisma/client';
-import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class CategoryRepository {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly productService: ProductService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async count(name?: string): Promise<number> {
     return await this.prisma.category.count({
@@ -20,16 +16,8 @@ export class CategoryRepository {
     });
   }
 
-  async countProductsInCategory(categoryId: number) {
-    return await this.productService.countProductsInCategory(categoryId);
-  }
-
   async findAll(skip: number, limit: number): Promise<Category[]> {
     return await this.prisma.category.findMany({ skip, take: limit });
-  }
-
-  async findCategoryProducts(id: number, skip: number, limit: number) {
-    return await this.productService.getCategoryProducts(id, skip, limit);
   }
 
   async findOne(id: number): Promise<Category> {

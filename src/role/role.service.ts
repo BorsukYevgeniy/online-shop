@@ -7,8 +7,8 @@ import { Role } from '@prisma/client';
 export class RoleService {
   constructor(private readonly roleRepository: RoleRepository) {}
 
-  async getRoleById(id: number){
-    return await this.roleRepository.findById(id)
+  async getRoleById(id: number) {
+    return await this.roleRepository.findById(id);
   }
 
   async getRoleByValue(value: string): Promise<Role> {

@@ -52,11 +52,10 @@ describe('RoleService', () => {
     expect(role).toEqual(mockRole);
   });
 
-
   it('should get a role by id', async () => {
     const mockRole = {
       id: 1,
-      value: "TEST",
+      value: 'TEST',
       description: 'Test description',
     };
 
@@ -68,7 +67,6 @@ describe('RoleService', () => {
 
     expect(role).toEqual(mockRole);
   });
-
 
   it('should create a new role', async () => {
     const roleDto: CreateRoleDto = {

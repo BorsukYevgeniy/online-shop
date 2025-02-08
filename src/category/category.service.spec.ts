@@ -19,8 +19,6 @@ describe('CategoryService', () => {
             findAll: jest.fn(),
             findByName: jest.fn(),
             findOne: jest.fn(),
-            countProductsInCategory: jest.fn(),
-            findCategoryProducts: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -97,41 +95,6 @@ describe('CategoryService', () => {
 
     expect(repository.findOne).toHaveBeenCalledWith(1);
     expect(categories).toEqual(mockCategories);
-  });
-
-  it('should return category products', async () => {
-    const mockProducts = {
-      products: [
-        {
-          id: 1,
-          title: 'test',
-          description: 'test',
-          price: 1,
-          userId: 1,
-          images: ['1'],
-          categories: [1, 2],
-        },
-      ],
-      total: 1,
-      page: 1,
-      pageSize: 1,
-      nextPage: null,
-      prevPage: null,
-      totalPages: 1,
-    };
-
-    jest.spyOn(repository, 'countProductsInCategory').mockResolvedValue(1)
-    jest
-      .spyOn(repository, 'findCategoryProducts')
-      .mockResolvedValue(mockProducts.products);
-
-    const products = await service.findCategoryProducts(1, {
-      page: 1,
-      pageSize: 1,
-    });
-
-    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1);
-    expect(products).toEqual(mockProducts);
   });
 
   it('should create category', async () => {

@@ -178,7 +178,6 @@ describe('UserRepository', () => {
     expect(roles).toEqual(mockRoles);
   });
 
-
   it('should get all users', async () => {
     const mockUsers = [
       {
@@ -194,7 +193,7 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findAll( 0, 10);
+    const users = await repository.findAll(0, 10);
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       select: {
@@ -267,7 +266,7 @@ describe('UserRepository', () => {
 
     const users = await repository.findUsers(
       {
-        nickname: "test",
+        nickname: 'test',
         minDate: date,
         maxDate: date,
       },
@@ -277,7 +276,7 @@ describe('UserRepository', () => {
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       where: {
-        nickname: { contains: "test", mode: 'insensitive' },
+        nickname: { contains: 'test', mode: 'insensitive' },
         createdAt: {
           gte: date,
           lte: date,

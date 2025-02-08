@@ -46,7 +46,7 @@ describe('RoleController', () => {
   it('should get a role by id', async () => {
     const mockRole = {
       id: 1,
-      value: "TEST",
+      value: 'TEST',
       description: 'Test description',
     };
 
@@ -93,9 +93,7 @@ describe('RoleController', () => {
 
     jest.spyOn(service, 'deleteRoleByValue').mockResolvedValue(mockRole);
 
-    await controller.deleteRoleByValue(
-      deleteRoleData.value,
-    );
+    await controller.deleteRoleByValue(deleteRoleData.value);
     expect(service.deleteRoleByValue).toHaveBeenCalledWith(
       deleteRoleData.value,
     );
