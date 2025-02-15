@@ -19,6 +19,8 @@ import { PaginationDto } from '../dto/pagination.dto';
 import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { ProductService } from '../product/product.service';
+import { PaginatedCategory } from './type/category.type';
+import { PaginatedProducts } from 'src/product/types/product.types';
 
 @Controller('category')
 export class CategoryController {
@@ -28,7 +30,9 @@ export class CategoryController {
   ) {}
 
   @Get()
-  async findAll(@Query() pagination: PaginationDto) {
+  async findAll(
+    @Query() pagination: PaginationDto,
+  ): Promise<PaginatedCategory> {
     return await this.categoryService.findAll(pagination);
   }
 
@@ -36,7 +40,7 @@ export class CategoryController {
   async searchCategory(
     @Query() searchCategoryDto: SearchCategoryDto,
     @Query() paginationDto: PaginationDto,
-  ) {
+  ): Promise<PaginatedCategory> {
     return await this.categoryService.searchCategory(
       searchCategoryDto,
       paginationDto,
@@ -52,7 +56,7 @@ export class CategoryController {
   async getCategoryProduct(
     @Param('id') categoryId: number,
     @Query() pagination: PaginationDto,
-  ) {
+  ): Promise<PaginatedProducts> {
     return await this.productService.getCategoryProducts(
       categoryId,
       pagination,

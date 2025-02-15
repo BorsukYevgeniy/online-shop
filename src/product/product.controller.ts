@@ -18,18 +18,21 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
-import { AuthRequest } from '../interfaces/express-requests.interface';
+import { AuthRequest } from '../types/request.type';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { ParseProductDtoPipe } from './pipe/parse-product-filter.pipe';
+import { PaginatedProducts } from './types/product.types';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('')
-  async getAllProducts(@Query() paginationDto: PaginationDto) {
+  async getAllProducts(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedProducts> {
     return await this.productService.findAll(paginationDto);
   }
 
@@ -37,7 +40,7 @@ export class ProductController {
   async searchProducts(
     @Query(ParseProductDtoPipe) dto: SearchProductDto,
     @Query() pagination: PaginationDto,
-  ) {
+  ): Promise<PaginatedProducts> {
     return await this.productService.searchProducts(dto, pagination);
   }
 

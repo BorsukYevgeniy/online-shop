@@ -15,10 +15,12 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
-import { AuthRequest } from '../interfaces/express-requests.interface';
+import { AuthRequest } from '../types/request.type';
 import {
+  PaginatedUsersRolesNoProductsCreds,
   UserProductsRolesNoCreds,
   UserProductsRolesNoPassword,
+  UserRolesNoProductsCreds,
 } from './types/user.types';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
@@ -32,14 +34,18 @@ export class UserController {
   @Patch('assing-admin/:userId')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async assignAdmin(@Param('userId') userId: number) {
+  async assignAdmin(
+    @Param('userId') userId: number,
+  ): Promise<UserRolesNoProductsCreds> {
     return await this.userService.assignAdmin(userId);
   }
 
   @Get('')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async findAll(@Query() paginationDto: PaginationDto) {
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedUsersRolesNoProductsCreds> {
     return await this.userService.findAll(paginationDto);
   }
 
@@ -47,7 +53,7 @@ export class UserController {
   async searchUsers(
     @Query(ParseUserFilterPipe) dto: SearchUserDto,
     @Query() pagination: PaginationDto,
-  ) {
+  ): Promise<PaginatedUsersRolesNoProductsCreds> {
     return await this.userService.searchUsers(dto, pagination);
   }
 

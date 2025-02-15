@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { Token } from '@prisma/client';
 import { TokenPayload, Tokens } from './interface/token.interfaces';
-import { DeletingCount } from '../interfaces/deleting-count.interface';
+import { DeletingCount } from '../types/deleting-count.type';
 
 @Injectable()
 export class TokenService {

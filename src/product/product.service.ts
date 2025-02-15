@@ -9,7 +9,7 @@ import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
 import { PaginationDto } from 'src/dto/pagination.dto';
-import { ProductCategory } from './types/product.type';
+import { PaginatedProducts, ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class ProductService {
   private async validateProductOwnership(
     userId: number,
     productId: number,
-  ): Promise<ProductCategory> {
+  ): Promise<void> {
     const product: ProductCategory | null =
       await this.productRepository.findById(productId);
 
@@ -34,10 +34,10 @@ export class ProductService {
       throw new ForbiddenException();
     }
 
-    return product;
+    return;
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto): Promise<PaginatedProducts> {
     const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
@@ -61,7 +61,10 @@ export class ProductService {
     };
   }
 
-  async searchProducts(dto: SearchProductDto, pagination: PaginationDto) {
+  async searchProducts(
+    dto: SearchProductDto,
+    pagination: PaginationDto,
+  ): Promise<PaginatedProducts> {
     const { pageSize, page }: PaginationDto = pagination;
 
     const skip: number = (page - 1) * pageSize;
@@ -133,7 +136,10 @@ export class ProductService {
     return await this.productRepository.delete(productId);
   }
 
-  async getCategoryProducts(categoryId: number, pagination: PaginationDto) {
+  async getCategoryProducts(
+    categoryId: number,
+    pagination: PaginationDto,
+  ): Promise<PaginatedProducts> {
     const { pageSize, page }: PaginationDto = pagination;
 
     const skip: number = (page - 1) * pageSize;
@@ -160,7 +166,4 @@ export class ProductService {
     };
   }
 
-  async countProductsInCategory(categoryId: number): Promise<number> {
-    return await this.productRepository.countProductsInCategory(categoryId);
-  }
 }

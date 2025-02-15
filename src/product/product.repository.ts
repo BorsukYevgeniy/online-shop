@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductFilter } from './types/product-filter.interface';
-import { ProductCategory } from './types/product.type';
+import { ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from '@prisma/client';
 

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
-import { AuthRequest } from '../interfaces/express-requests.interface';
+import { AuthRequest } from '../types/request.type';
 import { Response } from 'express';
 
 describe('UserController', () => {

@@ -14,6 +14,7 @@ import {
   UserRoles,
   UserRolesNoPassword,
   UserRolesNoProductsCreds,
+  PaginatedUsersRolesNoProductsCreds,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -25,7 +26,9 @@ export class UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedUsersRolesNoProductsCreds> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
@@ -45,12 +48,16 @@ export class UserService {
     };
   }
 
-  async searchUsers(dto: SearchUserDto, pagination: PaginationDto) {
+  async searchUsers(
+    dto: SearchUserDto,
+    pagination: PaginationDto,
+  ): Promise<PaginatedUsersRolesNoProductsCreds> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = pageSize * (page - 1);
 
-    const users = await this.userRepository.findUsers(dto, skip, pageSize);
-    const total = await this.userRepository.count();
+    const users: UserRolesNoProductsCreds[] =
+      await this.userRepository.findUsers(dto, skip, pageSize);
+    const total: number = await this.userRepository.count();
 
     const totalPages: number = Math.ceil(total / pageSize);
 

@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import { AuthRequest } from '../interfaces/express-requests.interface';
+import { AuthRequest } from '../types/request.type';
 import { TokenService } from '../token/token.service';
 
 describe('AuthController', () => {

@@ -6,7 +6,7 @@ import { Role, Token } from '@prisma/client';
 import { TokenService } from '../token/token.service';
 import { Tokens } from '../token/interface/token.interfaces';
 import { UserRoles, UserRolesNoPassword } from '../user/types/user.types';
-import { DeletingCount } from '../interfaces/deleting-count.interface';
+import { DeletingCount } from '../types/deleting-count.type';
 import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()

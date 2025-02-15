@@ -5,12 +5,13 @@ import { CategoryRepository } from './category.repository';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
+import { PaginatedCategory } from './type/category.type';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async findAll(pagination: PaginationDto) {
+  async findAll(pagination: PaginationDto): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
@@ -33,7 +34,10 @@ export class CategoryService {
     };
   }
 
-  async searchCategory(dto: SearchCategoryDto, pagination: PaginationDto) {
+  async searchCategory(
+    dto: SearchCategoryDto,
+    pagination: PaginationDto,
+  ): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
