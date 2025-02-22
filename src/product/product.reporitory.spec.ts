@@ -40,6 +40,63 @@ describe('ProductRepository', () => {
     expect(repository).toBeDefined();
   });
 
+  it('should count products in category', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount = await repository.countProductsInCategory(1);
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        categories: {
+          some: {
+            id: 1,
+          },
+        },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should find products in category', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'Product A',
+        price: 100,
+        userId: 1,
+        description: 'MOCK1 description',
+        images: ['1', '2'],
+      },
+      {
+        id: 2,
+        title: 'Product B',
+        price: 50,
+        userId: 2,
+        description: 'MOCK2 description',
+        images: ['3', '4'],
+      },
+    ];
+
+    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
+
+    const products = await repository.findCategoryProducts(1, 0, 10);
+
+    expect(prisma.product.findMany).toHaveBeenCalledWith({
+      where: {
+        categories: {
+          some: {
+            id: 1,
+          },
+        },
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(products).toEqual(mockProducts);
+  });
+
   it('should count all products without filter', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 

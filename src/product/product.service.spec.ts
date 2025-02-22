@@ -47,7 +47,8 @@ describe('ProductService', () => {
             findAll: jest.fn(),
             findProducts: jest.fn(),
             findById: jest.fn(),
-            findUserProducts: jest.fn(),
+            countProductsInCategory: jest.fn(),
+            findCategoryProducts: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -73,6 +74,39 @@ describe('ProductService', () => {
   it('should be defined', async () => {
     expect(service).toBeDefined();
   });
+
+  it('should return category products', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'title',
+        price: 50,
+        userId: 1,
+        description: 'description',
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
+      },
+    ];
+
+    jest.spyOn(repository, 'countProductsInCategory').mockResolvedValue(1);
+    jest.spyOn(repository, 'findCategoryProducts').mockResolvedValue(mockProducts);
+
+
+    const products = await service.getCategoryProducts(1, { page: 1, pageSize: 1 });
+
+    expect(repository.countProductsInCategory).toHaveBeenCalledWith(1);
+    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1);
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 1,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
+
+  })
 
   it('should return all products without filters', async () => {
     const mockProducts = [
