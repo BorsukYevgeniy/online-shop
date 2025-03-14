@@ -26,8 +26,8 @@ export class RoleController {
   @Post('')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async createRole(@Body() dto: CreateRoleDto): Promise<Role> {
-    return await this.roleService.createRole(dto);
+  async create(@Body() dto: CreateRoleDto): Promise<Role> {
+    return await this.roleService.create(dto);
   }
 
   @Delete(':value')

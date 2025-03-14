@@ -24,7 +24,7 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: UserService,
-          useValue: { findByEmail: jest.fn(), create: jest.fn() },
+          useValue: { getByEmail: jest.fn(), create: jest.fn() },
         },
         {
           provide: TokenService,
@@ -67,7 +67,7 @@ describe('AuthService', () => {
       roles: [{} as Role],
     };
 
-    jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
+    jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
     hash.mockResolvedValue(hashedPassword);
     jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
 
@@ -93,7 +93,7 @@ describe('AuthService', () => {
       roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
 
-    jest.spyOn(userService, 'findByEmail').mockResolvedValue(mockUser);
+    jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
     hash.mockResolvedValue(hashedPassword);
     jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
 
@@ -123,7 +123,7 @@ describe('AuthService', () => {
       refreshToken: 'refreshToken',
     };
 
-    jest.spyOn(userService, 'findByEmail').mockResolvedValue(mockUser);
+    jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
     compare.mockResolvedValue(true);
 
     jest.spyOn(tokenService, 'generateTokens').mockResolvedValue(mockTokens);
@@ -139,7 +139,7 @@ describe('AuthService', () => {
       nickname: 'test',
       password: '12345',
     };
-    jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
+    jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
 
     await expect(service.login(dto)).rejects.toThrow(
       new HttpException('User not found', HttpStatus.NOT_FOUND),
@@ -162,7 +162,7 @@ describe('AuthService', () => {
       roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
     };
 
-    jest.spyOn(userService, 'findByEmail').mockResolvedValue(mockUser);
+    jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
     compare.mockResolvedValue(false);
 
     await expect(service.login(dto)).rejects.toThrow(

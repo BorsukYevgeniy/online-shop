@@ -14,7 +14,7 @@ describe('RoleService', () => {
         {
           provide: RoleRepository,
           useValue: {
-            createRole: jest.fn(),
+            create: jest.fn(),
             findById: jest.fn(),
             findByValue: jest.fn(),
             deleteRoleByValue: jest.fn(),
@@ -80,11 +80,11 @@ describe('RoleService', () => {
       description: roleDto.description,
     };
 
-    jest.spyOn(repository, 'createRole').mockResolvedValue(mockRole);
+    jest.spyOn(repository, 'create').mockResolvedValue(mockRole);
 
-    const role = await service.createRole(roleDto);
+    const role = await service.create(roleDto);
 
-    expect(repository.createRole).toHaveBeenCalledWith(
+    expect(repository.create).toHaveBeenCalledWith(
       roleDto.value,
       roleDto.description,
     );

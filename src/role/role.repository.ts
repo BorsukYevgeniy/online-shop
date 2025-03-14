@@ -14,7 +14,7 @@ export class RoleRepository {
     return await this.prismaService.role.findUnique({ where: { id } });
   }
 
-  async createRole(value: string, description: string): Promise<Role> {
+  async create(value: string, description: string): Promise<Role> {
     return await this.prismaService.role.create({
       data: { value, description },
     });

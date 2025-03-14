@@ -30,31 +30,31 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('')
-  async getAllProducts(
+  async getAll(
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedProducts> {
-    return await this.productService.findAll(paginationDto);
+    return await this.productService.getAll(paginationDto);
   }
 
   @Get('search')
-  async searchProducts(
+  async search(
     @Query(ParseProductDtoPipe) dto: SearchProductDto,
     @Query() pagination: PaginationDto,
   ): Promise<PaginatedProducts> {
-    return await this.productService.searchProducts(dto, pagination);
+    return await this.productService.search(dto, pagination);
   }
 
   @Get(':productId')
-  async getProductById(
+  async getById(
     @Param('productId') productId: number,
   ): Promise<Product> {
-    return await this.productService.findById(productId);
+    return await this.productService.getById(productId);
   }
 
   @Post('')
   @UseGuards(AuthGuard)
   @UseInterceptors(ImagesInterceptor())
-  async createProduct(
+  async create(
     @Req() req: AuthRequest,
     @Body() dto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
@@ -65,13 +65,13 @@ export class ProductController {
   @Patch(':productId')
   @UseGuards(AuthGuard)
   @UseInterceptors(ImagesInterceptor())
-  async updateProduct(
+  async update(
     @Req() req: AuthRequest,
     @Body() dto: UpdateProductDto,
     @Param('productId') productId: number,
     @UploadedFiles() images?: Express.Multer.File[],
   ): Promise<Product> {
-    return await this.productService.updateProduct(
+    return await this.productService.update(
       req.user.id,
       productId,
       dto,
@@ -82,11 +82,11 @@ export class ProductController {
   @Delete(':productId')
   @UseGuards(AuthGuard)
   @HttpCode(204)
-  async deleteProduct(
+  async delete(
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
   ): Promise<void> {
-    await this.productService.deleteProduct(req.user.id, productId);
+    await this.productService.delete(req.user.id, productId);
     return;
   }
 }

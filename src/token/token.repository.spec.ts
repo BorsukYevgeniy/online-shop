@@ -37,22 +37,6 @@ describe('TokenRepository', () => {
     expect(tokensRepository).toBeDefined();
   });
 
-  it('should find one token by userId', async () => {
-    const userId = 1;
-    const token: Token = {
-      id: 1,
-      userId,
-      token: 'refreshToken',
-      expiresAt: new Date(),
-    };
-    jest.spyOn(prismaService.token, 'findFirst').mockResolvedValue(token);
-
-    expect(await tokensRepository.findOne(userId)).toBe(token);
-    expect(prismaService.token.findFirst).toHaveBeenCalledWith({
-      where: { userId },
-    });
-  });
-
   it('should create a new token', async () => {
     const userId = 1;
     const refreshToken = 'refreshToken';

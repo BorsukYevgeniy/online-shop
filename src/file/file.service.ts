@@ -20,7 +20,7 @@ export class FileService {
         await fsPromises.mkdir(filePath, { recursive: true });
       }
 
-      const writePromises = images.map(
+      const writePromises: Promise<void>[] = images.map(
         (file: Express.Multer.File): Promise<void> => {
           const fileName: string = uuidV4() + fileExtname(file.originalname);
 

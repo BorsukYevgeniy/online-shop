@@ -90,7 +90,7 @@ describe('CategoryRepository', () => {
 
     jest.spyOn(prisma.category, 'findUnique').mockResolvedValue(mockCategories);
 
-    const categories = await repository.findOne(1);
+    const categories = await repository.findById(1);
 
     expect(prisma.category.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },

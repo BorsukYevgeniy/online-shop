@@ -20,7 +20,7 @@ export class CategoryRepository {
     return await this.prisma.category.findMany({ skip, take: limit });
   }
 
-  async findOne(id: number): Promise<Category> {
+  async findById(id: number): Promise<Category> {
     return await this.prisma.category.findUnique({ where: { id } });
   }
 

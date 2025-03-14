@@ -11,7 +11,7 @@ import { PaginatedCategory } from './type/category.type';
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async findAll(pagination: PaginationDto): Promise<PaginatedCategory> {
+  async getAll(pagination: PaginationDto): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
@@ -34,7 +34,7 @@ export class CategoryService {
     };
   }
 
-  async searchCategory(
+  async search(
     dto: SearchCategoryDto,
     pagination: PaginationDto,
   ): Promise<PaginatedCategory> {
@@ -61,8 +61,8 @@ export class CategoryService {
     };
   }
 
-  async findOne(id: number): Promise<Category> {
-    return this.categoryRepository.findOne(id);
+  async getById(id: number): Promise<Category> {
+    return this.categoryRepository.findById(id);
   }
 
   async create(dto: CreateCategoryDto): Promise<Category> {
@@ -73,7 +73,7 @@ export class CategoryService {
     return this.categoryRepository.update(id, dto);
   }
 
-  async remove(id: number): Promise<Category> {
+  async delete(id: number): Promise<Category> {
     return this.categoryRepository.delete(id);
   }
 }

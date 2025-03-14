@@ -141,17 +141,6 @@ export class UserRepository {
     return userWithProducts.products;
   }
 
-  async findUserRoles(userId: number): Promise<Role[]> {
-    const userRoles = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { roles: true },
-    });
-
-    if (!userRoles) return null;
-
-    return userRoles.roles;
-  }
-
   async create(
     email: string,
     nickname: string,

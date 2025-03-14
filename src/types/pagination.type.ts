@@ -8,4 +8,4 @@ export type Paginated<
   totalPages: number;
   prevPage: number;
   nextPage: number;
-} & Record<F, T[]>
+} & Record<F, T[]>;

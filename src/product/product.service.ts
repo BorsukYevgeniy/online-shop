@@ -37,7 +37,7 @@ export class ProductService {
     return;
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<PaginatedProducts> {
+  async getAll(paginationDto: PaginationDto): Promise<PaginatedProducts> {
     const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
@@ -61,7 +61,7 @@ export class ProductService {
     };
   }
 
-  async searchProducts(
+  async search(
     dto: SearchProductDto,
     pagination: PaginationDto,
   ): Promise<PaginatedProducts> {
@@ -89,7 +89,7 @@ export class ProductService {
     };
   }
 
-  async findById(productId: number): Promise<ProductCategory> {
+  async getById(productId: number): Promise<ProductCategory> {
     const product: ProductCategory | null =
       await this.productRepository.findById(productId);
 
@@ -108,7 +108,7 @@ export class ProductService {
     return await this.productRepository.create(userId, dto, imagesNames);
   }
 
-  async updateProduct(
+  async update(
     userId: number,
     productId: number,
     dto: UpdateProductDto,
@@ -127,10 +127,7 @@ export class ProductService {
     return await this.productRepository.update(productId, dto, imagesNames);
   }
 
-  async deleteProduct(
-    userId: number,
-    productId: number,
-  ): Promise<ProductCategory> {
+  async delete(userId: number, productId: number): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
 
     return await this.productRepository.delete(productId);
@@ -165,5 +162,4 @@ export class ProductService {
       nextPage: page < totalPages ? page + 1 : null,
     };
   }
-
 }

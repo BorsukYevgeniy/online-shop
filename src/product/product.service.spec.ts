@@ -89,10 +89,14 @@ describe('ProductService', () => {
     ];
 
     jest.spyOn(repository, 'countProductsInCategory').mockResolvedValue(1);
-    jest.spyOn(repository, 'findCategoryProducts').mockResolvedValue(mockProducts);
+    jest
+      .spyOn(repository, 'findCategoryProducts')
+      .mockResolvedValue(mockProducts);
 
-
-    const products = await service.getCategoryProducts(1, { page: 1, pageSize: 1 });
+    const products = await service.getCategoryProducts(1, {
+      page: 1,
+      pageSize: 1,
+    });
 
     expect(repository.countProductsInCategory).toHaveBeenCalledWith(1);
     expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1);
@@ -105,8 +109,7 @@ describe('ProductService', () => {
       prevPage: null,
       nextPage: null,
     });
-
-  })
+  });
 
   it('should return all products without filters', async () => {
     const mockProducts = [
@@ -124,7 +127,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
 
-    const products = await service.findAll({ page: 1, pageSize: 1 });
+    const products = await service.getAll({ page: 1, pageSize: 1 });
 
     expect(repository.findAll).toHaveBeenCalledWith(0, 1);
     expect(products).toEqual({
@@ -154,7 +157,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.searchProducts(
+    const products = await service.search(
       { title: 'Test' },
       { pageSize: 1, page: 1 },
     );
@@ -191,7 +194,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.searchProducts(
+    const products = await service.search(
       { title: 'Test', minPrice: 20, maxPrice: 20 },
       { pageSize: 1, page: 1 },
     );
@@ -228,7 +231,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.searchProducts(
+    const products = await service.search(
       { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
       { pageSize: 1, page: 1 },
     );
@@ -263,7 +266,7 @@ describe('ProductService', () => {
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
 
-    const product = await service.findById(productId);
+    const product = await service.getById(productId);
 
     expect(repository.findById).toHaveBeenCalledWith(productId);
 
@@ -321,12 +324,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
 
-    const product = await service.updateProduct(
-      userId,
-      productId,
-      dto,
-      mockFiles,
-    );
+    const product = await service.update(userId, productId, dto, mockFiles);
 
     expect(product).toEqual(mockProduct);
   });
@@ -352,7 +350,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
 
-    const product = await service.updateProduct(userId, productId, dto);
+    const product = await service.update(userId, productId, dto);
 
     expect(product).toEqual(mockProduct);
   });
@@ -378,7 +376,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
 
-    const product = await service.updateProduct(userId, productId, dto);
+    const product = await service.update(userId, productId, dto);
 
     expect(product).toEqual(mockProduct);
   });
@@ -401,12 +399,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
 
-    const product = await service.updateProduct(
-      userId,
-      productId,
-      dto,
-      mockFiles,
-    );
+    const product = await service.update(userId, productId, dto, mockFiles);
 
     expect(product).toEqual(mockProduct);
   });
@@ -427,7 +420,7 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
     jest.spyOn(repository, 'delete').mockResolvedValue(mockProduct);
 
-    const product = await service.deleteProduct(userId, productId);
+    const product = await service.delete(userId, productId);
 
     expect(repository.delete).toHaveBeenCalledWith(productId);
     expect(product).toEqual(mockProduct);

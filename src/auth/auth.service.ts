@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   async register(dto: CreateUserDto): Promise<UserRolesNoPassword> {
-    const candidate: UserRoles | null = await this.userService.findByEmail(
+    const candidate: UserRoles | null = await this.userService.getByEmail(
       dto.email,
     );
 
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   async login(dto: LoginUserDto): Promise<Tokens> {
-    const candidate: UserRoles | null = await this.userService.findByEmail(
+    const candidate: UserRoles | null = await this.userService.getByEmail(
       dto.email,
     );
 

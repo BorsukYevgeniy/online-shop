@@ -18,13 +18,14 @@ describe('CategoryController', () => {
         {
           provide: CategoryService,
           useValue: {
-            findAll: jest.fn(),
-            findOne: jest.fn(),
-            searchCategory: jest.fn(),
-            findCategoryProducts: jest.fn(),
+            getAll: jest.fn(),
+            getById: jest.fn(),
+            search: jest.fn(),
+            getCategoryById: jest.fn(),
+            getCategoryProducts: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
-            remove: jest.fn(),
+            delete: jest.fn(),
           },
         },
         { provide: TokenService, useValue: { verifyAccessToken: jest.fn() } },
@@ -61,11 +62,11 @@ describe('CategoryController', () => {
       totalPages: 1,
     };
 
-    jest.spyOn(categoryService, 'findAll').mockResolvedValue(mockCategories);
+    jest.spyOn(categoryService, 'getAll').mockResolvedValue(mockCategories);
 
-    const categories = await controller.findAll({ page: 1, pageSize: 1 });
+    const categories = await controller.getAll({ page: 1, pageSize: 1 });
 
-    expect(categoryService.findAll).toHaveBeenCalledWith({
+    expect(categoryService.getAll).toHaveBeenCalledWith({
       page: 1,
       pageSize: 1,
     });
@@ -84,15 +85,15 @@ describe('CategoryController', () => {
     };
 
     jest
-      .spyOn(categoryService, 'searchCategory')
+      .spyOn(categoryService, 'search')
       .mockResolvedValue(mockCategories);
 
-    const categories = await controller.searchCategory(
+    const categories = await controller.search(
       { name: 'TEST' },
       { page: 1, pageSize: 1 },
     );
 
-    expect(categoryService.searchCategory).toHaveBeenCalledWith(
+    expect(categoryService.search).toHaveBeenCalledWith(
       { name: 'TEST' },
       { page: 1, pageSize: 1 },
     );
@@ -102,11 +103,11 @@ describe('CategoryController', () => {
   it('should find category by id', async () => {
     const mockCategories = { id: 1, name: 'TEST', description: 'TEST' };
 
-    jest.spyOn(categoryService, 'findOne').mockResolvedValue(mockCategories);
+    jest.spyOn(categoryService, 'getById').mockResolvedValue(mockCategories);
 
-    const categories = await controller.findOne(1);
+    const categories = await controller.getById(1);
 
-    expect(categoryService.findOne).toHaveBeenCalledWith(1);
+    expect(categoryService.getById).toHaveBeenCalledWith(1);
     expect(categories).toEqual(mockCategories);
   });
 
@@ -135,7 +136,7 @@ describe('CategoryController', () => {
       .spyOn(productService, 'getCategoryProducts')
       .mockResolvedValue(mockProducts);
 
-    const products = await controller.getCategoryProduct(1, {
+    const products = await controller.getCategoryProducts(1, {
       page: 1,
       pageSize: 1,
     });
@@ -227,9 +228,9 @@ describe('CategoryController', () => {
       description: 'TEST',
     };
 
-    jest.spyOn(categoryService, 'remove').mockResolvedValue(mockCategory);
-    await controller.remove(1);
+    jest.spyOn(categoryService, 'delete').mockResolvedValue(mockCategory);
+    await controller.delete(1);
 
-    expect(categoryService.remove).toHaveBeenCalledWith(1);
+    expect(categoryService.delete).toHaveBeenCalledWith(1);
   });
 });

@@ -30,30 +30,25 @@ export class CategoryController {
   ) {}
 
   @Get()
-  async findAll(
-    @Query() pagination: PaginationDto,
-  ): Promise<PaginatedCategory> {
-    return await this.categoryService.findAll(pagination);
+  async getAll(@Query() pagination: PaginationDto): Promise<PaginatedCategory> {
+    return await this.categoryService.getAll(pagination);
   }
 
   @Get('search')
-  async searchCategory(
+  async search(
     @Query() searchCategoryDto: SearchCategoryDto,
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedCategory> {
-    return await this.categoryService.searchCategory(
-      searchCategoryDto,
-      paginationDto,
-    );
+    return await this.categoryService.search(searchCategoryDto, paginationDto);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<Category> {
-    return this.categoryService.findOne(id);
+  async getById(@Param('id') id: number): Promise<Category> {
+    return this.categoryService.getById(id);
   }
 
   @Get(':id/products')
-  async getCategoryProduct(
+  async getCategoryProducts(
     @Param('id') categoryId: number,
     @Query() pagination: PaginationDto,
   ): Promise<PaginatedProducts> {
@@ -84,8 +79,8 @@ export class CategoryController {
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   @HttpCode(204)
-  async remove(@Param('id') id: number): Promise<void> {
-    await this.categoryService.remove(id);
+  async delete(@Param('id') id: number): Promise<void> {
+    await this.categoryService.delete(id);
     return;
   }
 }

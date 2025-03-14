@@ -164,20 +164,6 @@ describe('UserRepository', () => {
     expect(products).toEqual(mockProducts);
   });
 
-  it('should get user roles', async () => {
-    const mockRoles: Role[] = [
-      { id: 1, value: 'USER', description: 'User role' },
-    ];
-
-    jest
-      .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue({ roles: mockRoles } as any);
-
-    const roles = await repository.findUserRoles(1);
-
-    expect(roles).toEqual(mockRoles);
-  });
-
   it('should get all users', async () => {
     const mockUsers = [
       {

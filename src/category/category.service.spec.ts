@@ -18,7 +18,7 @@ describe('CategoryService', () => {
             count: jest.fn(),
             findAll: jest.fn(),
             findByName: jest.fn(),
-            findOne: jest.fn(),
+            findById: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -55,7 +55,7 @@ describe('CategoryService', () => {
       .spyOn(repository, 'findAll')
       .mockResolvedValue(mockCategories.categories);
 
-    const categories = await service.findAll({ page: 1, pageSize: 1 });
+    const categories = await service.getAll({ page: 1, pageSize: 1 });
 
     expect(repository.findAll).toHaveBeenCalledWith(0, 1);
     expect(categories).toEqual(mockCategories);
@@ -77,7 +77,7 @@ describe('CategoryService', () => {
       .spyOn(repository, 'findByName')
       .mockResolvedValue(mockCategories.categories);
 
-    const categories = await service.searchCategory(
+    const categories = await service.search(
       { name: 'TEST' },
       { page: 1, pageSize: 1 },
     );
@@ -89,11 +89,11 @@ describe('CategoryService', () => {
   it('should find category by id', async () => {
     const mockCategories = { id: 1, name: 'TEST', description: 'TEST' };
 
-    jest.spyOn(repository, 'findOne').mockResolvedValue(mockCategories);
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockCategories);
 
-    const categories = await service.findOne(1);
+    const categories = await service.getById(1);
 
-    expect(repository.findOne).toHaveBeenCalledWith(1);
+    expect(repository.findById).toHaveBeenCalledWith(1);
     expect(categories).toEqual(mockCategories);
   });
 
@@ -181,7 +181,7 @@ describe('CategoryService', () => {
 
     jest.spyOn(repository, 'delete').mockResolvedValue(mockCategory);
 
-    const category = await service.remove(1);
+    const category = await service.delete(1);
 
     expect(repository.delete).toHaveBeenCalledWith(1);
     expect(category).toEqual(mockCategory);

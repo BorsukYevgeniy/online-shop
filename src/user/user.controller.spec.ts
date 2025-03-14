@@ -17,11 +17,11 @@ describe('UserController', () => {
           provide: UserService,
           useValue: {
             assignAdmin: jest.fn(),
-            findAll: jest.fn(),
-            searchUsers: jest.fn(),
-            findById: jest.fn(),
-            findUserProducts: jest.fn(),
-            findUserProfile: jest.fn(),
+            getAll: jest.fn(),
+            search: jest.fn(),
+            getById: jest.fn(),
+            getUserProducts: jest.fn(),
+            getMe: jest.fn(),
             delete: jest.fn(),
           },
         },
@@ -92,7 +92,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findAll').mockResolvedValue({
+    jest.spyOn(service, 'getAll').mockResolvedValue({
       users: mockUsers,
       page: 1,
       total: 1,
@@ -102,7 +102,7 @@ describe('UserController', () => {
       prevPage: null,
     });
 
-    const users = await controller.findAll({ page: 1, pageSize: 10 });
+    const users = await controller.getAll({ page: 1, pageSize: 10 });
 
     expect(users).toEqual({
       users: mockUsers,
@@ -144,7 +144,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'searchUsers').mockResolvedValue({
+    jest.spyOn(service, 'search').mockResolvedValue({
       users: mockUsers,
       total: 1,
       page: 1,
@@ -154,7 +154,7 @@ describe('UserController', () => {
       prevPage: null,
     });
 
-    const users = await controller.searchUsers(
+    const users = await controller.search(
       { nickname: 'test' },
       { page: 1, pageSize: 10 },
     );
@@ -199,7 +199,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'searchUsers').mockResolvedValue({
+    jest.spyOn(service, 'search').mockResolvedValue({
       users: mockUsers,
       total: 1,
       page: 1,
@@ -209,7 +209,7 @@ describe('UserController', () => {
       prevPage: null,
     });
 
-    const users = await controller.searchUsers(
+    const users = await controller.search(
       { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       { page: 1, pageSize: 10 },
     );
@@ -254,7 +254,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'searchUsers').mockResolvedValue({
+    jest.spyOn(service, 'search').mockResolvedValue({
       users: mockUsers,
       total: 1,
       page: 1,
@@ -264,7 +264,7 @@ describe('UserController', () => {
       prevPage: null,
     });
 
-    const users = await controller.searchUsers(
+    const users = await controller.search(
       { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       { page: 1, pageSize: 10 },
     );
@@ -308,13 +308,13 @@ describe('UserController', () => {
       ],
     };
 
-    jest.spyOn(service, 'findById').mockResolvedValue(mockUsers);
+    jest.spyOn(service, 'getById').mockResolvedValue(mockUsers);
 
-    await controller.findUserById(1, req, {
+    await controller.getById(1, req, {
       send: jest.fn(),
     } as unknown as Response);
 
-    expect(service.findById).toHaveBeenCalledWith(1);
+    expect(service.getById).toHaveBeenCalledWith(1);
   });
 
   it('should return user profile', async () => {
@@ -344,12 +344,12 @@ describe('UserController', () => {
       ],
     };
 
-    jest.spyOn(service, 'findUserProfile').mockResolvedValue(mockUser);
+    jest.spyOn(service, 'getMe').mockResolvedValue(mockUser);
 
-    const user = await controller.findUserProfile(req);
+    const user = await controller.getMe(req);
 
     expect(user).toEqual(mockUser);
-    expect(service.findUserProfile).toHaveBeenCalledWith(1);
+    expect(service.getMe).toHaveBeenCalledWith(1);
   });
 
   it('should return user products', async () => {
@@ -365,9 +365,9 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'findUserProducts').mockResolvedValue(mockProducts);
+    jest.spyOn(service, 'getUserProducts').mockResolvedValue(mockProducts);
 
-    const products = await controller.findUserProductsById(userId);
+    const products = await controller.getUserProducts(userId);
 
     expect(products).toEqual(mockProducts);
   });
@@ -409,7 +409,7 @@ describe('UserController', () => {
 
     const req: AuthRequest = { user: { id: userId } } as any;
 
-    await controller.deleteUserById(req, res as any);
+    await controller.deleteMe(req, res as any);
 
     expect(service.delete).toHaveBeenCalledWith(userId);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');

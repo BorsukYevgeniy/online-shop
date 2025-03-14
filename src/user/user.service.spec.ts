@@ -66,7 +66,7 @@ describe('UserService', () => {
       ],
     };
 
-    jest.spyOn(repository, 'findUserRoles').mockResolvedValue(mockUser.roles);
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser as any);
     jest.spyOn(repository, 'assignAdmin').mockResolvedValue(mockUser);
 
     const user = await service.assignAdmin(1);
@@ -105,7 +105,7 @@ describe('UserService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
 
-    const users = await service.findAll({ page: 1, pageSize: 10 });
+    const users = await service.getAll({ page: 1, pageSize: 10 });
 
     expect(users).toEqual({
       users: mockUsers,
@@ -151,7 +151,7 @@ describe('UserService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
 
-    const users = await service.searchUsers(
+    const users = await service.search(
       { nickname: 'test' },
       { page: 1, pageSize: 10 },
     );
@@ -199,7 +199,7 @@ describe('UserService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
 
-    const users = await service.searchUsers(
+    const users = await service.search(
       { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       { page: 1, pageSize: 10 },
     );
@@ -242,7 +242,7 @@ describe('UserService', () => {
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
 
-    const user = await service.findById(1);
+    const user = await service.getById(1);
     expect(user).toEqual(mockUser);
   });
 
@@ -273,14 +273,14 @@ describe('UserService', () => {
 
     jest.spyOn(repository, 'findUserProfile').mockResolvedValue(mockUser);
 
-    const user = await service.findUserProfile(1);
+    const user = await service.getMe(1);
     expect(user).toEqual(mockUser);
   });
 
   it('should throw NotFoundException if user not found by id', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
-    await expect(service.findById(1)).rejects.toThrow(NotFoundException);
+    await expect(service.getById(1)).rejects.toThrow(NotFoundException);
     expect(repository.findById).toHaveBeenCalledWith(1);
   });
 
@@ -298,7 +298,7 @@ describe('UserService', () => {
     ];
     jest.spyOn(repository, 'findUserProducts').mockResolvedValue(products);
 
-    const userProducts = await service.findUserProducts(1);
+    const userProducts = await service.getUserProducts(1);
 
     expect(userProducts).toEqual(products);
   });
@@ -332,7 +332,7 @@ describe('UserService', () => {
     };
     jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
 
-    const user = await service.findByEmail(email);
+    const user = await service.getByEmail(email);
 
     expect(user).toEqual(mockUser);
   });

@@ -17,7 +17,7 @@ describe('RoleController', () => {
           useValue: {
             getRoleById: jest.fn(),
             getRoleByValue: jest.fn(),
-            createRole: jest.fn(),
+            create: jest.fn(),
             deleteRoleByValue: jest.fn(),
           },
         },
@@ -71,11 +71,11 @@ describe('RoleController', () => {
       description: roleDto.description,
     };
 
-    jest.spyOn(service, 'createRole').mockResolvedValue(mockRole);
+    jest.spyOn(service, 'create').mockResolvedValue(mockRole);
 
-    const role = await controller.createRole(roleDto);
+    const role = await controller.create(roleDto);
 
-    expect(service.createRole).toHaveBeenCalledWith({
+    expect(service.create).toHaveBeenCalledWith({
       description: roleDto.description,
       value: roleDto.value,
     });

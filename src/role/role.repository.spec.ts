@@ -67,7 +67,7 @@ describe('RoleRepository', () => {
 
     jest.spyOn(prisma.role, 'create').mockResolvedValue(mockRole);
 
-    const role = await repository.createRole(
+    const role = await repository.create(
       createRoleDto.value,
       createRoleDto.description,
     );

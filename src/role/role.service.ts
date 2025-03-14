@@ -15,8 +15,8 @@ export class RoleService {
     return await this.roleRepository.findByValue(value);
   }
 
-  async createRole(dto: CreateRoleDto): Promise<Role> {
-    return await this.roleRepository.createRole(dto.value, dto.description);
+  async create(dto: CreateRoleDto): Promise<Role> {
+    return await this.roleRepository.create(dto.value, dto.description);
   }
 
   async deleteRoleByValue(value: string): Promise<Role> {

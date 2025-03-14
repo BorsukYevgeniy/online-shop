@@ -43,58 +43,51 @@ export class UserController {
   @Get('')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
-  async findAll(
+  async getAll(
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedUsersRolesNoProductsCreds> {
-    return await this.userService.findAll(paginationDto);
-  }
-
-  @Get('search')
-  async searchUsers(
-    @Query(ParseUserFilterPipe) dto: SearchUserDto,
-    @Query() pagination: PaginationDto,
-  ): Promise<PaginatedUsersRolesNoProductsCreds> {
-    return await this.userService.searchUsers(dto, pagination);
-  }
-
-  @Get('me')
-  @UseGuards(AuthGuard)
-  async findUserProfile(
-    @Req() req: AuthRequest,
-  ): Promise<UserProductsRolesNoPassword> {
-    return await this.userService.findUserProfile(req.user.id);
+    return await this.userService.getAll(paginationDto);
   }
 
   @Get(':userId')
   @UseGuards(AuthGuard)
-  async findUserById(
+  async getById(
     @Param('userId') userId: number,
     @Req() req: AuthRequest,
     @Res() res: Response,
   ): Promise<UserProductsRolesNoCreds | void> {
     if (userId === req.user.id) {
-      return res.redirect('/api/users/profile');
+      return res.redirect('/api/users/me');
     } else {
-      const user = await this.userService.findById(userId);
+      const user = await this.userService.getById(userId);
       res.send(user);
     }
   }
 
+  @Get('search')
+  async search(
+    @Query(ParseUserFilterPipe) dto: SearchUserDto,
+    @Query() pagination: PaginationDto,
+  ): Promise<PaginatedUsersRolesNoProductsCreds> {
+    return await this.userService.search(dto, pagination);
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  async getMe(@Req() req: AuthRequest): Promise<UserProductsRolesNoPassword> {
+    return await this.userService.getMe(req.user.id);
+  }
+
   @Get(':userId/products')
-  async findUserProductsById(
-    @Param('userId') userId: number,
-  ): Promise<Product[]> {
-    return await this.userService.findUserProducts(userId);
+  async getUserProducts(@Param('userId') userId: number): Promise<Product[]> {
+    return await this.userService.getUserProducts(userId);
   }
 
   // Маршрут для видалення акаунту власиником цього акаунту
   @Delete('me')
   @UseGuards(AuthGuard)
   @HttpCode(204)
-  async deleteUserById(
-    @Req() req: AuthRequest,
-    @Res() res: Response,
-  ): Promise<void> {
+  async deleteMe(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
     await this.userService.delete(req.user.id);
 
     res.clearCookie('accessToken');
@@ -106,7 +99,7 @@ export class UserController {
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   @HttpCode(204)
-  async deleteUserByIdByAdmin(@Param('userId') userId: number): Promise<void> {
+  async delete(@Param('userId') userId: number): Promise<void> {
     await this.userService.delete(userId);
     return;
   }

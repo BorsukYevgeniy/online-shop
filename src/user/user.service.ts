@@ -26,7 +26,7 @@ export class UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  async findAll(
+  async getAll(
     paginationDto: PaginationDto,
   ): Promise<PaginatedUsersRolesNoProductsCreds> {
     const { page, pageSize }: PaginationDto = paginationDto;
@@ -48,7 +48,7 @@ export class UserService {
     };
   }
 
-  async searchUsers(
+  async search(
     dto: SearchUserDto,
     pagination: PaginationDto,
   ): Promise<PaginatedUsersRolesNoProductsCreds> {
@@ -72,7 +72,7 @@ export class UserService {
     };
   }
 
-  async findById(userId: number): Promise<UserProductsRolesNoCreds> {
+  async getById(userId: number): Promise<UserProductsRolesNoCreds> {
     const user: UserProductsRolesNoCreds | null =
       await this.userRepository.findById(userId);
 
@@ -83,15 +83,15 @@ export class UserService {
     return user;
   }
 
-  async findUserProfile(userId: number): Promise<UserProductsRolesNoPassword> {
+  async getMe(userId: number): Promise<UserProductsRolesNoPassword> {
     return await this.userRepository.findUserProfile(userId);
   }
 
-  async findUserProducts(userId: number): Promise<Product[]> {
+  async getUserProducts(userId: number): Promise<Product[]> {
     return await this.userRepository.findUserProducts(userId);
   }
 
-  async findByEmail(email: string): Promise<UserRoles | null> {
+  async getByEmail(email: string): Promise<UserRoles | null> {
     return await this.userRepository.findOneByEmail(email);
   }
 
@@ -117,7 +117,8 @@ export class UserService {
   }
 
   async assignAdmin(userId: number): Promise<UserRolesNoProductsCreds> {
-    const candidate: Role[] = await this.userRepository.findUserRoles(userId);
+    const candidate: UserProductsRolesNoCreds =
+      await this.userRepository.findById(userId);
 
     if (!candidate) {
       throw new NotFoundException('User not found');
