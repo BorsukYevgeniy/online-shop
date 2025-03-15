@@ -1,13 +1,13 @@
 import {
-  BadRequestException,
   Injectable,
+  BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../role/role.service';
-import { Product, Role, User } from '@prisma/client';
+import { Product, Role } from '@prisma/client';
 import {
   UserRoles,
   UserRolesNoPassword,
@@ -53,10 +53,13 @@ export class UserService {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = pageSize * (page - 1);
 
-    const users: UserRolesNoCreds[] =
-      await this.userRepository.findUsers(dto, skip, pageSize);
-    const total: number = await this.userRepository.count();
+    const users: UserRolesNoCreds[] = await this.userRepository.findUsers(
+      dto,
+      skip,
+      pageSize,
+    );
 
+    const total: number = await this.userRepository.count(dto);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -85,10 +88,6 @@ export class UserService {
     return await this.userRepository.findUserProfile(userId);
   }
 
-  async getUserProducts(userId: number): Promise<Product[]> {
-    return await this.userRepository.findUserProducts(userId);
-  }
-
   async getByEmail(email: string): Promise<UserRoles | null> {
     return await this.userRepository.findOneByEmail(email);
   }
@@ -104,7 +103,7 @@ export class UserService {
     );
   }
 
-  async delete(userId: number): Promise<User> {
+  async delete(userId: number): Promise<void> {
     try {
       return await this.userRepository.delete(userId);
     } catch (e) {

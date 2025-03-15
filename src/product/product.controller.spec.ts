@@ -397,11 +397,9 @@ describe('ProductController', () => {
   });
 
   it('should delete product by id', async () => {
-    const productId = 1;
-    const userId = 1;
     const mockProduct = {
-      id: productId,
-      userId,
+      id: 1,
+      userId:1,
       price: 22,
       title: 'TEST',
       description: 'Test',
@@ -410,10 +408,9 @@ describe('ProductController', () => {
     };
 
     jest.spyOn(service, 'getById').mockResolvedValue(mockProduct);
-    jest.spyOn(service, 'delete').mockResolvedValue(mockProduct);
     
-    await controller.delete(req, productId);
+    await controller.delete(req, 1);
 
-    expect(service.delete).toHaveBeenCalledWith(req.user.id, productId);
+    expect(service.delete).toHaveBeenCalledWith(req.user.id, 1);
   });
 });

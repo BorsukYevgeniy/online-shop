@@ -20,7 +20,7 @@ import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { ProductService } from '../product/product.service';
 import { PaginatedCategory } from './type/category.type';
-import { PaginatedProducts } from 'src/product/types/product.types';
+import { PaginatedProduct } from 'src/product/types/product.types';
 
 @Controller('category')
 export class CategoryController {
@@ -51,7 +51,7 @@ export class CategoryController {
   async getCategoryProducts(
     @Param('categoryId') categoryId: number,
     @Query() pagination: PaginationDto,
-  ): Promise<PaginatedProducts> {
+  ): Promise<PaginatedProduct> {
     return await this.productService.getCategoryProducts(
       categoryId,
       pagination,
@@ -80,7 +80,6 @@ export class CategoryController {
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async delete(@Param('categoryId') id: number): Promise<void> {
-    await this.categoryService.delete(id);
-    return;
+    return await this.categoryService.delete(id);
   }
 }

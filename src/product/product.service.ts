@@ -9,7 +9,7 @@ import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
 import { PaginationDto } from 'src/dto/pagination.dto';
-import { PaginatedProducts, ProductCategory } from './types/product.types';
+import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class ProductService {
     return;
   }
 
-  async getAll(paginationDto: PaginationDto): Promise<PaginatedProducts> {
+  async getAll(paginationDto: PaginationDto): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
@@ -64,7 +64,7 @@ export class ProductService {
   async search(
     dto: SearchProductDto,
     pagination: PaginationDto,
-  ): Promise<PaginatedProducts> {
+  ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = pagination;
 
     const skip: number = (page - 1) * pageSize;
@@ -127,7 +127,7 @@ export class ProductService {
     return await this.productRepository.update(productId, dto, imagesNames);
   }
 
-  async delete(userId: number, productId: number): Promise<ProductCategory> {
+  async delete(userId: number, productId: number): Promise<void> {
     await this.validateProductOwnership(userId, productId);
 
     return await this.productRepository.delete(productId);
@@ -136,9 +136,8 @@ export class ProductService {
   async getCategoryProducts(
     categoryId: number,
     pagination: PaginationDto,
-  ): Promise<PaginatedProducts> {
+  ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = pagination;
-
     const skip: number = (page - 1) * pageSize;
 
     const products: Product[] =
@@ -149,7 +148,36 @@ export class ProductService {
       );
 
     const total: number =
-      await this.productRepository.countProductsInCategory(categoryId);
+      await this.productRepository.countCategoryProducts(categoryId);
+    const totalPages: number = Math.ceil(total / pageSize);
+
+    return {
+      products,
+      total,
+      pageSize,
+      page,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
+  }
+
+  async getUserProducts(
+    userId: number,
+    pagination: PaginationDto,
+  ): Promise<PaginatedProduct> {
+    const { pageSize, page }: PaginationDto = pagination;
+    const skip: number = (page - 1) * pageSize;
+
+    const products: Product[] =
+      await this.productRepository.findUserProducts(
+        userId,
+        skip,
+        pageSize,
+      );
+
+    const total: number =
+      await this.productRepository.countUserProducts(userId);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {

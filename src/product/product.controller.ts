@@ -13,23 +13,25 @@ import {
   UseInterceptors,
   HttpCode,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
+import { PaginationDto } from '../dto/pagination.dto';
+import { ParseProductDtoPipe } from './pipe/parse-product-filter.pipe';
+import { ProductService } from './product.service';
+import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { AuthRequest } from '../types/request.type';
-import { Product } from '@prisma/client';
-import { PaginationDto } from '../dto/pagination.dto';
-import { SearchProductDto } from './dto/search-product.dto';
-import { ParseProductDtoPipe } from './pipe/parse-product-filter.pipe';
-import { PaginatedProducts as PaginatedProduct, ProductCategory } from './types/product.types';
+import {
+  PaginatedProduct,
+  ProductCategory,
+} from './types/product.types';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get('')
+  @Get()
   async getAll(
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedProduct> {
@@ -51,7 +53,7 @@ export class ProductController {
     return await this.productService.getById(productId);
   }
 
-  @Post('')
+  @Post()
   @UseGuards(AuthGuard)
   @UseInterceptors(ImagesInterceptor())
   async create(
@@ -86,7 +88,6 @@ export class ProductController {
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
   ): Promise<void> {
-    await this.productService.delete(req.user.id, productId);
-    return;
+    return await this.productService.delete(req.user.id, productId);
   }
 }

@@ -20,7 +20,7 @@ export class RoleRepository {
     });
   }
 
-  async deleteRoleByValue(value: string): Promise<Role> {
-    return await this.prismaService.role.delete({ where: { value } });
+  async deleteRoleByValue(value: string): Promise<void> {
+    await this.prismaService.role.delete({ where: { value } });
   }
 }

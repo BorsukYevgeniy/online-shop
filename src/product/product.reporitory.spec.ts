@@ -43,7 +43,7 @@ describe('ProductRepository', () => {
   it('should count products in category', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 
-    const productsCount = await repository.countProductsInCategory(1);
+    const productsCount = await repository.countCategoryProducts(1);
 
     expect(prisma.product.count).toHaveBeenCalledWith({
       where: {
@@ -96,6 +96,50 @@ describe('ProductRepository', () => {
 
     expect(products).toEqual(mockProducts);
   });
+
+
+
+  it('should count user products', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount = await repository.countUserProducts(1);
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        userId: 1
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should find user products', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'Product A',
+        price: 100,
+        userId: 1,
+        description: 'MOCK1 description',
+        images: ['1', '2'],
+      }];
+
+    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
+
+    const products = await repository.findUserProducts(1, 0, 10);
+
+    expect(prisma.product.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: 1
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(products).toEqual(mockProducts);
+  });
+
+
 
   it('should count all products without filter', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
@@ -527,28 +571,11 @@ describe('ProductRepository', () => {
   });
 
   it('should delete product by id', async () => {
-    const productId = 1;
-    const userId = 1;
-    const mockProduct = {
-      id: productId,
-      userId,
-      price: 22,
-      title: 'TEST',
-      description: 'Test',
-      images: ['13', '14'],
-    };
-
-    jest.spyOn(prisma.product, 'delete').mockResolvedValue(mockProduct);
-
-    const product = await repository.delete(productId);
+    await repository.delete(1);
 
     expect(prisma.product.delete).toHaveBeenCalledWith({
-      where: { id: productId },
-      include: {
-        categories: true,
-      },
+      where: { id: 1 },
+      
     });
-
-    expect(product).toEqual(mockProduct);
   });
 });

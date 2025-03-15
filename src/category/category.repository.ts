@@ -11,7 +11,7 @@ export class CategoryRepository {
   async count(name?: string): Promise<number> {
     return await this.prisma.category.count({
       where: {
-        name: name ? { contains: name, mode: 'insensitive' } : undefined,
+        name: { contains: name, mode: 'insensitive' },
       },
     });
   }
@@ -36,15 +36,21 @@ export class CategoryRepository {
     });
   }
 
-  async create(dto: CreateCategoryDto): Promise<Category> {
-    return await this.prisma.category.create({ data: dto });
+  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    return await this.prisma.category.create({ data: createCategoryDto });
   }
 
-  async update(id: number, dto: UpdateCategoryDto): Promise<Category> {
-    return await this.prisma.category.update({ where: { id }, data: dto });
+  async update(
+    id: number,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
+    return await this.prisma.category.update({
+      where: { id },
+      data: updateCategoryDto,
+    });
   }
 
-  async delete(id: number): Promise<Category> {
-    return await this.prisma.category.delete({ where: { id } });
+  async delete(id: number): Promise<void> {
+    await this.prisma.category.delete({ where: { id } });
   }
 }

@@ -135,35 +135,6 @@ describe('UserRepository', () => {
     });
   });
 
-  it('should return user products', async () => {
-    const userId = 1;
-    const mockProducts = [
-      {
-        id: 3,
-        userId,
-        title: 'TEST',
-        price: 52,
-        description: 'Test description',
-        images: ['11', '12'],
-      },
-    ];
-
-    jest
-      .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue({ products: mockProducts } as any);
-
-    const products = await repository.findUserProducts(userId);
-
-    expect(prismaService.user.findUnique).toHaveBeenCalledWith({
-      where: { id: userId },
-      select: {
-        products: true,
-      },
-    });
-
-    expect(products).toEqual(mockProducts);
-  });
-
   it('should get all users', async () => {
     const mockUsers = [
       {
@@ -403,10 +374,8 @@ describe('UserRepository', () => {
   });
 
   it('should delete user by id', async () => {
-    const userId = 1;
-
     const mockUser = {
-      id: userId,
+      id: 1,
       email: 'user@example.com',
       products: [{}],
       roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
@@ -414,12 +383,10 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser as any);
 
-    const user = await repository.delete(userId);
+    const user = await repository.delete(1);
 
     expect(prismaService.user.delete).toHaveBeenCalledWith({
-      where: { id: userId },
+      where: { id: 1 },
     });
-
-    expect(user).toEqual(mockUser);
   });
 });

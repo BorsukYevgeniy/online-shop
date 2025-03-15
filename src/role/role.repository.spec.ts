@@ -92,12 +92,10 @@ describe('RoleRepository', () => {
 
     jest.spyOn(prisma.role, 'delete').mockResolvedValue(mockRole);
 
-    const role = await repository.deleteRoleByValue(deleteRoleData.value);
+    await repository.deleteRoleByValue(deleteRoleData.value);
 
     expect(prisma.role.delete).toHaveBeenCalledWith({
       where: { value: deleteRoleData.value },
     });
-
-    expect(role).toEqual(mockRole);
   });
 });

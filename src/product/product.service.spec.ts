@@ -47,8 +47,10 @@ describe('ProductService', () => {
             findAll: jest.fn(),
             findProducts: jest.fn(),
             findById: jest.fn(),
-            countProductsInCategory: jest.fn(),
+            countCategoryProducts: jest.fn(),
             findCategoryProducts: jest.fn(),
+            countUserProducts: jest.fn(),
+            findUserProducts: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -88,7 +90,7 @@ describe('ProductService', () => {
       },
     ];
 
-    jest.spyOn(repository, 'countProductsInCategory').mockResolvedValue(1);
+    jest.spyOn(repository, 'countCategoryProducts').mockResolvedValue(1);
     jest
       .spyOn(repository, 'findCategoryProducts')
       .mockResolvedValue(mockProducts);
@@ -98,7 +100,7 @@ describe('ProductService', () => {
       pageSize: 1,
     });
 
-    expect(repository.countProductsInCategory).toHaveBeenCalledWith(1);
+    expect(repository.countCategoryProducts).toHaveBeenCalledWith(1);
     expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1);
     expect(products).toEqual({
       products: mockProducts,
@@ -110,6 +112,44 @@ describe('ProductService', () => {
       nextPage: null,
     });
   });
+
+
+  it('should return user products', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'title',
+        price: 50,
+        userId: 1,
+        description: 'description',
+        images: ['1', '2'],
+        categories: [{ id: 1, name: 'test', description: 'test' }],
+      },
+    ];
+
+    jest.spyOn(repository, 'countUserProducts').mockResolvedValue(1);
+    jest
+      .spyOn(repository, 'findUserProducts')
+      .mockResolvedValue(mockProducts);
+
+    const products = await service.getUserProducts(1, {
+      page: 1,
+      pageSize: 1,
+    });
+
+    expect(repository.countUserProducts).toHaveBeenCalledWith(1);
+    expect(repository.findUserProducts).toHaveBeenCalledWith(1, 0, 1);
+    expect(products).toEqual({
+      products: mockProducts,
+      total: 1,
+      pageSize: 1,
+      page: 1,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
+  });
+
 
   it('should return all products without filters', async () => {
     const mockProducts = [
@@ -405,11 +445,9 @@ describe('ProductService', () => {
   });
 
   it('should delete product by id', async () => {
-    const productId = 1;
-    const userId = 1;
     const mockProduct = {
-      id: productId,
-      userId,
+      id: 1,
+      userId: 1,
       price: 22,
       title: 'TEST',
       description: 'Test',
@@ -418,11 +456,9 @@ describe('ProductService', () => {
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
-    jest.spyOn(repository, 'delete').mockResolvedValue(mockProduct);
 
-    const product = await service.delete(userId, productId);
+    await service.delete(1, 1);
 
-    expect(repository.delete).toHaveBeenCalledWith(productId);
-    expect(product).toEqual(mockProduct);
+    expect(repository.delete).toHaveBeenCalledWith(1);
   });
 });

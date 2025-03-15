@@ -37,12 +37,10 @@ export class UserRepository {
   async count(filter?: UserFilter): Promise<number> {
     return await this.prisma.user.count({
       where: {
-        nickname: filter
-          ? { contains: filter.nickname, mode: 'insensitive' }
-          : undefined,
+        nickname: { contains: filter.nickname, mode: 'insensitive' },
         createdAt: {
-          gte: filter ? filter.minDate : undefined,
-          lte: filter ? filter.maxDate : undefined,
+          gte: filter.minDate,
+          lte: filter.maxDate,
         },
       },
     });
@@ -54,7 +52,6 @@ export class UserRepository {
         id: true,
         nickname: true,
         createdAt: true,
-
         roles: true,
       },
       skip,
@@ -65,16 +62,14 @@ export class UserRepository {
   }
 
   async findUsers(
-    dto: SearchUserDto,
+    searchUserDto: SearchUserDto,
     skip: number,
     limit: number,
   ): Promise<UserRolesNoCreds[]> {
-    const { nickname, minDate, maxDate }: SearchUserDto = dto;
-
     return await this.prisma.user.findMany({
       where: {
-        nickname: { contains: nickname, mode: 'insensitive' },
-        createdAt: { lte: maxDate, gte: minDate },
+        nickname: { contains: searchUserDto.nickname, mode: 'insensitive' },
+        createdAt: { lte: searchUserDto.maxDate, gte: searchUserDto.minDate },
       },
       select: {
         id: true,
@@ -99,51 +94,33 @@ export class UserRepository {
       },
     });
 
-    if (!user) return null;
-
     return user;
   }
 
-  async findUserProfile(id: number): Promise<UserRolesNoPassword> {
+  async findUserProfile(userId: number): Promise<UserRolesNoPassword | null> {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
       select: {
         id: true,
         nickname: true,
         email: true,
         createdAt: true,
-
         roles: true,
       },
     });
-
-    if (!user) return null;
 
     return user;
   }
 
   async findOneByEmail(email: string): Promise<UserRoles | null> {
-    const user = await this.prisma.user.findUnique({
+    const user: UserRoles | null = await this.prisma.user.findUnique({
       where: { email },
       include: {
         roles: true,
       },
     });
 
-    if (!user) return null;
-
     return user;
-  }
-
-  async findUserProducts(userId: number): Promise<Product[] | null> {
-    const userWithProducts = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        products: true,
-      },
-    });
-
-    return userWithProducts.products;
   }
 
   async create(
@@ -170,18 +147,12 @@ export class UserRepository {
       },
     });
 
-    if (!user) return null;
-
     return user;
   }
 
-  async delete(userId: number): Promise<User> {
-    const user = await this.prisma.user.delete({
+  async delete(userId: number): Promise<void> {
+    await this.prisma.user.delete({
       where: { id: userId },
     });
-
-    if (!user) return null;
-
-    return user;
   }
 }

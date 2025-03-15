@@ -6,6 +6,7 @@ import { DeletingCount } from 'src/types/deleting-count.type';
 @Injectable()
 export class TokenRepository {
   constructor(private readonly prismaService: PrismaService) {}
+  
   async findUserTokens(userId: number): Promise<Token[] | null> {
     return await this.prismaService.token.findMany({
       where: { userId },

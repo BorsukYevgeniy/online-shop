@@ -284,25 +284,6 @@ describe('UserService', () => {
     expect(repository.findById).toHaveBeenCalledWith(1);
   });
 
-  it('should find user products by user id', async () => {
-    const products = [
-      {
-        id: 1,
-        name: 'Product 1',
-        userId: 1,
-        price: 100,
-        description: 'Product description',
-        title: 'ds',
-        images: ['1'],
-      },
-    ];
-    jest.spyOn(repository, 'findUserProducts').mockResolvedValue(products);
-
-    const userProducts = await service.getUserProducts(1);
-
-    expect(userProducts).toEqual(products);
-  });
-
   it('should find user by email', async () => {
     const email = 'test@example.com';
     const mockUser = {
@@ -385,20 +366,8 @@ describe('UserService', () => {
   });
 
   it('should delete a user by id', async () => {
-    const userId = 1;
-    const mockUser = {
-      id: 1,
-      email: 'test',
-      password: 'password',
-      nickname: 'test',
-      createdAt: new Date(),
-    };
+    await service.delete(1);
 
-    jest.spyOn(repository, 'delete').mockResolvedValue(mockUser);
-
-    const user = await service.delete(userId);
-
-    expect(user).toEqual(mockUser);
     expect(repository.delete).toHaveBeenCalledWith(1);
   });
 });

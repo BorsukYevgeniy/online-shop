@@ -84,18 +84,10 @@ describe('RoleController', () => {
   });
 
   it('should delete role by value', async () => {
-    const deleteRoleData = { value: 'TEST' };
-    const mockRole = {
-      id: 1,
-      value: deleteRoleData.value,
-      description: 'Test description',
-    };
+    const roleValue = 'TEST';
 
-    jest.spyOn(service, 'deleteRoleByValue').mockResolvedValue(mockRole);
+    await controller.deleteRoleByValue(roleValue);
 
-    await controller.deleteRoleByValue(deleteRoleData.value);
-    expect(service.deleteRoleByValue).toHaveBeenCalledWith(
-      deleteRoleData.value,
-    );
+    expect(service.deleteRoleByValue).toHaveBeenCalledWith(roleValue);
   });
 });

@@ -173,17 +173,8 @@ describe('CategoryService', () => {
   });
 
   it('should remove category', async () => {
-    const mockCategory = {
-      id: 1,
-      name: 'TEST',
-      description: 'TEST',
-    };
-
-    jest.spyOn(repository, 'delete').mockResolvedValue(mockCategory);
-
-    const category = await service.delete(1);
+    await service.delete(1);
 
     expect(repository.delete).toHaveBeenCalledWith(1);
-    expect(category).toEqual(mockCategory);
   });
 });

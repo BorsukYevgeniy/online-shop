@@ -11,15 +11,24 @@ import { Product } from '@prisma/client';
 export class ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async countCategoryProducts(categoryId: number): Promise<number> {
+    return await this.prisma.product.count({
+      where: { categories: { some: { id: categoryId } } },
+    });
+  }
+  async countUserProducts(userId: number): Promise<number> {
+    return await this.prisma.product.count({
+      where: { userId},
+    });
+  }
+
   async count(filter?: ProductFilter): Promise<number> {
     return await this.prisma.product.count({
       where: {
-        title: filter
-          ? { contains: filter.title, mode: 'insensitive' }
-          : undefined,
+        title: { contains: filter.title, mode: 'insensitive' },
         price: {
-          gte: filter ? filter.minPrice : undefined,
-          lte: filter ? filter.maxPrice : undefined,
+          gte: filter.minPrice,
+          lte: filter.maxPrice,
         },
       },
     });
@@ -33,21 +42,43 @@ export class ProductRepository {
   }
 
   async findProducts(
-    dto: SearchProductDto,
+    searchProductDto: SearchProductDto,
     skip: number,
     limit: number,
   ): Promise<Product[]> {
-    const { title, maxPrice, minPrice, categoryIds }: SearchProductDto = dto;
-
     return await this.prisma.product.findMany({
       where: {
-        title: { contains: title, mode: 'insensitive' },
+        title: { contains: searchProductDto.title, mode: 'insensitive' },
         price: {
-          gte: minPrice,
-          lte: maxPrice,
+          gte: searchProductDto.minPrice,
+          lte: searchProductDto.maxPrice,
         },
-        categories: { some: { id: { in: categoryIds } } },
+        categories: { some: { id: { in: searchProductDto.categoryIds } } },
       },
+      skip,
+      take: limit,
+    });
+  }
+
+  async findCategoryProducts(
+    categoryId: number,
+    skip: number,
+    limit: number,
+  ): Promise<Product[]> {
+    return await this.prisma.product.findMany({
+      where: { categories: { some: { id: categoryId } } },
+      skip,
+      take: limit,
+    });
+  }
+
+  async findUserProducts(
+    userId: number,
+    skip: number,
+    limit: number,
+  ): Promise<Product[]> {
+    return await this.prisma.product.findMany({
+      where: { userId },
       skip,
       take: limit,
     });
@@ -100,30 +131,9 @@ export class ProductRepository {
     });
   }
 
-  async delete(productId: number): Promise<ProductCategory | null> {
-    return await this.prisma.product.delete({
+  async delete(productId: number): Promise<void> {
+    await this.prisma.product.delete({
       where: { id: productId },
-      include: { categories: true },
-    });
-  }
-
-  async findCategoryProducts(
-    id: number,
-    skip: number,
-    limit: number,
-  ): Promise<Product[]> {
-    const products: Product[] = await this.prisma.product.findMany({
-      where: { categories: { some: { id } } },
-      skip,
-      take: limit,
-    });
-
-    return products;
-  }
-
-  async countProductsInCategory(categoryId: number): Promise<number> {
-    return await this.prisma.product.count({
-      where: { categories: { some: { id: categoryId } } },
     });
   }
 }

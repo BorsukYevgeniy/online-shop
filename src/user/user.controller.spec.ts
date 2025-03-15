@@ -4,12 +4,14 @@ import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
 import { AuthRequest } from '../types/request.type';
 import { Response } from 'express';
+import { ProductService } from '../product/product.service';
 
 const req = { user: { id: 2, roles: ['USER'] } } as AuthRequest;
 
 describe('UserController', () => {
   let controller: UserController;
-  let service: UserService;
+  let userService: UserService;
+  let productService: ProductService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,13 +29,14 @@ describe('UserController', () => {
             delete: jest.fn(),
           },
         },
-
+        { provide: ProductService, useValue: { getUserProducts: jest.fn() } },
         { provide: TokenService, useValue: { verifyAccessToken: jest.fn() } },
       ],
     }).compile();
 
     controller = module.get<UserController>(UserController);
-    service = module.get<UserService>(UserService);
+    userService = module.get<UserService>(UserService);
+    productService = module.get<ProductService>(ProductService);
   });
 
   afterEach(async () => {
@@ -58,7 +61,7 @@ describe('UserController', () => {
       ],
     };
 
-    jest.spyOn(service, 'assignAdmin').mockResolvedValue(mockUser);
+    jest.spyOn(userService, 'assignAdmin').mockResolvedValue(mockUser);
 
     const user = await controller.assignAdmin(1);
 
@@ -94,7 +97,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'getAll').mockResolvedValue({
+    jest.spyOn(userService, 'getAll').mockResolvedValue({
       users: mockUsers,
       page: 1,
       total: 1,
@@ -146,7 +149,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'search').mockResolvedValue({
+    jest.spyOn(userService, 'search').mockResolvedValue({
       users: mockUsers,
       total: 1,
       page: 1,
@@ -201,7 +204,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'search').mockResolvedValue({
+    jest.spyOn(userService, 'search').mockResolvedValue({
       users: mockUsers,
       total: 1,
       page: 1,
@@ -256,7 +259,7 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'search').mockResolvedValue({
+    jest.spyOn(userService, 'search').mockResolvedValue({
       users: mockUsers,
       total: 1,
       page: 1,
@@ -308,11 +311,11 @@ describe('UserController', () => {
       ],
     };
 
-    jest.spyOn(service, 'getById').mockResolvedValue(mockUsers);
+    jest.spyOn(userService, 'getById').mockResolvedValue(mockUsers);
 
     await controller.getById(1);
 
-    expect(service.getById).toHaveBeenCalledWith(1);
+    expect(userService.getById).toHaveBeenCalledWith(1);
   });
 
   it('should return user profile', async () => {
@@ -324,12 +327,12 @@ describe('UserController', () => {
       roles: [{ id: 1, value: 'USER', description: 'user role' }],
     };
 
-    jest.spyOn(service, 'getMe').mockResolvedValue(mockUser);
+    jest.spyOn(userService, 'getMe').mockResolvedValue(mockUser);
 
     const user = await controller.getMe(req);
 
     expect(user).toEqual(mockUser);
-    expect(service.getMe).toHaveBeenCalledWith(2);
+    expect(userService.getMe).toHaveBeenCalledWith(2);
   });
 
   it('should return user products', async () => {
@@ -345,33 +348,42 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(service, 'getUserProducts').mockResolvedValue(mockProducts);
+    jest
+      .spyOn(productService, 'getUserProducts')
+      .mockResolvedValue({
+        nextPage: null,
+        prevPage: null,
+        page: 1,
+        pageSize: 10,
+        products: mockProducts,
+        total: 1,
+        totalPages: 1,
+      });
 
-    const products = await controller.getUserProducts(userId);
+    const products = await controller.getUserProducts(userId, {
+      page: 1,
+      pageSize: 10,
+    });
 
-    expect(products).toEqual(mockProducts);
+    expect(products).toEqual({
+      nextPage: null,
+      prevPage: null,
+      page: 1,
+      pageSize: 10,
+      products: mockProducts,
+      total: 1,
+      totalPages: 1,
+    });
   });
 
   it('should delete user', async () => {
-    const userId = 2;
-    const mockUser = {
-      id: userId,
-      email: 'test',
-      nickname: 'test',
-      createdAt: new Date(),
-      password: 'password',
-    };
-
     const res = {
       clearCookie: jest.fn(),
       send: jest.fn(),
     } as unknown as Response;
 
-    jest.spyOn(service, 'delete').mockResolvedValue(mockUser);
-
     await controller.deleteMe(req, res);
 
-    expect(service.delete).toHaveBeenCalledWith(userId);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
   });

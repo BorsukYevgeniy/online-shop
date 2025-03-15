@@ -191,9 +191,8 @@ describe('CategoryRepository', () => {
 
     jest.spyOn(prisma.category, 'delete').mockResolvedValue(mockCategory);
 
-    const category = await repository.delete(1);
+    await repository.delete(1);
 
     expect(prisma.category.delete).toHaveBeenCalledWith({ where: { id: 1 } });
-    expect(category).toEqual(mockCategory);
   });
 });

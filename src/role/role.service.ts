@@ -7,19 +7,22 @@ import { Role } from '@prisma/client';
 export class RoleService {
   constructor(private readonly roleRepository: RoleRepository) {}
 
-  async getRoleById(id: number) {
-    return await this.roleRepository.findById(id);
+  async getRoleById(roleId: number) {
+    return await this.roleRepository.findById(roleId);
   }
 
-  async getRoleByValue(value: string): Promise<Role> {
-    return await this.roleRepository.findByValue(value);
+  async getRoleByValue(roleValue: string): Promise<Role> {
+    return await this.roleRepository.findByValue(roleValue);
   }
 
-  async create(dto: CreateRoleDto): Promise<Role> {
-    return await this.roleRepository.create(dto.value, dto.description);
+  async create(createRoleDto: CreateRoleDto): Promise<Role> {
+    return await this.roleRepository.create(
+      createRoleDto.value,
+      createRoleDto.description,
+    );
   }
 
-  async deleteRoleByValue(value: string): Promise<Role> {
-    return await this.roleRepository.deleteRoleByValue(value);
+  async deleteRoleByValue(roleValue: string): Promise<void> {
+    return await this.roleRepository.deleteRoleByValue(roleValue);
   }
 }

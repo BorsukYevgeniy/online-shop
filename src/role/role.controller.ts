@@ -23,7 +23,7 @@ export class RoleController {
     return await this.roleService.getRoleById(id);
   }
 
-  @Post('')
+  @Post()
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   async create(@Body() dto: CreateRoleDto): Promise<Role> {
@@ -35,7 +35,6 @@ export class RoleController {
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async deleteRoleByValue(@Param('value') roleValue: string): Promise<void> {
-    await this.roleService.deleteRoleByValue(roleValue);
-    return;
+    return await this.roleService.deleteRoleByValue(roleValue);
   }
 }

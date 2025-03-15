@@ -222,13 +222,6 @@ describe('CategoryController', () => {
   });
 
   it('should remove category', async () => {
-    const mockCategory = {
-      id: 1,
-      name: 'TEST',
-      description: 'TEST',
-    };
-
-    jest.spyOn(categoryService, 'delete').mockResolvedValue(mockCategory);
     await controller.delete(1);
 
     expect(categoryService.delete).toHaveBeenCalledWith(1);

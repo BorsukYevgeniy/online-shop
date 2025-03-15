@@ -21,16 +21,20 @@ import {
   UserRolesNoPassword,
   UserRolesNoCreds,
 } from './types/user.types';
-import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
+import { ProductService } from '../product/product.service';
+import { PaginatedProduct } from '../product/types/product.types';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly productService: ProductService,
+  ) {}
 
-  @Get('')
+  @Get()
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   async getAll(
@@ -62,8 +66,11 @@ export class UserController {
   }
 
   @Get(':userId/products')
-  async getUserProducts(@Param('userId') userId: number): Promise<Product[]> {
-    return await this.userService.getUserProducts(userId);
+  async getUserProducts(
+    @Param('userId') userId: number,
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedProduct> {
+    return await this.productService.getUserProducts(userId, paginationDto);
   }
 
   // Привоїти користувачу роль адміна
@@ -81,11 +88,10 @@ export class UserController {
   @UseGuards(AuthGuard)
   @HttpCode(204)
   async deleteMe(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
-    await this.userService.delete(req.user.id);
-
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-    return;
+
+    return await this.userService.delete(req.user.id);
   }
 
   // Видалення акаунту адміністратором
@@ -94,7 +100,6 @@ export class UserController {
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async delete(@Param('userId') userId: number): Promise<void> {
-    await this.userService.delete(userId);
-    return;
+    return await this.userService.delete(userId);
   }
 }

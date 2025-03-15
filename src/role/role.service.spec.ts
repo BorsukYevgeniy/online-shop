@@ -93,20 +93,10 @@ describe('RoleService', () => {
   });
 
   it('should delete role by value', async () => {
-    const deleteRoleData = { value: 'TEST' };
-    const mockRole = {
-      id: 1,
-      value: deleteRoleData.value,
-      description: 'Test description',
-    };
+    const roleValue = 'TEST';
 
-    jest.spyOn(repository, 'deleteRoleByValue').mockResolvedValue(mockRole);
+    await service.deleteRoleByValue(roleValue);
 
-    const deletedRole = await service.deleteRoleByValue(deleteRoleData.value);
-    expect(repository.deleteRoleByValue).toHaveBeenCalledWith(
-      deleteRoleData.value,
-    );
-
-    expect(deletedRole).toEqual(mockRole);
+    expect(repository.deleteRoleByValue).toHaveBeenCalledWith(roleValue);
   });
 });
