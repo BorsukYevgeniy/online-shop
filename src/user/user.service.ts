@@ -9,12 +9,10 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RoleService } from '../role/role.service';
 import { Product, Role, User } from '@prisma/client';
 import {
-  UserProductsRolesNoPassword,
-  UserProductsRolesNoCreds,
   UserRoles,
   UserRolesNoPassword,
-  UserRolesNoProductsCreds,
-  PaginatedUsersRolesNoProductsCreds,
+  UserRolesNoCreds,
+  PaginatedUserRolesNoCreds,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -28,7 +26,7 @@ export class UserService {
 
   async getAll(
     paginationDto: PaginationDto,
-  ): Promise<PaginatedUsersRolesNoProductsCreds> {
+  ): Promise<PaginatedUserRolesNoCreds> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
@@ -51,11 +49,11 @@ export class UserService {
   async search(
     dto: SearchUserDto,
     pagination: PaginationDto,
-  ): Promise<PaginatedUsersRolesNoProductsCreds> {
+  ): Promise<PaginatedUserRolesNoCreds> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = pageSize * (page - 1);
 
-    const users: UserRolesNoProductsCreds[] =
+    const users: UserRolesNoCreds[] =
       await this.userRepository.findUsers(dto, skip, pageSize);
     const total: number = await this.userRepository.count();
 
@@ -72,8 +70,8 @@ export class UserService {
     };
   }
 
-  async getById(userId: number): Promise<UserProductsRolesNoCreds> {
-    const user: UserProductsRolesNoCreds | null =
+  async getById(userId: number): Promise<UserRolesNoCreds> {
+    const user: UserRolesNoCreds | null =
       await this.userRepository.findById(userId);
 
     if (!user) {
@@ -83,7 +81,7 @@ export class UserService {
     return user;
   }
 
-  async getMe(userId: number): Promise<UserProductsRolesNoPassword> {
+  async getMe(userId: number): Promise<UserRolesNoPassword> {
     return await this.userRepository.findUserProfile(userId);
   }
 
@@ -116,8 +114,8 @@ export class UserService {
     }
   }
 
-  async assignAdmin(userId: number): Promise<UserRolesNoProductsCreds> {
-    const candidate: UserProductsRolesNoCreds =
+  async assignAdmin(userId: number): Promise<UserRolesNoCreds> {
+    const candidate: UserRolesNoCreds =
       await this.userRepository.findById(userId);
 
     if (!candidate) {

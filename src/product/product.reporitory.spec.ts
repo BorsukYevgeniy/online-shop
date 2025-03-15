@@ -189,9 +189,6 @@ describe('ProductRepository', () => {
     const products = await repository.findAll(0, 10);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
-      include: {
-        categories: true,
-      },
       skip: 0,
       take: 10,
     });
@@ -229,9 +226,7 @@ describe('ProductRepository', () => {
           },
         },
       },
-      include: {
-        categories: true,
-      },
+
       skip: 0,
       take: 10,
     });
@@ -273,9 +268,6 @@ describe('ProductRepository', () => {
           },
         },
       },
-      include: {
-        categories: true,
-      },
       skip: 0,
       take: 10,
     });
@@ -316,9 +308,6 @@ describe('ProductRepository', () => {
             },
           },
         },
-      },
-      include: {
-        categories: true,
       },
       skip: 0,
       take: 10,

@@ -25,15 +25,18 @@ export class ProductRepository {
     });
   }
 
-  async findAll(skip: number, limit: number): Promise<ProductCategory[]> {
+  async findAll(skip: number, limit: number): Promise<Product[]> {
     return await this.prisma.product.findMany({
-      include: { categories: true },
       skip,
       take: limit,
     });
   }
 
-  async findProducts(dto: SearchProductDto, skip: number, limit: number) {
+  async findProducts(
+    dto: SearchProductDto,
+    skip: number,
+    limit: number,
+  ): Promise<Product[]> {
     const { title, maxPrice, minPrice, categoryIds }: SearchProductDto = dto;
 
     return await this.prisma.product.findMany({
@@ -45,7 +48,6 @@ export class ProductRepository {
         },
         categories: { some: { id: { in: categoryIds } } },
       },
-      include: { categories: true },
       skip,
       take: limit,
     });
@@ -71,7 +73,7 @@ export class ProductRepository {
         images: imageNames,
         price: Number(dto.price),
         categories: {
-          connect: dto.categoryIds.map((id) => ({ id: Number(id) })),
+          connect: dto.categoryIds.map((id) => ({ id })),
         },
       },
       include: { categories: true },
@@ -91,7 +93,7 @@ export class ProductRepository {
         description: dto.description,
         title: dto.title,
         categories: dto.categoryIds
-          ? { set: dto.categoryIds.map((c) => ({ id: Number(c) })) }
+          ? { set: dto.categoryIds.map((id) => ({ id })) }
           : undefined,
       },
       include: { categories: true },
@@ -110,7 +112,7 @@ export class ProductRepository {
     skip: number,
     limit: number,
   ): Promise<Product[]> {
-    const products = await this.prisma.product.findMany({
+    const products: Product[] = await this.prisma.product.findMany({
       where: { categories: { some: { id } } },
       skip,
       take: limit,

@@ -5,6 +5,8 @@ import { TokenService } from '../token/token.service';
 import { AuthRequest } from '../types/request.type';
 import { Response } from 'express';
 
+const req = { user: { id: 2, roles: ['USER'] } } as AuthRequest;
+
 describe('UserController', () => {
   let controller: UserController;
   let service: UserService;
@@ -281,8 +283,6 @@ describe('UserController', () => {
   });
 
   it('should return user by id', async () => {
-    const req = { user: { id: 2, roles: ['USER'] } } as AuthRequest;
-
     const mockUsers = {
       id: 1,
       email: 'test',
@@ -310,38 +310,18 @@ describe('UserController', () => {
 
     jest.spyOn(service, 'getById').mockResolvedValue(mockUsers);
 
-    await controller.getById(1, req, {
-      send: jest.fn(),
-    } as unknown as Response);
+    await controller.getById(1);
 
     expect(service.getById).toHaveBeenCalledWith(1);
   });
 
   it('should return user profile', async () => {
-    const req = { user: { id: 1, roles: ['USER'] } } as AuthRequest;
     const mockUser = {
       id: 1,
       nickname: 'test',
       createdAt: new Date(),
       email: 'test',
-
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      roles: [{ id: 1, value: 'USER', description: 'user role' }],
     };
 
     jest.spyOn(service, 'getMe').mockResolvedValue(mockUser);
@@ -349,7 +329,7 @@ describe('UserController', () => {
     const user = await controller.getMe(req);
 
     expect(user).toEqual(mockUser);
-    expect(service.getMe).toHaveBeenCalledWith(1);
+    expect(service.getMe).toHaveBeenCalledWith(2);
   });
 
   it('should return user products', async () => {
@@ -373,43 +353,23 @@ describe('UserController', () => {
   });
 
   it('should delete user', async () => {
-    const userId = 1;
+    const userId = 2;
     const mockUser = {
       id: userId,
       email: 'test',
       nickname: 'test',
       createdAt: new Date(),
-
       password: 'password',
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
     };
+
+    const res = {
+      clearCookie: jest.fn(),
+      send: jest.fn(),
+    } as unknown as Response;
 
     jest.spyOn(service, 'delete').mockResolvedValue(mockUser);
 
-    const res: Partial<Response> = {
-      clearCookie: jest.fn(),
-      send: jest.fn(),
-    } as any;
-
-    const req: AuthRequest = { user: { id: userId } } as any;
-
-    await controller.deleteMe(req, res as any);
+    await controller.deleteMe(req, res);
 
     expect(service.delete).toHaveBeenCalledWith(userId);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');

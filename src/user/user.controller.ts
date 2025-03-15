@@ -17,10 +17,9 @@ import { Response } from 'express';
 import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { AuthRequest } from '../types/request.type';
 import {
-  PaginatedUsersRolesNoProductsCreds,
-  UserProductsRolesNoCreds,
-  UserProductsRolesNoPassword,
-  UserRolesNoProductsCreds,
+  PaginatedUserRolesNoCreds,
+  UserRolesNoPassword,
+  UserRolesNoCreds,
 } from './types/user.types';
 import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
@@ -31,56 +30,50 @@ import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Patch('assing-admin/:userId')
-  @Roles('ADMIN')
-  @UseGuards(RolesGuard)
-  async assignAdmin(
-    @Param('userId') userId: number,
-  ): Promise<UserRolesNoProductsCreds> {
-    return await this.userService.assignAdmin(userId);
-  }
-
   @Get('')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   async getAll(
     @Query() paginationDto: PaginationDto,
-  ): Promise<PaginatedUsersRolesNoProductsCreds> {
+  ): Promise<PaginatedUserRolesNoCreds> {
     return await this.userService.getAll(paginationDto);
   }
 
-  @Get(':userId')
+  @Get('me')
   @UseGuards(AuthGuard)
-  async getById(
-    @Param('userId') userId: number,
-    @Req() req: AuthRequest,
-    @Res() res: Response,
-  ): Promise<UserProductsRolesNoCreds | void> {
-    if (userId === req.user.id) {
-      return res.redirect('/api/users/me');
-    } else {
-      const user = await this.userService.getById(userId);
-      res.send(user);
-    }
+  async getMe(@Req() req: AuthRequest): Promise<UserRolesNoPassword> {
+    return await this.userService.getMe(req.user.id);
   }
 
   @Get('search')
   async search(
     @Query(ParseUserFilterPipe) dto: SearchUserDto,
     @Query() pagination: PaginationDto,
-  ): Promise<PaginatedUsersRolesNoProductsCreds> {
+  ): Promise<PaginatedUserRolesNoCreds> {
     return await this.userService.search(dto, pagination);
   }
 
-  @Get('me')
+  @Get(':userId')
   @UseGuards(AuthGuard)
-  async getMe(@Req() req: AuthRequest): Promise<UserProductsRolesNoPassword> {
-    return await this.userService.getMe(req.user.id);
+  async getById(
+    @Param('userId') userId: number,
+  ): Promise<UserRolesNoCreds | void> {
+    return await this.userService.getById(userId);
   }
 
   @Get(':userId/products')
   async getUserProducts(@Param('userId') userId: number): Promise<Product[]> {
     return await this.userService.getUserProducts(userId);
+  }
+
+  // Привоїти користувачу роль адміна
+  @Patch('assing-admin/:userId')
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
+  async assignAdmin(
+    @Param('userId') userId: number,
+  ): Promise<UserRolesNoCreds> {
+    return await this.userService.assignAdmin(userId);
   }
 
   // Маршрут для видалення акаунту власиником цього акаунту
@@ -92,6 +85,7 @@ export class UserController {
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
+    return;
   }
 
   // Видалення акаунту адміністратором

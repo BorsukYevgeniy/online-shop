@@ -66,7 +66,7 @@ describe('UserService', () => {
       ],
     };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser as any);
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
     jest.spyOn(repository, 'assignAdmin').mockResolvedValue(mockUser);
 
     const user = await service.assignAdmin(1);

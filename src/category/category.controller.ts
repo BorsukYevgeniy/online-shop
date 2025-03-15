@@ -42,14 +42,14 @@ export class CategoryController {
     return await this.categoryService.search(searchCategoryDto, paginationDto);
   }
 
-  @Get(':id')
-  async getById(@Param('id') id: number): Promise<Category> {
+  @Get(':categoryId')
+  async getById(@Param('categoryId') id: number): Promise<Category> {
     return this.categoryService.getById(id);
   }
 
-  @Get(':id/products')
+  @Get(':categoryId/products')
   async getCategoryProducts(
-    @Param('id') categoryId: number,
+    @Param('categoryId') categoryId: number,
     @Query() pagination: PaginationDto,
   ): Promise<PaginatedProducts> {
     return await this.productService.getCategoryProducts(
@@ -65,21 +65,21 @@ export class CategoryController {
     return await this.categoryService.create(dto);
   }
 
-  @Patch(':id')
+  @Patch(':categoryId')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   async update(
-    @Param('id') id: number,
+    @Param('categoryId') id: number,
     @Body() dto: UpdateCategoryDto,
   ): Promise<Category> {
     return await this.categoryService.update(id, dto);
   }
 
-  @Delete(':id')
+  @Delete(':categoryId')
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   @HttpCode(204)
-  async delete(@Param('id') id: number): Promise<void> {
+  async delete(@Param('categoryId') id: number): Promise<void> {
     await this.categoryService.delete(id);
     return;
   }

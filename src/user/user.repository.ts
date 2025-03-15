@@ -6,7 +6,7 @@ import {
   UserProductsRolesNoPassword,
   UserRolesNoPassword,
   UserProductsRolesNoCreds,
-  UserRolesNoProductsCreds,
+  UserRolesNoCreds,
 } from './types/user.types';
 import { UserFilter } from './types/user-filter.type';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -15,7 +15,7 @@ import { SearchUserDto } from './dto/search-user.dto';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async assignAdmin(userId: number): Promise<UserRolesNoProductsCreds> {
+  async assignAdmin(userId: number): Promise<UserRolesNoCreds> {
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       select: {
@@ -48,10 +48,7 @@ export class UserRepository {
     });
   }
 
-  async findAll(
-    skip: number,
-    limit: number,
-  ): Promise<UserRolesNoProductsCreds[]> {
+  async findAll(skip: number, limit: number): Promise<UserRolesNoCreds[]> {
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
@@ -67,7 +64,11 @@ export class UserRepository {
     return users;
   }
 
-  async findUsers(dto: SearchUserDto, skip: number, limit: number) {
+  async findUsers(
+    dto: SearchUserDto,
+    skip: number,
+    limit: number,
+  ): Promise<UserRolesNoCreds[]> {
     const { nickname, minDate, maxDate }: SearchUserDto = dto;
 
     return await this.prisma.user.findMany({
@@ -75,20 +76,25 @@ export class UserRepository {
         nickname: { contains: nickname, mode: 'insensitive' },
         createdAt: { lte: maxDate, gte: minDate },
       },
+      select: {
+        id: true,
+        nickname: true,
+        createdAt: true,
+        roles: true,
+      },
       skip,
       take: limit,
-      select: { id: true, nickname: true, roles: true, createdAt: true },
     });
   }
 
-  async findById(userId: number): Promise<UserProductsRolesNoCreds | null> {
+  async findById(userId: number): Promise<UserRolesNoCreds | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
         nickname: true,
         createdAt: true,
-        products: true,
+
         roles: true,
       },
     });
@@ -98,14 +104,13 @@ export class UserRepository {
     return user;
   }
 
-  async findUserProfile(id: number): Promise<UserProductsRolesNoPassword> {
+  async findUserProfile(id: number): Promise<UserRolesNoPassword> {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
         nickname: true,
         email: true,
-        products: true,
         createdAt: true,
 
         roles: true,

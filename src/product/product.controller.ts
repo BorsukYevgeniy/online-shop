@@ -23,7 +23,7 @@ import { Product } from '@prisma/client';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { ParseProductDtoPipe } from './pipe/parse-product-filter.pipe';
-import { PaginatedProducts } from './types/product.types';
+import { PaginatedProducts as PaginatedProduct, ProductCategory } from './types/product.types';
 
 @Controller('products')
 export class ProductController {
@@ -32,7 +32,7 @@ export class ProductController {
   @Get('')
   async getAll(
     @Query() paginationDto: PaginationDto,
-  ): Promise<PaginatedProducts> {
+  ): Promise<PaginatedProduct> {
     return await this.productService.getAll(paginationDto);
   }
 
@@ -40,14 +40,14 @@ export class ProductController {
   async search(
     @Query(ParseProductDtoPipe) dto: SearchProductDto,
     @Query() pagination: PaginationDto,
-  ): Promise<PaginatedProducts> {
+  ): Promise<PaginatedProduct> {
     return await this.productService.search(dto, pagination);
   }
 
   @Get(':productId')
   async getById(
     @Param('productId') productId: number,
-  ): Promise<Product> {
+  ): Promise<ProductCategory> {
     return await this.productService.getById(productId);
   }
 
@@ -58,7 +58,7 @@ export class ProductController {
     @Req() req: AuthRequest,
     @Body() dto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
-  ): Promise<Product> {
+  ): Promise<ProductCategory> {
     return await this.productService.create(req.user.id, dto, images);
   }
 
@@ -70,7 +70,7 @@ export class ProductController {
     @Body() dto: UpdateProductDto,
     @Param('productId') productId: number,
     @UploadedFiles() images?: Express.Multer.File[],
-  ): Promise<Product> {
+  ): Promise<ProductCategory> {
     return await this.productService.update(
       req.user.id,
       productId,

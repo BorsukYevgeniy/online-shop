@@ -21,7 +21,7 @@ export type UserRolesNoPassword = Omit<UserRoles, 'password'>;
 /**
  * Represents a user with roles but without `products` ,`password` and `email` field for security reasons.
  */
-export type UserRolesNoProductsCreds = Omit<UserRolesNoPassword, 'email'>;
+export type UserRolesNoCreds = Omit<UserRolesNoPassword, 'email'>;
 
 /**
  * Represents a user with roles and a list of products they own.
@@ -48,7 +48,7 @@ export type UserProductsRolesNoCreds = Omit<
 /**
  * Represents a users with roles, products and pagination ,but without sensitive fields (`password` and `email`).
  */
-export type PaginatedUsersRolesNoProductsCreds = Paginated<
-  UserRolesNoProductsCreds,
+export type PaginatedUserRolesNoCreds = Paginated<
+  UserRolesNoCreds,
   'users'
 >;

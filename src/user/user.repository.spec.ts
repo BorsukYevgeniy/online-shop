@@ -172,7 +172,6 @@ describe('UserRepository', () => {
         nickname: 'test',
         password: 'test',
         createdAt: date,
-        products: [{} as Product],
         roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
       },
     ];
@@ -304,7 +303,6 @@ describe('UserRepository', () => {
         id: true,
         nickname: true,
         createdAt: true,
-        products: true,
         roles: true,
       },
     });
@@ -334,7 +332,6 @@ describe('UserRepository', () => {
         nickname: true,
         email: true,
         createdAt: true,
-        products: true,
         roles: true,
       },
     });
