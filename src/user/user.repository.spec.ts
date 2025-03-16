@@ -1,7 +1,8 @@
-import { Product, Role } from '@prisma/client';
+import { Product, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
+import Role from '../enum/role.enum';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -47,7 +48,8 @@ describe('UserRepository', () => {
       id: 1,
       nickname: 'test',
       createdAt: date,
-      roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
     };
 
     jest
@@ -143,7 +145,8 @@ describe('UserRepository', () => {
         nickname: 'test',
         password: 'test',
         createdAt: date,
-        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+
+role: Role.USER
       },
     ];
 
@@ -156,7 +159,7 @@ describe('UserRepository', () => {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
       skip: 0,
       take: 10,
@@ -174,7 +177,8 @@ describe('UserRepository', () => {
         password: 'password',
         createdAt: date,
         products: [{} as Product],
-        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
       },
     ];
 
@@ -196,7 +200,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
 
-        roles: true,
+        role: true,
       },
       skip: 0,
       take: 10,
@@ -214,7 +218,8 @@ describe('UserRepository', () => {
         createdAt: date,
         password: 'password',
         products: [{} as Product],
-        roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
       },
     ];
 
@@ -244,7 +249,7 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
 
-        roles: true,
+        role: true,
       },
       skip: 0,
       take: 10,
@@ -259,7 +264,8 @@ describe('UserRepository', () => {
       id: userId,
       email: 'email',
       products: [{}],
-      roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
     };
 
     jest
@@ -274,7 +280,7 @@ describe('UserRepository', () => {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
     });
 
@@ -287,7 +293,8 @@ describe('UserRepository', () => {
       id: userId,
       email: 'email',
       products: [{}],
-      roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
     };
 
     jest
@@ -303,7 +310,7 @@ describe('UserRepository', () => {
         nickname: true,
         email: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
     });
 
@@ -319,7 +326,8 @@ describe('UserRepository', () => {
       password: 'test',
       createdAt: date,
       products: [{}],
-      roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
     };
 
     jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
@@ -328,9 +336,7 @@ describe('UserRepository', () => {
 
     expect(prismaService.user.findUnique).toHaveBeenCalledWith({
       where: { email },
-      include: {
-        roles: true,
-      },
+      
     });
 
     expect(user).toEqual(mockUser);
@@ -339,34 +345,30 @@ describe('UserRepository', () => {
   it('should create a new user', async () => {
     const email = 'email';
     const nickname = 'test';
-    const roleId = 1;
     const password = '12345';
 
     const mockUser = {
       id: 1,
       email,
-      roles: [{ id: roleId, value: 'admin', description: 'admin' }],
+      role: Role.USER
     };
 
-    jest.spyOn(prismaService.user, 'create').mockResolvedValue(mockUser as any);
+    jest.spyOn(prismaService.user, 'create').mockResolvedValue(mockUser as User);
 
-    const user = await repository.create(email, nickname, password, roleId);
+    const user = await repository.create(email, nickname, password);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
       data: {
         email,
         nickname,
         password,
-        roles: {
-          connect: [{ id: roleId }],
-        },
       },
       select: {
         id: true,
         email: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
     });
 
@@ -378,7 +380,8 @@ describe('UserRepository', () => {
       id: 1,
       email: 'user@example.com',
       products: [{}],
-      roles: [{ id: 1, value: 'Admin', description: 'Administrator role' }],
+role: Role.USER
+
     };
 
     jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser as any);

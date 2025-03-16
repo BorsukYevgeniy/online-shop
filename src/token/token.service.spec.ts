@@ -3,6 +3,7 @@ import { TokenService } from './token.service';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import Role from '../enum/role.enum';
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -48,7 +49,6 @@ describe('TokenService', () => {
 
   it('should generate and save tokens', async () => {
     const userId = 1;
-    const roles = ['admin'];
     const accessToken = 'access-token';
     const refreshToken = 'refresh-token';
 
@@ -61,7 +61,7 @@ describe('TokenService', () => {
       expiresAt: new Date(),
     });
 
-    const result = await service.generateTokens(userId, roles);
+    const result = await service.generateTokens(userId, Role.ADMIN);
 
     expect(repository.create).toHaveBeenCalledWith(
       userId,

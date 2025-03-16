@@ -2,11 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
-import { AuthRequest } from '../types/request.type';
 import { Response } from 'express';
 import { ProductService } from '../product/product.service';
+import AuthRequest from '../types/request.type';
+import Role from '../enum/role.enum';
 
-const req = { user: { id: 2, roles: ['USER'] } } as AuthRequest;
+const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
 
 describe('UserController', () => {
   let controller: UserController;
@@ -52,13 +53,7 @@ describe('UserController', () => {
       id: 1,
       nickname: 'test',
       createdAt: new Date(),
-      roles: [
-        {
-          id: 1,
-          value: 'USER',
-          description: 'user role',
-        },
-      ],
+      role: Role.USER,
     };
 
     jest.spyOn(userService, 'assignAdmin').mockResolvedValue(mockUser);
@@ -87,13 +82,7 @@ describe('UserController', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER,
       },
     ];
 
@@ -139,13 +128,7 @@ describe('UserController', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER,
       },
     ];
 
@@ -194,13 +177,7 @@ describe('UserController', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER,
       },
     ];
 
@@ -249,13 +226,7 @@ describe('UserController', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER,
       },
     ];
 
@@ -302,13 +273,7 @@ describe('UserController', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      role: Role.USER,
     };
 
     jest.spyOn(userService, 'getById').mockResolvedValue(mockUsers);
@@ -324,7 +289,7 @@ describe('UserController', () => {
       nickname: 'test',
       createdAt: new Date(),
       email: 'test',
-      roles: [{ id: 1, value: 'USER', description: 'user role' }],
+      role: Role.USER,
     };
 
     jest.spyOn(userService, 'getMe').mockResolvedValue(mockUser);
@@ -348,17 +313,15 @@ describe('UserController', () => {
       },
     ];
 
-    jest
-      .spyOn(productService, 'getUserProducts')
-      .mockResolvedValue({
-        nextPage: null,
-        prevPage: null,
-        page: 1,
-        pageSize: 10,
-        products: mockProducts,
-        total: 1,
-        totalPages: 1,
-      });
+    jest.spyOn(productService, 'getUserProducts').mockResolvedValue({
+      nextPage: null,
+      prevPage: null,
+      page: 1,
+      pageSize: 10,
+      products: mockProducts,
+      total: 1,
+      totalPages: 1,
+    });
 
     const products = await controller.getUserProducts(userId, {
       page: 1,

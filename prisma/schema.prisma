@@ -26,7 +26,7 @@ model User {
   createdAt DateTime  @default(now())
   tokens    Token[]
   products  Product[]
-  roles     Role[]
+  role      Roles      @default(USER)
 }
 
 model Token {
@@ -37,16 +37,14 @@ model Token {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Role {
-  id          Int    @id @default(autoincrement())
-  value       String @unique
-  description String
-  user        User[]
-}
-
 model Category {
   id          Int       @id @default(autoincrement())
   name        String    @unique
   description String
   products    Product[]
+}
+
+enum Roles {
+  USER
+  ADMIN
 }

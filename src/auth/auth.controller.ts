@@ -11,9 +11,9 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
-import { AuthRequest } from '../types/request.type';
+import AuthRequest from '../types/request.type';
 import { Tokens } from '../token/interface/token.interfaces';
-import { UserRolesNoPassword } from '../user/types/user.types';
+import { UserNoPassword } from '../user/types/user.types';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from './guards/jwt-auth.guard';
 
@@ -22,7 +22,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
-  async registration(@Body() dto: CreateUserDto): Promise<UserRolesNoPassword> {
+  async registration(@Body() dto: CreateUserDto): Promise<UserNoPassword> {
     return await this.authService.register(dto);
   }
 

@@ -1,33 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product, Role, User } from '@prisma/client';
 import {
-  UserRoles,
-  UserProductsRolesNoPassword,
-  UserRolesNoPassword,
-  UserProductsRolesNoCreds,
-  UserRolesNoCreds,
+  UserNoPassword,
+  UserNoCred,
 } from './types/user.types';
 import { UserFilter } from './types/user-filter.type';
 import { SearchUserDto } from './dto/search-user.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async assignAdmin(userId: number): Promise<UserRolesNoCreds> {
+  async assignAdmin(userId: number): Promise<UserNoCred> {
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       select: {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
       data: {
-        roles: {
-          connect: { id: 2 },
-        },
+        role: 'ADMIN'
       },
     });
 
@@ -46,13 +41,13 @@ export class UserRepository {
     });
   }
 
-  async findAll(skip: number, limit: number): Promise<UserRolesNoCreds[]> {
+  async findAll(skip: number, limit: number): Promise<UserNoCred[]> {
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
       skip,
       take: limit,
@@ -65,7 +60,7 @@ export class UserRepository {
     searchUserDto: SearchUserDto,
     skip: number,
     limit: number,
-  ): Promise<UserRolesNoCreds[]> {
+  ): Promise<UserNoCred[]> {
     return await this.prisma.user.findMany({
       where: {
         nickname: { contains: searchUserDto.nickname, mode: 'insensitive' },
@@ -75,14 +70,14 @@ export class UserRepository {
         id: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
       skip,
       take: limit,
     });
   }
 
-  async findById(userId: number): Promise<UserRolesNoCreds | null> {
+  async findById(userId: number): Promise<UserNoCred | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -90,14 +85,14 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
 
-        roles: true,
+        role: true,
       },
     });
 
     return user;
   }
 
-  async findUserProfile(userId: number): Promise<UserRolesNoPassword | null> {
+  async findUserProfile(userId: number): Promise<UserNoPassword | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -105,45 +100,36 @@ export class UserRepository {
         nickname: true,
         email: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
     });
 
     return user;
   }
 
-  async findOneByEmail(email: string): Promise<UserRoles | null> {
-    const user: UserRoles | null = await this.prisma.user.findUnique({
+  async findOneByEmail(email: string): Promise<User | null> {
+    return await this.prisma.user.findUnique({
       where: { email },
-      include: {
-        roles: true,
-      },
-    });
-
-    return user;
+    });;
   }
 
   async create(
     email: string,
     nickname: string,
     password: string,
-    roleId: number,
-  ): Promise<UserRolesNoPassword> {
+  ): Promise<UserNoPassword> {
     const user = await this.prisma.user.create({
       data: {
         email,
         nickname,
         password,
-        roles: {
-          connect: [{ id: roleId }],
-        },
       },
       select: {
         id: true,
         email: true,
         nickname: true,
         createdAt: true,
-        roles: true,
+        role: true,
       },
     });
 

@@ -1,14 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
-import { RoleService } from '../role/role.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import Role from '../enum/role.enum';
 
 describe('UserService', () => {
   let service: UserService;
   let repository: UserRepository;
-  let roleService: RoleService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,18 +29,11 @@ describe('UserService', () => {
             delete: jest.fn(),
           },
         },
-        {
-          provide: RoleService,
-          useValue: {
-            getRoleByValue: jest.fn(),
-          },
-        },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
     repository = module.get<UserRepository>(UserRepository);
-    roleService = module.get<RoleService>(RoleService);
   });
 
   afterEach(async () => {
@@ -57,13 +49,8 @@ describe('UserService', () => {
       id: 1,
       nickname: 'test',
       createdAt: new Date(),
-      roles: [
-        {
-          id: 1,
-          value: 'USER',
-          description: 'user role',
-        },
-      ],
+      role: Role.USER
+
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
@@ -92,13 +79,7 @@ describe('UserService', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER
       },
     ];
 
@@ -138,13 +119,7 @@ describe('UserService', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER
       },
     ];
 
@@ -186,13 +161,7 @@ describe('UserService', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        roles: [
-          {
-            id: 1,
-            value: 'admin',
-            description: 'Administrator role',
-          },
-        ],
+        role: Role.USER
       },
     ];
 
@@ -231,13 +200,7 @@ describe('UserService', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      role: Role.USER
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
@@ -262,13 +225,7 @@ describe('UserService', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      role: Role.USER
     };
 
     jest.spyOn(repository, 'findUserProfile').mockResolvedValue(mockUser);
@@ -303,13 +260,7 @@ describe('UserService', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      role: Role.USER
     };
     jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
 
@@ -324,44 +275,25 @@ describe('UserService', () => {
       nickname: 'test',
       password: 'password',
     };
-    const userRole = { id: 1, value: 'USER', description: 'User role' };
     const mockUser = {
       id: 1,
       email: 'test',
       nickname: 'test',
       createdAt: new Date(),
 
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
-      roles: [
-        {
-          id: 1,
-          value: 'admin',
-          description: 'Administrator role',
-        },
-      ],
+      products: null,
+      role: Role.USER
     };
 
-    jest.spyOn(roleService, 'getRoleByValue').mockResolvedValue(userRole);
     jest.spyOn(repository, 'create').mockResolvedValue(mockUser);
 
     const user = await service.create(dto);
 
     expect(user).toEqual(mockUser);
-    expect(roleService.getRoleByValue).toHaveBeenCalledWith('USER');
     expect(repository.create).toHaveBeenCalledWith(
       dto.email,
       dto.nickname,
       dto.password,
-      userRole.id,
     );
   });
 

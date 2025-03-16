@@ -2,12 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcryptjs';
-import { Role, Token } from '@prisma/client';
+import { Token, User } from '@prisma/client';
 import { TokenService } from '../token/token.service';
 import { Tokens } from '../token/interface/token.interfaces';
-import { UserRoles, UserRolesNoPassword } from '../user/types/user.types';
-import { DeletingCount } from '../types/deleting-count.type';
+import { UserNoPassword } from '../user/types/user.types';
+import DeletingCount from '../types/deleting-count.type';
 import { LoginUserDto } from './dto/login-user.dto';
+import Role from '../enum/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +17,8 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async register(dto: CreateUserDto): Promise<UserRolesNoPassword> {
-    const candidate: UserRoles | null = await this.userService.getByEmail(
+  async register(dto: CreateUserDto): Promise<UserNoPassword> {
+    const candidate: User | null = await this.userService.getByEmail(
       dto.email,
     );
 
@@ -26,7 +27,7 @@ export class AuthService {
     }
 
     const hashedPassword: string = await hash(dto.password, 3);
-    const user: UserRolesNoPassword = await this.userService.create({
+    const user: UserNoPassword = await this.userService.create({
       ...dto,
       password: hashedPassword,
     });
@@ -35,7 +36,7 @@ export class AuthService {
   }
 
   async login(dto: LoginUserDto): Promise<Tokens> {
-    const candidate: UserRoles | null = await this.userService.getByEmail(
+    const candidate: User | null = await this.userService.getByEmail(
       dto.email,
     );
 
@@ -43,7 +44,7 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const { email, password: hashedPassword, roles } = candidate;
+    const { email, password: hashedPassword, role } = candidate;
 
     if (dto.email !== email) {
       throw new HttpException(
@@ -65,7 +66,7 @@ export class AuthService {
 
     return await this.tokenService.generateTokens(
       candidate.id,
-      roles.map((r: Role): string => r.value),
+      role as Role,
     );
   }
 
@@ -78,7 +79,7 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string): Promise<Tokens> {
-    const { id, roles } =
+    const { id, role } =
       await this.tokenService.verifyRefreshToken(refreshToken);
 
     const userTokens: Token[] | null =
@@ -90,6 +91,6 @@ export class AuthService {
 
     if (!validToken) throw new Error('Invalid refresh token');
 
-    return this.tokenService.generateTokens(id, roles);
+    return this.tokenService.generateTokens(id, role);
   }
 }

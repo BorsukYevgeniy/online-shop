@@ -14,13 +14,14 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { Roles } from '../auth/decorator/roles-auth.decorator';
 import { PaginationDto } from '../dto/pagination.dto';
 import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { ProductService } from '../product/product.service';
 import { PaginatedCategory } from './type/category.type';
-import { PaginatedProduct } from 'src/product/types/product.types';
+import { PaginatedProduct } from '../product/types/product.types';
+import Roles from '../auth/decorator/roles-auth.decorator';
+import Role from '../enum/role.enum';
 
 @Controller('category')
 export class CategoryController {
@@ -59,14 +60,14 @@ export class CategoryController {
   }
 
   @Post()
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async create(@Body() dto: CreateCategoryDto): Promise<Category> {
     return await this.categoryService.create(dto);
   }
 
   @Patch(':categoryId')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async update(
     @Param('categoryId') id: number,
@@ -76,7 +77,7 @@ export class CategoryController {
   }
 
   @Delete(':categoryId')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async delete(@Param('categoryId') id: number): Promise<void> {

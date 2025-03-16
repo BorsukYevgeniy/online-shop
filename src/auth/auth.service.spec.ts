@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import Role from '../enum/role.enum';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -64,7 +64,7 @@ describe('AuthService', () => {
       email: dto.email,
       nickname: 'test',
       createdAt: new Date(),
-      roles: [{} as Role],
+      role: Role.USER
     };
 
     jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
@@ -90,7 +90,7 @@ describe('AuthService', () => {
       createdAt: new Date(),
 
       password: hashedPassword,
-      roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
+      role: Role.USER,
     };
 
     jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
@@ -115,8 +115,7 @@ describe('AuthService', () => {
       password: hashedPassword,
       nickname: 'test',
       createdAt: new Date(),
-
-      roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
+      role: Role.USER,
     };
     const mockTokens = {
       accessToken: 'accessToken',
@@ -157,9 +156,8 @@ describe('AuthService', () => {
       email: 'test@gmail.com',
       nickname: 'test',
       createdAt: new Date(),
-
       password: 'hashedPassword',
-      roles: [{ id: 1, value: 'ADMIN', description: 'S' }],
+      role: Role.USER,
     };
 
     jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
@@ -207,7 +205,7 @@ describe('AuthService', () => {
 
     jest
       .spyOn(tokenService, 'verifyRefreshToken')
-      .mockResolvedValue({ id: 1, roles: ['ADMIN'] });
+      .mockResolvedValue({ id: 1, role: Role.USER });
 
     jest
       .spyOn(tokenService, 'getUserTokens')

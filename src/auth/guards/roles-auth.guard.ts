@@ -7,7 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorator/roles-auth.decorator';
 import { TokenService } from '../../token/token.service';
-import { AuthRequest } from '../../types/request.type';
+import AuthRequest from '../../types/request.type';
+import Role from '../../enum/role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -18,11 +19,12 @@ export class RolesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      const requiredRoles: string[] = this.reflector.getAllAndOverride<
-        string[]
-      >(ROLES_KEY, [context.getHandler(), context.getClass()]);
+      const requiredRole: Role = this.reflector.getAllAndOverride<Role>(
+        ROLES_KEY,
+        [context.getHandler(), context.getClass()],
+      );
 
-      if (!requiredRoles) {
+      if (!requiredRole) {
         return true;
       }
       const req: AuthRequest = context.switchToHttp().getRequest<AuthRequest>();
@@ -32,14 +34,12 @@ export class RolesGuard implements CanActivate {
         throw new UnauthorizedException('Access token is missing in cookies');
       }
 
-      const { id, roles } =
+      const { id, role: userRole } =
         await this.tokenService.verifyAccessToken(accessToken);
 
-      req.user = { id, roles };
+      req.user = { id, role: userRole };
 
-      return roles.some((role: string): boolean =>
-        requiredRoles.includes(role),
-      );
+      return requiredRole === userRole
     } catch (e: unknown) {
       throw new UnauthorizedException('Invalid token');
     }

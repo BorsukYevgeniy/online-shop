@@ -3,8 +3,9 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import { AuthRequest } from '../types/request.type';
+import  AuthRequest  from '../types/request.type';
 import { TokenService } from '../token/token.service';
+import Role from '../enum/role.enum';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -53,7 +54,7 @@ describe('AuthController', () => {
       nickname: 'test',
       createdAt: new Date(),
 
-      roles: [{ id: 1, value: 'USER', description: 'user' }],
+      role: Role.USER,
     };
 
     jest.spyOn(service, 'register').mockResolvedValue(mockUser);

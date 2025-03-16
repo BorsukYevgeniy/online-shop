@@ -5,7 +5,8 @@ import { ConfigService } from '@nestjs/config';
 
 import { Token } from '@prisma/client';
 import { TokenPayload, Tokens } from './interface/token.interfaces';
-import { DeletingCount } from '../types/deleting-count.type';
+import DeletingCount from '../types/deleting-count.type';
+import Role from '../enum/role.enum';
 
 @Injectable()
 export class TokenService {
@@ -31,14 +32,14 @@ export class TokenService {
     );
   }
 
-  async generateTokens(userId: number, roles: string[]): Promise<Tokens> {
+  async generateTokens(userId: number, role: Role): Promise<Tokens> {
     const accessToken: string = await this.jwtService.signAsync(
-      { id: userId, roles },
+      { id: userId, role },
       { expiresIn: this.accessTokenExpirationTime, secret: this.accessSecret },
     );
 
     const refreshToken: string = await this.jwtService.signAsync(
-      { id: userId, roles },
+      { id: userId, role },
       {
         expiresIn: this.refreshTokenExpirationTime,
         secret: this.refreshSecret,

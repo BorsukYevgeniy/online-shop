@@ -1,33 +1,21 @@
 import { User } from '@prisma/client';
-import { Paginated } from 'src/types/pagination.type';
-
-/**
- * Represents a user with their assigned roles.
- * Includes the `roles` field containing an array of role objects.
- */
-export type UserRoles = User & {
-  roles: {
-    id: number;
-    value: string;
-    description: string;
-  }[];
-};
+import Paginated  from 'src/types/pagination.type';
 
 /**
  * Represents a user with roles but without the `password` field for security reasons.
  */
-export type UserRolesNoPassword = Omit<UserRoles, 'password'>;
+export type UserNoPassword = Omit<User, 'password'>;
 
 /**
  * Represents a user with roles but without `products` ,`password` and `email` field for security reasons.
  */
-export type UserRolesNoCreds = Omit<UserRolesNoPassword, 'email'>;
+export type UserNoCred = Omit<UserNoPassword, 'email'>;
 
 /**
  * Represents a user with roles and a list of products they own.
  * The `password` field is omitted for security reasons.
  */
-export type UserProductsRolesNoPassword = Omit<UserRoles, 'password'> & {
+export type UserProductNoPassword = Omit<User, 'password'> & {
   products: {
     id: number;
     userId: number;
@@ -40,15 +28,15 @@ export type UserProductsRolesNoPassword = Omit<UserRoles, 'password'> & {
 /**
  * Represents a user with roles and products, but without sensitive fields (`password` and `email`).
  */
-export type UserProductsRolesNoCreds = Omit<
-  UserProductsRolesNoPassword,
+export type UserProductNoCreds = Omit<
+  UserProductNoPassword,
   'email'
 >;
 
 /**
- * Represents a users with roles, products and pagination ,but without sensitive fields (`password` and `email`).
+ * Represents a users with products and pagination ,but without sensitive fields (`password` and `email`).
  */
 export type PaginatedUserRolesNoCreds = Paginated<
-  UserRolesNoCreds,
+  UserNoCred,
   'users'
 >;

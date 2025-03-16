@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import { FileModule } from './file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TokenModule } from './token/token.module';
-import { RoleModule } from './role/role.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { join as joinPath } from 'path';
@@ -24,7 +23,6 @@ import { CategoryModule } from './category/category.module';
       rootPath: joinPath(__dirname, '..', 'static'),
     }),
     TokenModule,
-    RoleModule,
     ScheduleModule.forRoot(),
     CategoryModule,
   ],

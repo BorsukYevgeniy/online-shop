@@ -1,3 +1,6 @@
 import { Request } from 'express';
+import Role from '../enum/role.enum';
 
-export type AuthRequest = Request & { user?: { id: number; roles: string[] } };
+type AuthRequest = Request & { user?: { id: number; role: Role } }
+
+export default AuthRequest

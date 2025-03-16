@@ -14,18 +14,19 @@ import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
-import { Roles } from '../auth/decorator/roles-auth.decorator';
-import { AuthRequest } from '../types/request.type';
+import  Roles  from '../auth/decorator/roles-auth.decorator';
+import  AuthRequest from '../types/request.type';
 import {
   PaginatedUserRolesNoCreds,
-  UserRolesNoPassword,
-  UserRolesNoCreds,
+  UserNoPassword,
+  UserNoCred,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
 import { ProductService } from '../product/product.service';
 import { PaginatedProduct } from '../product/types/product.types';
+import Role from '../enum/role.enum';
 
 @Controller('users')
 export class UserController {
@@ -35,7 +36,7 @@ export class UserController {
   ) {}
 
   @Get()
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async getAll(
     @Query() paginationDto: PaginationDto,
@@ -45,7 +46,7 @@ export class UserController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  async getMe(@Req() req: AuthRequest): Promise<UserRolesNoPassword> {
+  async getMe(@Req() req: AuthRequest): Promise<UserNoPassword> {
     return await this.userService.getMe(req.user.id);
   }
 
@@ -61,7 +62,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   async getById(
     @Param('userId') userId: number,
-  ): Promise<UserRolesNoCreds | void> {
+  ): Promise<UserNoCred | void> {
     return await this.userService.getById(userId);
   }
 
@@ -75,11 +76,11 @@ export class UserController {
 
   // Привоїти користувачу роль адміна
   @Patch('assing-admin/:userId')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async assignAdmin(
     @Param('userId') userId: number,
-  ): Promise<UserRolesNoCreds> {
+  ): Promise<UserNoCred> {
     return await this.userService.assignAdmin(userId);
   }
 
@@ -96,7 +97,7 @@ export class UserController {
 
   // Видалення акаунту адміністратором
   @Delete(':userId')
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async delete(@Param('userId') userId: number): Promise<void> {

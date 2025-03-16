@@ -21,7 +21,7 @@ import { ParseProductDtoPipe } from './pipe/parse-product-filter.pipe';
 import { ProductService } from './product.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
-import { AuthRequest } from '../types/request.type';
+import  AuthRequest from '../types/request.type';
 import {
   PaginatedProduct,
   ProductCategory,

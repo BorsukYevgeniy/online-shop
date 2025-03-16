@@ -6,22 +6,19 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { RoleService } from '../role/role.service';
-import { Product, Role } from '@prisma/client';
 import {
-  UserRoles,
-  UserRolesNoPassword,
-  UserRolesNoCreds,
+  UserNoPassword,
+  UserNoCred,
   PaginatedUserRolesNoCreds,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly roleService: RoleService,
   ) {}
 
   async getAll(
@@ -53,7 +50,7 @@ export class UserService {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = pageSize * (page - 1);
 
-    const users: UserRolesNoCreds[] = await this.userRepository.findUsers(
+    const users: UserNoCred[] = await this.userRepository.findUsers(
       dto,
       skip,
       pageSize,
@@ -73,8 +70,8 @@ export class UserService {
     };
   }
 
-  async getById(userId: number): Promise<UserRolesNoCreds> {
-    const user: UserRolesNoCreds | null =
+  async getById(userId: number): Promise<UserNoCred> {
+    const user: UserNoCred | null =
       await this.userRepository.findById(userId);
 
     if (!user) {
@@ -84,22 +81,19 @@ export class UserService {
     return user;
   }
 
-  async getMe(userId: number): Promise<UserRolesNoPassword> {
+  async getMe(userId: number): Promise<UserNoPassword> {
     return await this.userRepository.findUserProfile(userId);
   }
 
-  async getByEmail(email: string): Promise<UserRoles | null> {
+  async getByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOneByEmail(email);
   }
 
-  async create(dto: CreateUserDto): Promise<UserRolesNoPassword> {
-    const userRole: Role = await this.roleService.getRoleByValue('USER');
-
+  async create(dto: CreateUserDto): Promise<UserNoPassword> {
     return await this.userRepository.create(
       dto.email,
       dto.nickname,
       dto.password,
-      userRole.id,
     );
   }
 
@@ -113,8 +107,8 @@ export class UserService {
     }
   }
 
-  async assignAdmin(userId: number): Promise<UserRolesNoCreds> {
-    const candidate: UserRolesNoCreds =
+  async assignAdmin(userId: number): Promise<UserNoCred> {
+    const candidate: UserNoCred =
       await this.userRepository.findById(userId);
 
     if (!candidate) {
