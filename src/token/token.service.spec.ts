@@ -19,7 +19,7 @@ describe('TokenService', () => {
           useValue: {
             findUserTokens: jest.fn(),
             create: jest.fn(),
-            deleteUserTokens: jest.fn(),
+            deleteUserToken: jest.fn(),
             deleteAllUsersTokens: jest.fn(),
           },
         },
@@ -116,7 +116,7 @@ describe('TokenService', () => {
   it('should delete all user tokens', async () => {
     const userId = 1;
 
-    jest.spyOn(repository, 'deleteUserTokens').mockResolvedValue({ count: 1 });
+    jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({ count: 1 });
 
     await service.deleteAllUsersTokens(userId);
 
@@ -126,10 +126,10 @@ describe('TokenService', () => {
   it('should delete user tokens', async () => {
     const token = 'token';
 
-    jest.spyOn(repository, 'deleteUserTokens').mockResolvedValue({ count: 1 });
+    jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({ count: 1 });
 
-    await service.deleteUserTokens(token);
+    await service.deleteUserToken(token);
 
-    expect(repository.deleteUserTokens).toHaveBeenCalledWith(token);
+    expect(repository.deleteUserToken).toHaveBeenCalledWith(token);
   });
 });

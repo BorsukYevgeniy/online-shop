@@ -71,7 +71,7 @@ export class AuthService {
   }
 
   async logout(token: string): Promise<DeletingCount> {
-    return await this.tokenService.deleteUserTokens(token);
+    return await this.tokenService.deleteUserToken(token);
   }
 
   async logoutAll(userId: number): Promise<DeletingCount> {

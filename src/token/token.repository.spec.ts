@@ -95,7 +95,7 @@ describe('TokenRepository', () => {
       .spyOn(prismaService.token, 'deleteMany')
       .mockResolvedValue({ count: 1 });
 
-    expect(await tokensRepository.deleteUserTokens(token)).toEqual({
+    expect(await tokensRepository.deleteUserToken(token)).toEqual({
       count: 1,
     });
     expect(prismaService.token.deleteMany).toHaveBeenCalledWith({

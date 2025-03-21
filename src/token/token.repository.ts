@@ -23,7 +23,7 @@ export class TokenRepository {
     });
   }
 
-  async deleteUserTokens(token: string): Promise<DeletingCount> {
+  async deleteUserToken(token: string): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({ where: { token } });
   }
 

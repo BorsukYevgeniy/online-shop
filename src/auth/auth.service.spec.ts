@@ -30,7 +30,7 @@ describe('AuthService', () => {
           provide: TokenService,
           useValue: {
             generateTokens: jest.fn(),
-            deleteUserTokens: jest.fn(),
+            deleteUserToken: jest.fn(),
             deleteAllUsersTokens: jest.fn(),
             verifyRefreshToken: jest.fn(),
             getUserTokens: jest.fn(),
@@ -175,19 +175,19 @@ describe('AuthService', () => {
     const refreshToken = 'refreshToken';
 
     jest
-      .spyOn(tokenService, 'deleteUserTokens')
+      .spyOn(tokenService, 'deleteUserToken')
       .mockResolvedValue({ count: 1 });
 
     await service.logout(refreshToken);
 
-    expect(tokenService.deleteUserTokens).toHaveBeenCalledWith(refreshToken);
+    expect(tokenService.deleteUserToken).toHaveBeenCalledWith(refreshToken);
   });
 
   it('should logout all users', async () => {
     const userId = 1;
 
     jest
-      .spyOn(tokenService, 'deleteUserTokens')
+      .spyOn(tokenService, 'deleteUserToken')
       .mockResolvedValue({ count: 1 });
 
     await service.logoutAll(userId);

@@ -66,8 +66,8 @@ export class TokenService {
     return await this.tokenRepositry.findUserTokens(userId);
   }
 
-  async deleteUserTokens(token: string): Promise<DeletingCount> {
-    return await this.tokenRepositry.deleteUserTokens(token);
+  async deleteUserToken(token: string): Promise<DeletingCount> {
+    return await this.tokenRepositry.deleteUserToken(token);
   }
 
   async deleteAllUsersTokens(userId: number): Promise<DeletingCount> {
