@@ -18,7 +18,7 @@ export class ProductRepository {
   }
   async countUserProducts(userId: number): Promise<number> {
     return await this.prisma.product.count({
-      where: { userId},
+      where: { userId },
     });
   }
 

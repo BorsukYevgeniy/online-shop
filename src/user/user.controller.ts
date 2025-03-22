@@ -14,8 +14,8 @@ import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
-import  Roles  from '../auth/decorator/roles-auth.decorator';
-import  AuthRequest from '../types/request.type';
+import Roles from '../auth/decorator/roles-auth.decorator';
+import AuthRequest from '../types/request.type';
 import {
   PaginatedUserRolesNoCreds,
   UserNoPassword,
@@ -60,9 +60,7 @@ export class UserController {
 
   @Get(':userId')
   @UseGuards(AuthGuard)
-  async getById(
-    @Param('userId') userId: number,
-  ): Promise<UserNoCred | void> {
+  async getById(@Param('userId') userId: number): Promise<UserNoCred | void> {
     return await this.userService.getById(userId);
   }
 
@@ -78,9 +76,7 @@ export class UserController {
   @Patch('assing-admin/:userId')
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  async assignAdmin(
-    @Param('userId') userId: number,
-  ): Promise<UserNoCred> {
+  async assignAdmin(@Param('userId') userId: number): Promise<UserNoCred> {
     return await this.userService.assignAdmin(userId);
   }
 

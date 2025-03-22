@@ -39,7 +39,7 @@ export class RolesGuard implements CanActivate {
 
       req.user = { id, role: userRole };
 
-      return requiredRole === userRole
+      return requiredRole === userRole;
     } catch (e: unknown) {
       throw new UnauthorizedException('Invalid token');
     }

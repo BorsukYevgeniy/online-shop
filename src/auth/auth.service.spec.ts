@@ -64,7 +64,7 @@ describe('AuthService', () => {
       email: dto.email,
       nickname: 'test',
       createdAt: new Date(),
-      role: Role.USER
+      role: Role.USER,
     };
 
     jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
@@ -174,9 +174,7 @@ describe('AuthService', () => {
   it('should logout a user', async () => {
     const refreshToken = 'refreshToken';
 
-    jest
-      .spyOn(tokenService, 'deleteUserToken')
-      .mockResolvedValue({ count: 1 });
+    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({ count: 1 });
 
     await service.logout(refreshToken);
 
@@ -186,9 +184,7 @@ describe('AuthService', () => {
   it('should logout all users', async () => {
     const userId = 1;
 
-    jest
-      .spyOn(tokenService, 'deleteUserToken')
-      .mockResolvedValue({ count: 1 });
+    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({ count: 1 });
 
     await service.logoutAll(userId);
 

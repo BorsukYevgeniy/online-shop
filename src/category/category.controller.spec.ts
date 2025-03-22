@@ -84,9 +84,7 @@ describe('CategoryController', () => {
       totalPages: 1,
     };
 
-    jest
-      .spyOn(categoryService, 'search')
-      .mockResolvedValue(mockCategories);
+    jest.spyOn(categoryService, 'search').mockResolvedValue(mockCategories);
 
     const categories = await controller.search(
       { name: 'TEST' },

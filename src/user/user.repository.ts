@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  UserNoPassword,
-  UserNoCred,
-} from './types/user.types';
+import { UserNoPassword, UserNoCred } from './types/user.types';
 import { UserFilter } from './types/user-filter.type';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
@@ -22,7 +19,7 @@ export class UserRepository {
         role: true,
       },
       data: {
-        role: 'ADMIN'
+        role: 'ADMIN',
       },
     });
 
@@ -110,7 +107,7 @@ export class UserRepository {
   async findOneByEmail(email: string): Promise<User | null> {
     return await this.prisma.user.findUnique({
       where: { email },
-    });;
+    });
   }
 
   async create(

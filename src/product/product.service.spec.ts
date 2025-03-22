@@ -113,7 +113,6 @@ describe('ProductService', () => {
     });
   });
 
-
   it('should return user products', async () => {
     const mockProducts = [
       {
@@ -128,9 +127,7 @@ describe('ProductService', () => {
     ];
 
     jest.spyOn(repository, 'countUserProducts').mockResolvedValue(1);
-    jest
-      .spyOn(repository, 'findUserProducts')
-      .mockResolvedValue(mockProducts);
+    jest.spyOn(repository, 'findUserProducts').mockResolvedValue(mockProducts);
 
     const products = await service.getUserProducts(1, {
       page: 1,
@@ -149,7 +146,6 @@ describe('ProductService', () => {
       nextPage: null,
     });
   });
-
 
   it('should return all products without filters', async () => {
     const mockProducts = [

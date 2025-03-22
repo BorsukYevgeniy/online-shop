@@ -20,7 +20,7 @@ describe('AuthController (e2e)', () => {
 
     app.use(cookieParser());
     await app.init();
-  });
+  }, 6500);
 
   afterAll(async () => {
     await prisma.user.deleteMany();

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { TokenService } from '../token/token.service';
-import  AuthRequest from '../types/request.type';
+import AuthRequest from '../types/request.type';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 
@@ -399,7 +399,7 @@ describe('ProductController', () => {
   it('should delete product by id', async () => {
     const mockProduct = {
       id: 1,
-      userId:1,
+      userId: 1,
       price: 22,
       title: 'TEST',
       description: 'Test',
@@ -408,7 +408,7 @@ describe('ProductController', () => {
     };
 
     jest.spyOn(service, 'getById').mockResolvedValue(mockProduct);
-    
+
     await controller.delete(req, 1);
 
     expect(service.delete).toHaveBeenCalledWith(req.user.id, 1);

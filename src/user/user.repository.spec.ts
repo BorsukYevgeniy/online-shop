@@ -48,8 +48,7 @@ describe('UserRepository', () => {
       id: 1,
       nickname: 'test',
       createdAt: date,
-role: Role.USER
-
+      role: Role.USER,
     };
 
     jest
@@ -146,7 +145,7 @@ role: Role.USER
         password: 'test',
         createdAt: date,
 
-role: Role.USER
+        role: Role.USER,
       },
     ];
 
@@ -177,8 +176,7 @@ role: Role.USER
         password: 'password',
         createdAt: date,
         products: [{} as Product],
-role: Role.USER
-
+        role: Role.USER,
       },
     ];
 
@@ -218,8 +216,7 @@ role: Role.USER
         createdAt: date,
         password: 'password',
         products: [{} as Product],
-role: Role.USER
-
+        role: Role.USER,
       },
     ];
 
@@ -264,8 +261,7 @@ role: Role.USER
       id: userId,
       email: 'email',
       products: [{}],
-role: Role.USER
-
+      role: Role.USER,
     };
 
     jest
@@ -293,8 +289,7 @@ role: Role.USER
       id: userId,
       email: 'email',
       products: [{}],
-role: Role.USER
-
+      role: Role.USER,
     };
 
     jest
@@ -326,8 +321,7 @@ role: Role.USER
       password: 'test',
       createdAt: date,
       products: [{}],
-role: Role.USER
-
+      role: Role.USER,
     };
 
     jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
@@ -336,7 +330,6 @@ role: Role.USER
 
     expect(prismaService.user.findUnique).toHaveBeenCalledWith({
       where: { email },
-      
     });
 
     expect(user).toEqual(mockUser);
@@ -350,10 +343,12 @@ role: Role.USER
     const mockUser = {
       id: 1,
       email,
-      role: Role.USER
+      role: Role.USER,
     };
 
-    jest.spyOn(prismaService.user, 'create').mockResolvedValue(mockUser as User);
+    jest
+      .spyOn(prismaService.user, 'create')
+      .mockResolvedValue(mockUser as User);
 
     const user = await repository.create(email, nickname, password);
 
@@ -380,8 +375,7 @@ role: Role.USER
       id: 1,
       email: 'user@example.com',
       products: [{}],
-role: Role.USER
-
+      role: Role.USER,
     };
 
     jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser as any);

@@ -169,12 +169,11 @@ export class ProductService {
     const { pageSize, page }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
-    const products: Product[] =
-      await this.productRepository.findUserProducts(
-        userId,
-        skip,
-        pageSize,
-      );
+    const products: Product[] = await this.productRepository.findUserProducts(
+      userId,
+      skip,
+      pageSize,
+    );
 
     const total: number =
       await this.productRepository.countUserProducts(userId);

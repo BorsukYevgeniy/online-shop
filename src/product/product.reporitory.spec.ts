@@ -97,8 +97,6 @@ describe('ProductRepository', () => {
     expect(products).toEqual(mockProducts);
   });
 
-
-
   it('should count user products', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 
@@ -106,7 +104,7 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.count).toHaveBeenCalledWith({
       where: {
-        userId: 1
+        userId: 1,
       },
     });
 
@@ -122,7 +120,8 @@ describe('ProductRepository', () => {
         userId: 1,
         description: 'MOCK1 description',
         images: ['1', '2'],
-      }];
+      },
+    ];
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
@@ -130,7 +129,7 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
-        userId: 1
+        userId: 1,
       },
       skip: 0,
       take: 10,
@@ -138,8 +137,6 @@ describe('ProductRepository', () => {
 
     expect(products).toEqual(mockProducts);
   });
-
-
 
   it('should count all products without filter', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
@@ -575,7 +572,6 @@ describe('ProductRepository', () => {
 
     expect(prisma.product.delete).toHaveBeenCalledWith({
       where: { id: 1 },
-      
     });
   });
 });

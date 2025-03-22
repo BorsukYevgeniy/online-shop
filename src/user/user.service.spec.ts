@@ -49,8 +49,7 @@ describe('UserService', () => {
       id: 1,
       nickname: 'test',
       createdAt: new Date(),
-      role: Role.USER
-
+      role: Role.USER,
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
@@ -79,7 +78,7 @@ describe('UserService', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        role: Role.USER
+        role: Role.USER,
       },
     ];
 
@@ -119,7 +118,7 @@ describe('UserService', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        role: Role.USER
+        role: Role.USER,
       },
     ];
 
@@ -161,7 +160,7 @@ describe('UserService', () => {
             images: ['image1.jpg', 'image2.jpg'],
           },
         ],
-        role: Role.USER
+        role: Role.USER,
       },
     ];
 
@@ -200,7 +199,7 @@ describe('UserService', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      role: Role.USER
+      role: Role.USER,
     };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
@@ -225,7 +224,7 @@ describe('UserService', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      role: Role.USER
+      role: Role.USER,
     };
 
     jest.spyOn(repository, 'findUserProfile').mockResolvedValue(mockUser);
@@ -260,7 +259,7 @@ describe('UserService', () => {
           images: ['image1.jpg', 'image2.jpg'],
         },
       ],
-      role: Role.USER
+      role: Role.USER,
     };
     jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
 
@@ -282,7 +281,7 @@ describe('UserService', () => {
       createdAt: new Date(),
 
       products: null,
-      role: Role.USER
+      role: Role.USER,
     };
 
     jest.spyOn(repository, 'create').mockResolvedValue(mockUser);

@@ -17,9 +17,7 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly userRepository: UserRepository,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async getAll(
     paginationDto: PaginationDto,
@@ -71,8 +69,7 @@ export class UserService {
   }
 
   async getById(userId: number): Promise<UserNoCred> {
-    const user: UserNoCred | null =
-      await this.userRepository.findById(userId);
+    const user: UserNoCred | null = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -108,8 +105,7 @@ export class UserService {
   }
 
   async assignAdmin(userId: number): Promise<UserNoCred> {
-    const candidate: UserNoCred =
-      await this.userRepository.findById(userId);
+    const candidate: UserNoCred = await this.userRepository.findById(userId);
 
     if (!candidate) {
       throw new NotFoundException('User not found');

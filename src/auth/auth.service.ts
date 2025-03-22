@@ -18,9 +18,7 @@ export class AuthService {
   ) {}
 
   async register(dto: CreateUserDto): Promise<UserNoPassword> {
-    const candidate: User | null = await this.userService.getByEmail(
-      dto.email,
-    );
+    const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (candidate) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
@@ -36,9 +34,7 @@ export class AuthService {
   }
 
   async login(dto: LoginUserDto): Promise<Tokens> {
-    const candidate: User | null = await this.userService.getByEmail(
-      dto.email,
-    );
+    const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (!candidate) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -64,10 +60,7 @@ export class AuthService {
       );
     }
 
-    return await this.tokenService.generateTokens(
-      candidate.id,
-      role as Role,
-    );
+    return await this.tokenService.generateTokens(candidate.id, role as Role);
   }
 
   async logout(token: string): Promise<DeletingCount> {

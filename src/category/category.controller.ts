@@ -23,7 +23,7 @@ import { PaginatedProduct } from '../product/types/product.types';
 import Roles from '../auth/decorator/roles-auth.decorator';
 import Role from '../enum/role.enum';
 
-@Controller('category')
+@Controller('categories')
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,

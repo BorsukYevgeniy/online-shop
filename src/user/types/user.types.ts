@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import Paginated  from 'src/types/pagination.type';
+import Paginated from 'src/types/pagination.type';
 
 /**
  * Represents a user with roles but without the `password` field for security reasons.
@@ -28,15 +28,9 @@ export type UserProductNoPassword = Omit<User, 'password'> & {
 /**
  * Represents a user with roles and products, but without sensitive fields (`password` and `email`).
  */
-export type UserProductNoCreds = Omit<
-  UserProductNoPassword,
-  'email'
->;
+export type UserProductNoCreds = Omit<UserProductNoPassword, 'email'>;
 
 /**
  * Represents a users with products and pagination ,but without sensitive fields (`password` and `email`).
  */
-export type PaginatedUserRolesNoCreds = Paginated<
-  UserNoCred,
-  'users'
->;
+export type PaginatedUserRolesNoCreds = Paginated<UserNoCred, 'users'>;
