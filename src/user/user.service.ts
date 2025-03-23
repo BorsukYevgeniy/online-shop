@@ -25,8 +25,10 @@ export class UserService {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
-    const users = await this.userRepository.findAll(skip, pageSize);
-    const total = await this.userRepository.count();
+    const [users, total] = await Promise.all([
+      this.userRepository.findAll(skip, pageSize),
+      this.userRepository.count(),
+    ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
 
@@ -48,13 +50,11 @@ export class UserService {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = pageSize * (page - 1);
 
-    const users: UserNoCred[] = await this.userRepository.findUsers(
-      dto,
-      skip,
-      pageSize,
-    );
+    const [users, total] = await Promise.all([
+      this.userRepository.findUsers(dto, skip, pageSize),
+      this.userRepository.count(dto),
+    ]);
 
-    const total: number = await this.userRepository.count(dto);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {

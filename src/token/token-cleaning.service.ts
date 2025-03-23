@@ -9,9 +9,8 @@ export class TokenCleaningService {
 
   @Cron('0 0 1 * *')
   async cleanExpiredTokens(): Promise<void> {
-    const now: Date = new Date();
     const result: DeletingCount =
-      await this.tokenRepository.deleteExpiredTokens(now);
+      await this.tokenRepository.deleteExpiredTokens();
 
     console.log(`Deleted ${result.count} expired tokens`);
   }

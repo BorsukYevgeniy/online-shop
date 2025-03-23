@@ -35,8 +35,8 @@ describe('TokenService', () => {
     }).compile();
 
     service = module.get<TokenService>(TokenService);
-    repository = module.get(TokenRepository);
-    jwt = module.get(JwtService);
+    repository = module.get<TokenRepository>(TokenRepository);
+    jwt = module.get<JwtService>(JwtService);
   });
 
   afterEach(async () => {

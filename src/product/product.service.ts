@@ -42,12 +42,11 @@ export class ProductService {
 
     const skip: number = (page - 1) * pageSize;
 
-    const products: Product[] = await this.productRepository.findAll(
-      skip,
-      pageSize,
-    );
+    const [products, total] = await Promise.all([
+      this.productRepository.findAll(skip, pageSize),
+      this.productRepository.count(),
+    ]);
 
-    const total: number = await this.productRepository.count();
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -66,16 +65,13 @@ export class ProductService {
     pagination: PaginationDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = pagination;
-
     const skip: number = (page - 1) * pageSize;
 
-    const products: Product[] = await this.productRepository.findProducts(
-      dto,
-      skip,
-      pageSize,
-    );
+    const [products, total] = await Promise.all([
+      this.productRepository.findProducts(dto, skip, pageSize),
+      this.productRepository.count(dto),
+    ]);
 
-    const total: number = await this.productRepository.count(dto);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -120,8 +116,6 @@ export class ProductService {
 
     if (images && images.length > 0) {
       imagesNames = await this.fileService.createImages(images);
-    } else {
-      imagesNames = [];
     }
 
     return await this.productRepository.update(productId, dto, imagesNames);
@@ -140,15 +134,11 @@ export class ProductService {
     const { pageSize, page }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
-    const products: Product[] =
-      await this.productRepository.findCategoryProducts(
-        categoryId,
-        skip,
-        pageSize,
-      );
+    const [products, total] = await Promise.all([
+      this.productRepository.findCategoryProducts(categoryId, skip, pageSize),
+      this.productRepository.countCategoryProducts(categoryId),
+    ]);
 
-    const total: number =
-      await this.productRepository.countCategoryProducts(categoryId);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -169,14 +159,11 @@ export class ProductService {
     const { pageSize, page }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
-    const products: Product[] = await this.productRepository.findUserProducts(
-      userId,
-      skip,
-      pageSize,
-    );
+    const [products, total] = await Promise.all([
+      this.productRepository.findUserProducts(userId, skip, pageSize),
+      this.productRepository.countUserProducts(userId),
+    ]);
 
-    const total: number =
-      await this.productRepository.countUserProducts(userId);
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {

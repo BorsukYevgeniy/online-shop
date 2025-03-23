@@ -40,14 +40,8 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const { email, password: hashedPassword, role } = candidate;
+    const { password: hashedPassword, role } = candidate;
 
-    if (dto.email !== email) {
-      throw new HttpException(
-        'Email or password are incorrect',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     const isPasswordValid: boolean = await compare(
       dto.password,
       hashedPassword,

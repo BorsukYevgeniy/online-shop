@@ -23,17 +23,19 @@ export class TokenRepository {
     });
   }
 
-  async deleteUserToken(token: string): Promise<DeletingCount> {
-    return await this.prismaService.token.deleteMany({ where: { token } });
+  async deleteUserToken(refreshToken: string): Promise<DeletingCount> {
+    return await this.prismaService.token.deleteMany({
+      where: { token: refreshToken },
+    });
   }
 
   async deleteAllUsersTokens(userId: number): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({ where: { userId } });
   }
 
-  async deleteExpiredTokens(now: Date): Promise<DeletingCount> {
+  async deleteExpiredTokens(): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({
-      where: { expiresAt: { lt: now } },
+      where: { expiresAt: { lt: new Date() } },
     });
   }
 }

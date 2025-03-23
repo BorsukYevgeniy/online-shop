@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductFilter } from './types/product-filter.interface';
 import { ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from '@prisma/client';
@@ -22,7 +21,7 @@ export class ProductRepository {
     });
   }
 
-  async count(filter?: ProductFilter): Promise<number> {
+  async count(filter?: SearchProductDto): Promise<number> {
     return await this.prisma.product.count({
       where: {
         title: { contains: filter?.title, mode: 'insensitive' },
@@ -30,6 +29,7 @@ export class ProductRepository {
           gte: filter?.minPrice,
           lte: filter?.maxPrice,
         },
+        categories: { some: { id: { in: filter?.categoryIds } } },
       },
     });
   }

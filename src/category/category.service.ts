@@ -15,13 +15,12 @@ export class CategoryService {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
-    const total: number = await this.categoryRepository.count();
-    const totalPages: number = Math.ceil(total / pageSize);
+    const [categories, total] = await Promise.all([
+      this.categoryRepository.findAll(skip, pageSize),
+      this.categoryRepository.count(),
+    ]);
 
-    const categories: Category[] = await this.categoryRepository.findAll(
-      skip,
-      pageSize,
-    );
+    const totalPages: number = Math.ceil(total / pageSize);
 
     return {
       categories,
@@ -40,15 +39,13 @@ export class CategoryService {
   ): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
-
-    const total: number = await this.categoryRepository.count(dto.name);
+    
+    const [categories, total] = await Promise.all([
+      this.categoryRepository.findByName(dto.name, skip, pageSize),
+      this.categoryRepository.count(dto.name),
+    ]);
+    
     const totalPages: number = Math.ceil(total / pageSize);
-
-    const categories: Category[] = await this.categoryRepository.findByName(
-      dto.name,
-      skip,
-      pageSize,
-    );
 
     return {
       categories,

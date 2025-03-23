@@ -33,7 +33,8 @@ describe('ProductController (e2e)', () => {
   }, 6500);
 
   let accessToken: string;
-  let category1Id: number, category2Id: number, userId: number;
+  let category1Id: number, category2Id: number;
+  let userId: number;
   beforeAll(async () => {
     const user = await prisma.user.create({
       data: {

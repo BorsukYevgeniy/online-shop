@@ -41,7 +41,6 @@ describe('CategoryController (e2e)', () => {
         nickname: 'user',
         role: 'ADMIN'
       },
-      select: { id: true },
     });
 
     const { headers } = await request(app.getHttpServer())

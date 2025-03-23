@@ -138,22 +138,35 @@ describe('ProductRepository', () => {
     expect(products).toEqual(mockProducts);
   });
 
-  it('should count all products without filter', async () => {
+  it('should count all products', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 
-    const productsCount: number = await repository.count({});
+    const productsCount: number = await repository.count();
 
     expect(prisma.product.count).toHaveBeenCalledWith({
       where: {
-        title: { contains: undefined, mode: 'insensitive' },
-        price: { lte: undefined, gte: undefined },
+        categories: {
+          some: {
+            id: {
+              in: undefined,
+            },
+          },
+        },
+        price: {
+          gte: undefined,
+          lte: undefined,
+        },
+        title: {
+          contains: undefined,
+          mode: 'insensitive',
+        },
       },
     });
 
     expect(productsCount).toEqual(1);
   });
 
-  it('should count all products filtered by title', async () => {
+  it('should count all products by title', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 
     const productsCount: number = await repository.count({ title: 'test' });
@@ -162,50 +175,95 @@ describe('ProductRepository', () => {
       where: {
         title: { contains: 'test', mode: 'insensitive' },
         price: { lte: undefined, gte: undefined },
+        categories: {
+          some: {
+            id: {
+              in: undefined,
+            },
+          },
+        },
       },
     });
 
     expect(productsCount).toEqual(1);
   });
 
-  it('should count all products filtered by price range', async () => {
-    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
-
-    const productsCount: number = await repository.count({
-      minPrice: 20,
-      maxPrice: 100,
-    });
-
-    expect(prisma.product.count).toHaveBeenCalledWith({
-      where: {
-        title: { contains: undefined, mode: 'insensitive' },
-        price: { lte: 100, gte: 20 },
-      },
-    });
-
-    expect(productsCount).toEqual(1);
-  });
-
-  it('should count all products filtered by title and price range', async () => {
+  it('should count all products by title and categories', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 
     const productsCount: number = await repository.count({
       title: 'test',
-      minPrice: 10,
-      maxPrice: 100,
+      categoryIds: [1, 2],
     });
 
     expect(prisma.product.count).toHaveBeenCalledWith({
       where: {
         title: { contains: 'test', mode: 'insensitive' },
-        price: { lte: 100, gte: 10 },
+        categories: { some: { id: { in: [1, 2] } } },
+        price: {
+          gte: undefined,
+          lte: undefined,
+        },
       },
     });
 
     expect(productsCount).toEqual(1);
   });
 
-  it('should return all products without filters', async () => {
+  it('should count all products by title and price range', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount: number = await repository.count({
+      title: 'test',
+      maxPrice: 100,
+      minPrice: 20,
+    });
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        title: { contains: 'test', mode: 'insensitive' },
+        price: {
+          gte: 20,
+          lte: 100,
+        },
+        categories: {
+          some: {
+            id: {
+              in: undefined,
+            },
+          },
+        },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should count all products by title ,price range and categories', async () => {
+    jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
+
+    const productsCount: number = await repository.count({
+      title: 'test',
+      maxPrice: 100,
+      minPrice: 20,
+      categoryIds: [1, 2],
+    });
+
+    expect(prisma.product.count).toHaveBeenCalledWith({
+      where: {
+        title: { contains: 'test', mode: 'insensitive' },
+        price: {
+          gte: 20,
+          lte: 100,
+        },
+        categories: { some: { id: { in: [1, 2] } } },
+      },
+    });
+
+    expect(productsCount).toEqual(1);
+  });
+
+  it('should return all products', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -307,6 +365,47 @@ describe('ProductRepository', () => {
               in: undefined,
             },
           },
+        },
+      },
+      skip: 0,
+      take: 10,
+    });
+    expect(products).toEqual(mockProducts);
+  });
+
+  it('should search products by title and category ids', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'Test Product',
+        price: 150,
+        description: 'Test description',
+        userId: 5,
+        images: ['9', '10'],
+      },
+    ];
+
+    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
+
+    const products = await repository.findProducts(
+      { title: 'Test', categoryIds: [1] },
+      0,
+      10,
+    );
+
+    expect(prisma.product.findMany).toHaveBeenCalledWith({
+      where: {
+        title: { contains: 'Test', mode: 'insensitive' },
+        categories: {
+          some: {
+            id: {
+              in: [1],
+            },
+          },
+        },
+        price: {
+          gte: undefined,
+          lte: undefined,
         },
       },
       skip: 0,
@@ -457,6 +556,9 @@ describe('ProductRepository', () => {
         description: updateDto.description,
         price: 100,
         images: imageNames,
+        categories: {
+          set: undefined,
+        },
       },
       include: {
         categories: true,
@@ -488,7 +590,9 @@ describe('ProductRepository', () => {
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },
       data: {
-        categories: undefined,
+        categories: {
+          set: undefined,
+        },
         description: undefined,
         price: undefined,
         title: updateDto.title,
@@ -524,10 +628,13 @@ describe('ProductRepository', () => {
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },
       data: {
-        categories: undefined,
         price: dto.price,
         title: undefined,
         images: undefined,
+        categories: {
+          set: undefined,
+        },
+        description: undefined,
       },
       include: { categories: true },
     });
@@ -555,7 +662,9 @@ describe('ProductRepository', () => {
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: productId },
       data: {
-        categories: undefined,
+        categories: {
+          set: undefined,
+        },
         description: undefined,
         images: images,
         price: undefined,
