@@ -4,7 +4,6 @@ import {
   IsNumber,
   Min,
   MaxLength,
-  IsArray,
 } from 'class-validator';
 import { ToNumber, Trim, ToNumberArray } from '../../decorators';
 
@@ -28,7 +27,6 @@ export class CreateProductDto {
   readonly price: number;
 
   @IsNotEmpty()
-  @IsArray()
   @ToNumberArray()
   readonly categoryIds: number[];
 }

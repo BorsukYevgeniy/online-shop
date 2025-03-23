@@ -27,7 +27,7 @@ describe('AuthController (e2e)', () => {
     await app.close();
   });
 
-  it('POST /auth/register - Should register a new user', async () => {
+  it('POST /auth/register - 201 CREATED - Should register a new user', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/registration')
       .send({ email: 'user@gmail.com', nickname: 'user', password: 'password' })
@@ -43,8 +43,7 @@ describe('AuthController (e2e)', () => {
   });
 
   let accessToken: string, refreshToken: string;
-
-  it('POST /auth/login - Should login a user', async () => {
+  it('POST /auth/login - 200 OK - Should login a user', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/login')
       .send({ email: 'user@gmail.com', password: 'password' })
@@ -54,21 +53,21 @@ describe('AuthController (e2e)', () => {
     refreshToken = res.headers['set-cookie'][1].split('=')[1].split(';')[0];
   });
 
-  it('POST /auth/refresh - Should refresh pair of JWT token', async () => {
+  it('POST /auth/refresh - 200 OK - Should refresh pair of JWT token', async () => {
     await request(app.getHttpServer())
       .post('/auth/refresh')
       .set('Cookie', [`refreshToken=${refreshToken}`])
       .expect(200);
   });
 
-  it('POST /auth/logout - Should logout a user', async () => {
+  it('POST /auth/logout - 200 OK- Should logout a user', async () => {
     await request(app.getHttpServer())
       .post('/auth/logout')
       .set('Cookie', [`refreshToken=${refreshToken}`])
       .expect(200);
   });
 
-  it('POST /auth/logout-all - Should logout a user from all devices', async () => {
+  it('POST /auth/logout-all - 200 OK - Should logout a user from all devices', async () => {
     await request(app.getHttpServer())
       .post('/auth/logout-all')
       .set('Cookie', [`accessToken=${accessToken}`])

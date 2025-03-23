@@ -25,10 +25,10 @@ export class ProductRepository {
   async count(filter?: ProductFilter): Promise<number> {
     return await this.prisma.product.count({
       where: {
-        title: { contains: filter.title, mode: 'insensitive' },
+        title: { contains: filter?.title, mode: 'insensitive' },
         price: {
-          gte: filter.minPrice,
-          lte: filter.maxPrice,
+          gte: filter?.minPrice,
+          lte: filter?.maxPrice,
         },
       },
     });
@@ -48,7 +48,7 @@ export class ProductRepository {
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: {
-        title: { contains: searchProductDto.title, mode: 'insensitive' },
+        title: { contains: searchProductDto.title , mode: 'insensitive' },
         price: {
           gte: searchProductDto.minPrice,
           lte: searchProductDto.maxPrice,
@@ -102,7 +102,7 @@ export class ProductRepository {
         title: dto.title,
         description: dto.description,
         images: imageNames,
-        price: Number(dto.price),
+        price: dto.price,
         categories: {
           connect: dto.categoryIds.map((id) => ({ id })),
         },
@@ -123,9 +123,7 @@ export class ProductRepository {
         price: dto.price,
         description: dto.description,
         title: dto.title,
-        categories: dto.categoryIds
-          ? { set: dto.categoryIds.map((id) => ({ id })) }
-          : undefined,
+        categories: { set: dto.categoryIds?.map((id) => ({ id })) },
       },
       include: { categories: true },
     });

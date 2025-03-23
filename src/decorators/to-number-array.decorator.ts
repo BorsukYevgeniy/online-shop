@@ -6,6 +6,6 @@ export function ToNumberArray(): PropertyDecorator {
       return value.map((v) => Number(v));
     }
 
-    return value;
+    return [Number(value)];
   });
 }

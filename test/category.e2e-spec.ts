@@ -7,6 +7,7 @@ import * as cookieParser from 'cookie-parser';
 import { CategoryModule } from '../src/category/category.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AuthModule } from '../src/auth/auth.module';
+import { hash } from 'bcryptjs';
 
 describe('CategoryController (e2e)', () => {
   let app: NestExpressApplication;
@@ -33,33 +34,31 @@ describe('CategoryController (e2e)', () => {
   let accessToken: string;
   // Створення адміністратора для подальших тестів
   beforeAll(async () => {
-    const { body: user } = await request(app.getHttpServer())
-      .post('/auth/registration')
-      .send({
+    await prisma.user.create({
+      data: {
         email: 'user@gmail.com',
-        password: 'password',
+        password: await hash('password', 10),
         nickname: 'user',
-      });
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { role: 'ADMIN' },
+        role: 'ADMIN'
+      },
+      select: { id: true },
     });
 
-    const res = await request(app.getHttpServer())
+    const { headers } = await request(app.getHttpServer())
       .post('/auth/login')
       .send({ email: 'user@gmail.com', password: 'password' })
       .expect(200);
 
-    accessToken = res.headers['set-cookie'][0].split('=')[1].split(';')[0];
-  });
+    accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
+  }, 6500);
 
   afterAll(async () => {
     await prisma.user.deleteMany();
+    await prisma.category.deleteMany();
     await app.close();
   });
 
-  it('GET /categories - Should get all categories', async () => {
+  it('GET /categories - 200 OK - Should get all categories', async () => {
     const res = await request(app.getHttpServer())
       .get('/categories')
       .expect(200);
@@ -76,7 +75,7 @@ describe('CategoryController (e2e)', () => {
   });
 
   let categoryId: number;
-  it('POST /categories - Should create a new category', async () => {
+  it('POST /categories - 201 CREATED - Should create a new category', async () => {
     const { body: category } = await request(app.getHttpServer())
       .post('/categories')
       .send({ name: 'Category', description: 'Category description' })
@@ -92,7 +91,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it("GET /categories/:categoryId - Should get a category by it's id", async () => {
+  it("GET /categories/:categoryId - 200 OK - Should get a category by it's id", async () => {
     const { body: category } = await request(app.getHttpServer())
       .get(`/categories/${categoryId}`)
       .expect(200);
@@ -104,7 +103,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('GET /categories/search - Should search categories by name', async () => {
+  it('GET /categories/search - 200 OK - Should search categories by name', async () => {
     const { body: categories } = await request(app.getHttpServer())
       .get('/categories/search')
       .query({ name: 'Categ' })
@@ -127,7 +126,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('GET /categories/:categoryId/products - Should get a category prpducts', async () => {
+  it('GET /categories/:categoryId/products - 200 OK - Should get a category prpducts', async () => {
     const { body: category } = await request(app.getHttpServer())
       .get(`/categories/${categoryId}/products`)
       .expect(200);
@@ -143,7 +142,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('PATCH /categories/:categoryId - Should update name in category', async () => {
+  it('PATCH /categories/:categoryId - 200 OK - Should update name in category', async () => {
     const { body: category } = await request(app.getHttpServer())
       .patch(`/categories/${categoryId}`)
       .send({ name: 'New category name' })
@@ -157,7 +156,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('PATCH /categories/:categoryId - Should update name and description in category', async () => {
+  it('PATCH /categories/:categoryId - 200 OK - Should update name and description in category', async () => {
     const { body: category } = await request(app.getHttpServer())
       .patch(`/categories/${categoryId}`)
       .send({
@@ -174,7 +173,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('DELETE /categories/:categoryId - Should delete a category by id', async () => {
+  it('DELETE /categories/:categoryId - 204 NO CONTENT - Should delete a category by id', async () => {
     await request(app.getHttpServer())
       .delete(`/categories/${categoryId}`)
       .set('Cookie', [`accessToken=${accessToken}`])
