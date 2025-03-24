@@ -39,7 +39,7 @@ describe('CategoryController (e2e)', () => {
         email: 'user@gmail.com',
         password: await hash('password', 10),
         nickname: 'user',
-        role: 'ADMIN'
+        role: 'ADMIN',
       },
     });
 

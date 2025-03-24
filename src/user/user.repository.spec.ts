@@ -63,7 +63,7 @@ describe('UserRepository', () => {
   it('should count all users without filters', async () => {
     jest.spyOn(prismaService.user, 'count').mockResolvedValue(10);
 
-    const result = await repository.count({});
+    const result = await repository.count();
 
     expect(result).toBe(10);
     expect(prismaService.user.count).toHaveBeenCalledWith({
@@ -93,22 +93,42 @@ describe('UserRepository', () => {
     });
   });
 
-  it('should count users filtered by date range', async () => {
+  it('should count users filtered by nickname and min date', async () => {
     jest.spyOn(prismaService.user, 'count').mockResolvedValue(3);
 
     const result = await repository.count({
+      nickname: 'test',
       minDate: date,
+    });
+    expect(result).toBe(3);
+    expect(prismaService.user.count).toHaveBeenCalledWith({
+      where: {
+        nickname: {
+          contains: 'test',
+          mode: 'insensitive',
+        },
+        createdAt: {
+          gte: date,
+        },
+      },
+    });
+  });
+
+  it('should count users filtered by nickname and max date', async () => {
+    jest.spyOn(prismaService.user, 'count').mockResolvedValue(3);
+
+    const result = await repository.count({
+      nickname: 'test',
       maxDate: date,
     });
     expect(result).toBe(3);
     expect(prismaService.user.count).toHaveBeenCalledWith({
       where: {
         nickname: {
-          contains: undefined,
+          contains: 'test',
           mode: 'insensitive',
         },
         createdAt: {
-          gte: date,
           lte: date,
         },
       },
@@ -159,6 +179,9 @@ describe('UserRepository', () => {
         nickname: true,
         createdAt: true,
         role: true,
+      },
+      orderBy: {
+        id: 'asc',
       },
       skip: 0,
       take: 10,

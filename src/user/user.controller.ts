@@ -85,10 +85,12 @@ export class UserController {
   @UseGuards(AuthGuard)
   @HttpCode(204)
   async deleteMe(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
+    await this.userService.delete(req.user.id);
+
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 
-    return await this.userService.delete(req.user.id);
+    res.sendStatus(204);
   }
 
   // Видалення акаунту адміністратором

@@ -48,7 +48,7 @@ export class ProductRepository {
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: {
-        title: { contains: searchProductDto.title , mode: 'insensitive' },
+        title: { contains: searchProductDto.title, mode: 'insensitive' },
         price: {
           gte: searchProductDto.minPrice,
           lte: searchProductDto.maxPrice,

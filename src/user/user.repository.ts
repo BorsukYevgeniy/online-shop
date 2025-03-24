@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserNoPassword, UserNoCred } from './types/user.types';
-import { UserFilter } from './types/user-filter.type';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 
@@ -26,13 +25,13 @@ export class UserRepository {
     return updatedUser;
   }
 
-  async count(filter?: UserFilter): Promise<number> {
+  async count(filter?: SearchUserDto): Promise<number> {
     return await this.prisma.user.count({
       where: {
-        nickname: { contains: filter.nickname, mode: 'insensitive' },
+        nickname: { contains: filter?.nickname, mode: 'insensitive' },
         createdAt: {
-          gte: filter.minDate,
-          lte: filter.maxDate,
+          gte: filter?.minDate,
+          lte: filter?.maxDate,
         },
       },
     });
@@ -48,6 +47,9 @@ export class UserRepository {
       },
       skip,
       take: limit,
+      orderBy: {
+        id: 'asc',
+      },
     });
 
     return users;

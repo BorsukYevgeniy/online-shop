@@ -1,8 +1,8 @@
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import { TestingModule, Test } from "@nestjs/testing";
-import { TokenRepository } from "./token.repository";
-import { TokenCleaningService } from "./token-cleaning.service";
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { TestingModule, Test } from '@nestjs/testing';
+import { TokenRepository } from './token.repository';
+import { TokenCleaningService } from './token-cleaning.service';
 
 describe('TokenCleaningService', () => {
   let service: TokenCleaningService;
@@ -39,13 +39,13 @@ describe('TokenCleaningService', () => {
 
   it('should be defined', async () => {
     expect(service).toBeDefined();
-  })
+  });
 
   it('should delete expired token', async () => {
-    const result = { count: 1 }
+    const result = { count: 1 };
     jest.spyOn(repository, 'deleteExpiredTokens').mockResolvedValue(result);
 
     await service.cleanExpiredTokens();
     expect(repository.deleteExpiredTokens).toHaveBeenCalled();
-  })
-})
+  });
+});

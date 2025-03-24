@@ -342,7 +342,7 @@ describe('UserController', () => {
   it('should delete user', async () => {
     const res = {
       clearCookie: jest.fn(),
-      send: jest.fn(),
+      sendStatus: jest.fn(),
     } as unknown as Response;
 
     await controller.deleteMe(req, res);

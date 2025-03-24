@@ -4,14 +4,13 @@ import {
   ArgumentMetadata,
   BadRequestException,
 } from '@nestjs/common';
-import { UserFilter } from '../types/user-filter.type';
 import { SearchUserDto } from '../dto/search-user.dto';
 
 @Injectable()
 export class ParseUserFilterPipe
-  implements PipeTransform<SearchUserDto, UserFilter>
+  implements PipeTransform<SearchUserDto, SearchUserDto>
 {
-  transform(value: SearchUserDto, metadata: ArgumentMetadata): UserFilter {
+  transform(value: SearchUserDto, metadata: ArgumentMetadata): SearchUserDto {
     const { minDate, maxDate }: SearchUserDto = value;
 
     if (minDate > maxDate) {
