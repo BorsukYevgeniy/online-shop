@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from '../decorator/roles-auth.decorator';
+import { ROLES_KEY } from '../decorator/requiered-roles.decorator';
 import { TokenService } from '../../token/token.service';
-import AuthRequest from '../../types/request.type';
-import Role from '../../enum/role.enum';
+import { AuthRequest } from '../../types/request.type';
+import { Role } from '../../enum/role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

@@ -47,9 +47,6 @@ export class UserRepository {
       },
       skip,
       take: limit,
-      orderBy: {
-        id: 'asc',
-      },
     });
 
     return users;

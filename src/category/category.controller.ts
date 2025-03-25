@@ -20,8 +20,8 @@ import { SearchCategoryDto } from './dto/search-category.dto';
 import { ProductService } from '../product/product.service';
 import { PaginatedCategory } from './type/category.type';
 import { PaginatedProduct } from '../product/types/product.types';
-import Roles from '../auth/decorator/roles-auth.decorator';
-import Role from '../enum/role.enum';
+import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
+import { Role } from '../enum/role.enum';
 
 @Controller('categories')
 export class CategoryController {
@@ -60,14 +60,14 @@ export class CategoryController {
   }
 
   @Post()
-  @Roles(Role.ADMIN)
+  @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async create(@Body() dto: CreateCategoryDto): Promise<Category> {
     return await this.categoryService.create(dto);
   }
 
   @Patch(':categoryId')
-  @Roles(Role.ADMIN)
+  @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async update(
     @Param('categoryId') id: number,
@@ -77,7 +77,7 @@ export class CategoryController {
   }
 
   @Delete(':categoryId')
-  @Roles(Role.ADMIN)
+  @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async delete(@Param('categoryId') id: number): Promise<void> {

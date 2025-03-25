@@ -9,7 +9,7 @@ import * as request from 'supertest';
 import { hash } from 'bcryptjs';
 import { ValidationPipe } from '@nestjs/common';
 
-describe('AuthController (e2e)', () => {
+describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
 
@@ -52,6 +52,7 @@ describe('AuthController (e2e)', () => {
       },
       select: { id: true },
     });
+
 
     const [adminRes, userRes] = await Promise.all([
       //Login as admin
@@ -97,13 +98,13 @@ describe('AuthController (e2e)', () => {
       users: [
         {
           createdAt: expect.any(String),
-          id: expect.any(Number),
+          id: userId,
           nickname: 'user',
           role: 'USER',
         },
         {
           createdAt: expect.any(String),
-          id: expect.any(Number),
+          id: adminId,
           nickname: 'admin',
           role: 'ADMIN',
         },

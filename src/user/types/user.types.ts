@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import Paginated from 'src/types/pagination.type';
+import { Paginated } from 'src/types/pagination.type';
 
 /**
  * Represents a user with roles but without the `password` field for security reasons.

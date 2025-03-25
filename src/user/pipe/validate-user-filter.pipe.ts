@@ -7,7 +7,7 @@ import {
 import { SearchUserDto } from '../dto/search-user.dto';
 
 @Injectable()
-export class ParseUserFilterPipe
+export class ValidateUserFilterPipe
   implements PipeTransform<SearchUserDto, SearchUserDto>
 {
   transform(value: SearchUserDto, metadata: ArgumentMetadata): SearchUserDto {

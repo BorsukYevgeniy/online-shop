@@ -11,7 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
-import AuthRequest from '../types/request.type';
+import { AuthRequest } from '../types/request.type';
 import { Tokens } from '../token/interface/token.interfaces';
 import { UserNoPassword } from '../user/types/user.types';
 import { LoginUserDto } from './dto/login-user.dto';

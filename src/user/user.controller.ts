@@ -14,8 +14,8 @@ import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
-import Roles from '../auth/decorator/roles-auth.decorator';
-import AuthRequest from '../types/request.type';
+import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
+import { AuthRequest } from '../types/request.type';
 import {
   PaginatedUserRolesNoCreds,
   UserNoPassword,
@@ -23,10 +23,10 @@ import {
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
-import { ParseUserFilterPipe } from './pipe/parse-user-filter.pipe';
+import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
 import { ProductService } from '../product/product.service';
 import { PaginatedProduct } from '../product/types/product.types';
-import Role from '../enum/role.enum';
+import { Role } from '../enum/role.enum';
 
 @Controller('users')
 export class UserController {
@@ -36,7 +36,7 @@ export class UserController {
   ) {}
 
   @Get()
-  @Roles(Role.ADMIN)
+  @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async getAll(
     @Query() paginationDto: PaginationDto,
@@ -52,7 +52,7 @@ export class UserController {
 
   @Get('search')
   async search(
-    @Query(ParseUserFilterPipe) dto: SearchUserDto,
+    @Query(ValidateUserFilterPipe) dto: SearchUserDto,
     @Query() pagination: PaginationDto,
   ): Promise<PaginatedUserRolesNoCreds> {
     return await this.userService.search(dto, pagination);
@@ -74,7 +74,7 @@ export class UserController {
 
   // Привоїти користувачу роль адміна
   @Patch('assing-admin/:userId')
-  @Roles(Role.ADMIN)
+  @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async assignAdmin(@Param('userId') userId: number): Promise<UserNoCred> {
     return await this.userService.assignAdmin(userId);
@@ -95,7 +95,7 @@ export class UserController {
 
   // Видалення акаунту адміністратором
   @Delete(':userId')
-  @Roles(Role.ADMIN)
+  @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(204)
   async delete(@Param('userId') userId: number): Promise<void> {

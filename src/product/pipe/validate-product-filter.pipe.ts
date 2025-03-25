@@ -7,7 +7,7 @@ import {
 import { SearchProductDto } from '../dto/search-product.dto';
 
 @Injectable()
-export class ParseProductDtoPipe
+export class ValidateProductDtoPipe
   implements PipeTransform<SearchProductDto, SearchProductDto>
 {
   transform(

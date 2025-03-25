@@ -1,5 +1,5 @@
 import { Product, Category } from '@prisma/client';
-import Paginated from '../../types/pagination.type';
+import { Paginated } from '../../types/pagination.type';
 
 /*
   Respresents type Product with Category fields

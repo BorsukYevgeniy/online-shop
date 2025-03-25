@@ -1,3 +1,3 @@
-export default interface DeletingCount {
+export interface DeletingCount {
   count: number;
 }

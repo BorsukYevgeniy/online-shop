@@ -180,9 +180,6 @@ describe('UserRepository', () => {
         createdAt: true,
         role: true,
       },
-      orderBy: {
-        id: 'asc',
-      },
       skip: 0,
       take: 10,
     });
@@ -190,7 +187,7 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should get all users searched by nickname', async () => {
+  it('should search user by nickname', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -230,7 +227,97 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should get all users searched nickname and date range', async () => {
+  it('should search user by nickname and min date', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: date,
+        password: 'password',
+        products: [{} as Product],
+        role: Role.USER,
+      },
+    ];
+
+    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
+
+    const users = await repository.findUsers(
+      {
+        nickname: 'test',
+        minDate: date,
+      },
+      0,
+      10,
+    );
+
+    expect(prismaService.user.findMany).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: 'test', mode: 'insensitive' },
+        createdAt: {
+          gte: date,
+        },
+      },
+
+      select: {
+        id: true,
+        nickname: true,
+        createdAt: true,
+        role: true,
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(users).toEqual(mockUsers);
+  });
+
+  it('should search user by nickname and max date', async () => {
+    const mockUsers = [
+      {
+        id: 1,
+        email: 'email',
+        nickname: 'test',
+        createdAt: date,
+        password: 'password',
+        products: [{} as Product],
+        role: Role.USER,
+      },
+    ];
+
+    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
+
+    const users = await repository.findUsers(
+      {
+        nickname: 'test',
+        maxDate: date,
+      },
+      0,
+      10,
+    );
+
+    expect(prismaService.user.findMany).toHaveBeenCalledWith({
+      where: {
+        nickname: { contains: 'test', mode: 'insensitive' },
+        createdAt: {
+          lte: date,
+        },
+      },
+
+      select: {
+        id: true,
+        nickname: true,
+        createdAt: true,
+        role: true,
+      },
+      skip: 0,
+      take: 10,
+    });
+
+    expect(users).toEqual(mockUsers);
+  });
+
+  it('should search user by nickname and date range', async () => {
     const mockUsers = [
       {
         id: 1,
