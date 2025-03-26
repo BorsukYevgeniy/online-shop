@@ -37,12 +37,12 @@ export class ProductRepository {
 
   async findAll(
     skip: number,
-    limit: number,
+    take: number,
     sortDto: SortProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       skip,
-      take: limit,
+      take,
       orderBy: { [sortDto.sortBy]: sortDto.order },
     });
   }
@@ -50,7 +50,7 @@ export class ProductRepository {
   async findProducts(
     searchProductDto: SearchProductDto,
     skip: number,
-    limit: number,
+    take: number,
     sortDto: SortProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
@@ -64,21 +64,21 @@ export class ProductRepository {
       },
       orderBy: { [sortDto.sortBy]: sortDto.order },
       skip,
-      take: limit,
+      take,
     });
   }
 
   async findCategoryProducts(
     categoryId: number,
     skip: number,
-    limit: number,
+    take: number,
     sortDto: SortProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: { categories: { some: { id: categoryId } } },
       orderBy: { [sortDto.sortBy]: sortDto.order },
       skip,
-      take: limit,
+      take,
     });
   }
 

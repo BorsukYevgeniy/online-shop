@@ -224,11 +224,7 @@ describe('UserService', () => {
     const user = await service.create(dto);
 
     expect(user).toEqual(mockUser);
-    expect(repository.create).toHaveBeenCalledWith(
-      dto.email,
-      dto.nickname,
-      dto.password,
-    );
+    expect(repository.create).toHaveBeenCalledWith(dto)
   });
 
   it('should delete a user by id', async () => {

@@ -4,6 +4,7 @@ import { UserNoPassword, UserNoCred } from './types/user.types';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 import { SortUserDto } from './dto/sort-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -26,13 +27,13 @@ export class UserRepository {
     return updatedUser;
   }
 
-  async count(filter?: SearchUserDto): Promise<number> {
+  async count(searchUserDto?: SearchUserDto): Promise<number> {
     return await this.prisma.user.count({
       where: {
-        nickname: { contains: filter?.nickname, mode: 'insensitive' },
+        nickname: { contains: searchUserDto?.nickname, mode: 'insensitive' },
         createdAt: {
-          gte: filter?.minDate,
-          lte: filter?.maxDate,
+          gte: searchUserDto?.minDate,
+          lte: searchUserDto?.maxDate,
         },
       },
     });
@@ -40,7 +41,7 @@ export class UserRepository {
 
   async findAll(
     skip: number,
-    limit: number,
+    take: number,
     sortDto: SortUserDto,
   ): Promise<UserNoCred[]> {
     return await this.prisma.user.findMany({
@@ -51,7 +52,7 @@ export class UserRepository {
         role: true,
       },
       skip,
-      take: limit,
+      take,
       orderBy: {
         [sortDto.sortBy]: sortDto.order,
       },
@@ -61,7 +62,7 @@ export class UserRepository {
   async findUsers(
     searchUserDto: SearchUserDto,
     skip: number,
-    limit: number,
+    take: number,
     sortDto: SortUserDto,
   ): Promise<UserNoCred[]> {
     return await this.prisma.user.findMany({
@@ -76,7 +77,7 @@ export class UserRepository {
         role: true,
       },
       skip,
-      take: limit,
+      take,
       orderBy: { [sortDto.sortBy]: sortDto.order },
     });
   }
@@ -118,16 +119,10 @@ export class UserRepository {
   }
 
   async create(
-    email: string,
-    nickname: string,
-    password: string,
+    createUserDto: CreateUserDto
   ): Promise<UserNoPassword> {
     const user = await this.prisma.user.create({
-      data: {
-        email,
-        nickname,
-        password,
-      },
+      data: createUserDto,
       select: {
         id: true,
         email: true,

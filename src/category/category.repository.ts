@@ -19,31 +19,31 @@ export class CategoryRepository {
 
   async findAll(
     skip: number,
-    limit: number,
+    take: number,
     sortDto?: SortCategoryDto,
   ): Promise<Category[]> {
     return await this.prisma.category.findMany({
       skip,
-      take: limit,
+      take,
       orderBy: { [sortDto.sortBy]: sortDto.order },
     });
   }
 
-  async findById(id: number): Promise<Category> {
-    return await this.prisma.category.findUnique({ where: { id } });
+  async findById(categoryId: number): Promise<Category> {
+    return await this.prisma.category.findUnique({ where: { id: categoryId } });
   }
 
   async findByName(
-    name: string,
+    categoryName: string,
     skip: number,
-    limit: number,
-    sortDto?: SortCategoryDto,
+    take: number,
+    sortCategoryDto?: SortCategoryDto,
   ): Promise<Category[]> {
     return await this.prisma.category.findMany({
-      where: { name: { contains: name, mode: 'insensitive' } },
+      where: { name: { contains: categoryName, mode: 'insensitive' } },
       skip,
-      take: limit,
-      orderBy: { [sortDto.sortBy]: sortDto.order },
+      take,
+      orderBy: { [sortCategoryDto.sortBy]: sortCategoryDto.order },
     });
   }
 
@@ -52,16 +52,16 @@ export class CategoryRepository {
   }
 
   async update(
-    id: number,
+    categoryId: number,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     return await this.prisma.category.update({
-      where: { id },
+      where: { id: categoryId },
       data: updateCategoryDto,
     });
   }
 
-  async delete(id: number): Promise<void> {
-    await this.prisma.category.delete({ where: { id } });
+  async delete(categoryId: number): Promise<void> {
+    await this.prisma.category.delete({ where: { id: categoryId } });
   }
 }

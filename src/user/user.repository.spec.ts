@@ -4,6 +4,7 @@ import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
+import { CreateUserDto } from './dto/create-user.dto';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -233,8 +234,8 @@ describe('UserRepository', () => {
       skip: 0,
       take: 10,
       orderBy: {
-        id: 'desc'
-      }
+        id: 'desc',
+      },
     });
 
     expect(users).toEqual(mockUsers);
@@ -471,28 +472,20 @@ describe('UserRepository', () => {
   });
 
   it('should create a new user', async () => {
-    const email = 'email';
-    const nickname = 'test';
-    const password = '12345';
-
-    const mockUser = {
-      id: 1,
-      email,
-      role: Role.USER,
+    const createUserDto: CreateUserDto = {
+      email: 'email',
+      nickname: 'nick',
+      password: '1234',
     };
 
     jest
       .spyOn(prismaService.user, 'create')
-      .mockResolvedValue(mockUser as User);
+      .mockResolvedValue(createUserDto as User);
 
-    const user = await repository.create(email, nickname, password);
+    const user = await repository.create(createUserDto);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
-      data: {
-        email,
-        nickname,
-        password,
-      },
+      data: createUserDto,
       select: {
         id: true,
         email: true,
@@ -502,20 +495,22 @@ describe('UserRepository', () => {
       },
     });
 
-    expect(user).toEqual(mockUser);
+    expect(user).toEqual(createUserDto);
   });
 
   it('should delete user by id', async () => {
     const mockUser = {
       id: 1,
+      nickname: 'nick',
       email: 'user@example.com',
-      products: [{}],
+      password: '1234',
       role: Role.USER,
+      createdAt: date,
     };
 
-    jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser as any);
+    jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser);
 
-    const user = await repository.delete(1);
+    await repository.delete(1);
 
     expect(prismaService.user.delete).toHaveBeenCalledWith({
       where: { id: 1 },

@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
-import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
 import { PaginationDto } from 'src/dto/pagination.dto';
@@ -40,14 +39,14 @@ export class ProductService {
 
   async getAll(
     paginationDto: PaginationDto,
-    sortDto: SortProductDto,
+    sortProductDto: SortProductDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findAll(skip, pageSize, sortDto),
+      this.productRepository.findAll(skip, pageSize, sortProductDto),
       this.productRepository.count(),
     ]);
 
@@ -65,16 +64,16 @@ export class ProductService {
   }
   
   async search(
-    dto: SearchProductDto,
-    pagination: PaginationDto,
-    sortDto: SortProductDto,
+    searchProductDto: SearchProductDto,
+    paginationDto: PaginationDto,
+    sortProductDto: SortProductDto,
   ): Promise<PaginatedProduct> {
-    const { pageSize, page }: PaginationDto = pagination;
+    const { pageSize, page }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findProducts(dto, skip, pageSize, sortDto),
-      this.productRepository.count(dto),
+      this.productRepository.findProducts(searchProductDto, skip, pageSize, sortProductDto),
+      this.productRepository.count(searchProductDto),
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
@@ -101,18 +100,18 @@ export class ProductService {
 
   async create(
     userId: number,
-    dto: CreateProductDto,
+    createProductDto: CreateProductDto,
     images: Express.Multer.File[],
   ): Promise<ProductCategory> {
     const imagesNames: string[] = await this.fileService.createImages(images);
 
-    return await this.productRepository.create(userId, dto, imagesNames);
+    return await this.productRepository.create(userId, createProductDto, imagesNames);
   }
 
   async update(
     userId: number,
     productId: number,
-    dto: UpdateProductDto,
+    updateProductDto: UpdateProductDto,
     images?: Express.Multer.File[],
   ): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
@@ -123,7 +122,7 @@ export class ProductService {
       imagesNames = await this.fileService.createImages(images);
     }
 
-    return await this.productRepository.update(productId, dto, imagesNames);
+    return await this.productRepository.update(productId, updateProductDto, imagesNames);
   }
 
   async delete(userId: number, productId: number): Promise<void> {
@@ -134,10 +133,10 @@ export class ProductService {
 
   async getCategoryProducts(
     categoryId: number,
-    pagination: PaginationDto,
-    sortDto: SortProductDto,
+    paginationDto: PaginationDto,
+    sortProductDto: SortProductDto,
   ): Promise<PaginatedProduct> {
-    const { pageSize, page }: PaginationDto = pagination;
+    const { pageSize, page }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
@@ -145,7 +144,7 @@ export class ProductService {
         categoryId,
         skip,
         pageSize,
-        sortDto,
+        sortProductDto,
       ),
       this.productRepository.countCategoryProducts(categoryId),
     ]);
@@ -165,14 +164,14 @@ export class ProductService {
 
   async getUserProducts(
     userId: number,
-    pagination: PaginationDto,
-    sortDto: SortProductDto,
+    paginationDto: PaginationDto,
+    sortProductDto: SortProductDto,
   ): Promise<PaginatedProduct> {
-    const { pageSize, page }: PaginationDto = pagination;
+    const { pageSize, page }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findUserProducts(userId, skip, pageSize, sortDto),
+      this.productRepository.findUserProducts(userId, skip, pageSize, sortProductDto),
       this.productRepository.countUserProducts(userId),
     ]);
 

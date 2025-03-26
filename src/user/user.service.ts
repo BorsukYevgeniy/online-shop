@@ -22,13 +22,13 @@ export class UserService {
 
   async getAll(
     paginationDto: PaginationDto,
-    sortDto: SortUserDto,
+    sortUserDto: SortUserDto,
   ): Promise<PaginatedUserNoCreds> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
     const [users, total] = await Promise.all([
-      this.userRepository.findAll(skip, pageSize, sortDto),
+      this.userRepository.findAll(skip, pageSize, sortUserDto),
       this.userRepository.count(),
     ]);
 
@@ -46,16 +46,16 @@ export class UserService {
   }
 
   async search(
-    dto: SearchUserDto,
-    pagination: PaginationDto,
-    sortDto: SortUserDto,
+    searchUserDto: SearchUserDto,
+    paginationDto: PaginationDto,
+    sortUserDto: SortUserDto,
   ): Promise<PaginatedUserNoCreds> {
-    const { page, pageSize }: PaginationDto = pagination;
+    const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
     const [users, total] = await Promise.all([
-      this.userRepository.findUsers(dto, skip, pageSize, sortDto),
-      this.userRepository.count(dto),
+      this.userRepository.findUsers(searchUserDto, skip, pageSize, sortUserDto),
+      this.userRepository.count(searchUserDto),
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
@@ -89,12 +89,8 @@ export class UserService {
     return await this.userRepository.findOneByEmail(email);
   }
 
-  async create(dto: CreateUserDto): Promise<UserNoPassword> {
-    return await this.userRepository.create(
-      dto.email,
-      dto.nickname,
-      dto.password,
-    );
+  async create(createUserDto: CreateUserDto): Promise<UserNoPassword> {
+    return await this.userRepository.create(createUserDto);
   }
 
   async delete(userId: number): Promise<void> {

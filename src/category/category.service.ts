@@ -12,12 +12,15 @@ import { SortCategoryDto } from './dto/sort-category.dto';
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async getAll(pagination: PaginationDto, sortDto?: SortCategoryDto): Promise<PaginatedCategory> {
-    const { page, pageSize }: PaginationDto = pagination;
+  async getAll(
+    paginationDto: PaginationDto,
+    sortCategoryDto?: SortCategoryDto,
+  ): Promise<PaginatedCategory> {
+    const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;
 
     const [categories, total] = await Promise.all([
-      this.categoryRepository.findAll(skip, pageSize, sortDto),
+      this.categoryRepository.findAll(skip, pageSize, sortCategoryDto),
       this.categoryRepository.count(),
     ]);
 
@@ -35,16 +38,21 @@ export class CategoryService {
   }
 
   async search(
-    dto: SearchCategoryDto,
-    pagination: PaginationDto,
-    sortDto?: SortCategoryDto,
+    searchCategoryDto: SearchCategoryDto,
+    paginationDto: PaginationDto,
+    sortCategoryDto?: SortCategoryDto,
   ): Promise<PaginatedCategory> {
-    const { page, pageSize }: PaginationDto = pagination;
+    const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;
 
     const [categories, total] = await Promise.all([
-      this.categoryRepository.findByName(dto.name, skip, pageSize, sortDto),
-      this.categoryRepository.count(dto.name),
+      this.categoryRepository.findByName(
+        searchCategoryDto.name,
+        skip,
+        pageSize,
+        sortCategoryDto,
+      ),
+      this.categoryRepository.count(searchCategoryDto.name),
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
@@ -60,19 +68,22 @@ export class CategoryService {
     };
   }
 
-  async getById(id: number): Promise<Category> {
-    return this.categoryRepository.findById(id);
+  async getById(categoryId: number): Promise<Category> {
+    return this.categoryRepository.findById(categoryId);
   }
 
-  async create(dto: CreateCategoryDto): Promise<Category> {
-    return this.categoryRepository.create(dto);
+  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    return this.categoryRepository.create(createCategoryDto);
   }
 
-  async update(id: number, dto: UpdateCategoryDto): Promise<Category> {
-    return this.categoryRepository.update(id, dto);
+  async update(
+    categoryId: number,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
+    return this.categoryRepository.update(categoryId, updateCategoryDto);
   }
 
-  async delete(id: number): Promise<void> {
-    return this.categoryRepository.delete(id);
+  async delete(categoryrId: number): Promise<void> {
+    return this.categoryRepository.delete(categoryrId);
   }
 }
