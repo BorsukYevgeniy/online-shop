@@ -6,17 +6,18 @@ import { PaginationDto } from 'src/dto/pagination.dto';
 import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { PaginatedCategory } from './type/category.type';
+import { SortCategoryDto } from './dto/sort-category.dto';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async getAll(pagination: PaginationDto): Promise<PaginatedCategory> {
+  async getAll(pagination: PaginationDto, sortDto?: SortCategoryDto): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
     const [categories, total] = await Promise.all([
-      this.categoryRepository.findAll(skip, pageSize),
+      this.categoryRepository.findAll(skip, pageSize, sortDto),
       this.categoryRepository.count(),
     ]);
 
@@ -36,12 +37,13 @@ export class CategoryService {
   async search(
     dto: SearchCategoryDto,
     pagination: PaginationDto,
+    sortDto?: SortCategoryDto,
   ): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
     const [categories, total] = await Promise.all([
-      this.categoryRepository.findByName(dto.name, skip, pageSize),
+      this.categoryRepository.findByName(dto.name, skip, pageSize, sortDto),
       this.categoryRepository.count(dto.name),
     ]);
 

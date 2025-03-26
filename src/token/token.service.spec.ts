@@ -3,7 +3,7 @@ import { TokenService } from './token.service';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import Role from '../enum/role.enum';
+import {Role} from '../enum/role.enum';
 
 describe('TokenService', () => {
   let service: TokenService;

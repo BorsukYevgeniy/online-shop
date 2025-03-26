@@ -17,7 +17,7 @@ import { Response } from 'express';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { AuthRequest } from '../types/request.type';
 import {
-  PaginatedUserRolesNoCreds,
+  PaginatedUserNoCreds,
   UserNoPassword,
   UserNoCred,
 } from './types/user.types';
@@ -27,6 +27,8 @@ import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
 import { ProductService } from '../product/product.service';
 import { PaginatedProduct } from '../product/types/product.types';
 import { Role } from '../enum/role.enum';
+import { SortUserDto } from './dto/sort-user.dto';
+import { SortProductDto } from '../product/dto/sort-product.dto';
 
 @Controller('users')
 export class UserController {
@@ -40,8 +42,9 @@ export class UserController {
   @UseGuards(RolesGuard)
   async getAll(
     @Query() paginationDto: PaginationDto,
-  ): Promise<PaginatedUserRolesNoCreds> {
-    return await this.userService.getAll(paginationDto);
+    @Query() sortDto: SortUserDto,
+  ): Promise<PaginatedUserNoCreds> {
+    return await this.userService.getAll(paginationDto, sortDto);
   }
 
   @Get('me')
@@ -54,8 +57,9 @@ export class UserController {
   async search(
     @Query(ValidateUserFilterPipe) dto: SearchUserDto,
     @Query() pagination: PaginationDto,
-  ): Promise<PaginatedUserRolesNoCreds> {
-    return await this.userService.search(dto, pagination);
+    @Query() sortDto: SortUserDto,
+  ): Promise<PaginatedUserNoCreds> {
+    return await this.userService.search(dto, pagination, sortDto);
   }
 
   @Get(':userId')
@@ -68,8 +72,9 @@ export class UserController {
   async getUserProducts(
     @Param('userId') userId: number,
     @Query() paginationDto: PaginationDto,
+    @Query() sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
-    return await this.productService.getUserProducts(userId, paginationDto);
+    return await this.productService.getUserProducts(userId, paginationDto, sortDto);
   }
 
   // Привоїти користувачу роль адміна

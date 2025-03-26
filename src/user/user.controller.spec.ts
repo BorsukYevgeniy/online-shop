@@ -4,8 +4,9 @@ import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
 import { Response } from 'express';
 import { ProductService } from '../product/product.service';
-import AuthRequest from '../types/request.type';
-import Role from '../enum/role.enum';
+import { AuthRequest } from '../types/request.type';
+import { Role } from '../enum/role.enum';
+import { Order } from '../enum/order.enum';
 
 const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
 
@@ -63,25 +64,12 @@ describe('UserController', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should return all users without filters', async () => {
+  it('should return all users without filters with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
-        email: 'test',
         nickname: 'test',
         createdAt: new Date(),
-
-        password: 'password',
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
         role: Role.USER,
       },
     ];
@@ -96,7 +84,10 @@ describe('UserController', () => {
       prevPage: null,
     });
 
-    const users = await controller.getAll({ page: 1, pageSize: 10 });
+    const users = await controller.getAll(
+      { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
     expect(users).toEqual({
       users: mockUsers,
@@ -109,25 +100,12 @@ describe('UserController', () => {
     });
   });
 
-  it('should return all users searched by nickname', async () => {
+  it('should return all users searched by nickname with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
-        email: 'test',
         nickname: 'test',
         createdAt: new Date(),
-
-        password: 'password',
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
         role: Role.USER,
       },
     ];
@@ -145,6 +123,7 @@ describe('UserController', () => {
     const users = await controller.search(
       { nickname: 'test' },
       { page: 1, pageSize: 10 },
+      {sortBy: 'id', order: Order.DESC},
     );
 
     expect(users).toEqual({
@@ -158,25 +137,12 @@ describe('UserController', () => {
     });
   });
 
-  it('should return all users searched by nickname and date range', async () => {
+  it('should return all users searched by nickname and date range with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
-        email: 'test',
         nickname: 'test',
         createdAt: new Date(),
-
-        password: 'password',
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
         role: Role.USER,
       },
     ];
@@ -194,55 +160,7 @@ describe('UserController', () => {
     const users = await controller.search(
       { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       { page: 1, pageSize: 10 },
-    );
-
-    expect(users).toEqual({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 10,
-      nextPage: null,
-      prevPage: null,
-    });
-  });
-
-  it('should return all users searched by nickname and date range', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'test',
-        nickname: 'test',
-        createdAt: new Date(),
-
-        password: 'password',
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(userService, 'search').mockResolvedValue({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 10,
-      nextPage: null,
-      prevPage: null,
-    });
-
-    const users = await controller.search(
-      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
-      { page: 1, pageSize: 10 },
+      {sortBy: 'id', order: Order.DESC},
     );
 
     expect(users).toEqual({
@@ -300,7 +218,7 @@ describe('UserController', () => {
     expect(userService.getMe).toHaveBeenCalledWith(2);
   });
 
-  it('should return user products', async () => {
+  it('should return user products with default sorting', async () => {
     const userId = 1;
     const mockProducts = [
       {
@@ -323,10 +241,14 @@ describe('UserController', () => {
       totalPages: 1,
     });
 
-    const products = await controller.getUserProducts(userId, {
-      page: 1,
-      pageSize: 10,
-    });
+    const products = await controller.getUserProducts(
+      userId,
+      {
+        page: 1,
+        pageSize: 10,
+      },
+      {sortBy: "id", order: Order.DESC},
+    );
 
     expect(products).toEqual({
       nextPage: null,

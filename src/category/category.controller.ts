@@ -22,6 +22,8 @@ import { PaginatedCategory } from './type/category.type';
 import { PaginatedProduct } from '../product/types/product.types';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { Role } from '../enum/role.enum';
+import { SortProductDto } from '../product/dto/sort-product.dto';
+import { SortCategoryDto } from './dto/sort-category.dto';
 
 @Controller('categories')
 export class CategoryController {
@@ -31,31 +33,37 @@ export class CategoryController {
   ) {}
 
   @Get()
-  async getAll(@Query() pagination: PaginationDto): Promise<PaginatedCategory> {
-    return await this.categoryService.getAll(pagination);
+  async getAll(
+    @Query() pagination: PaginationDto,
+    @Query() sortDto?: SortCategoryDto,
+  ): Promise<PaginatedCategory> {
+    return await this.categoryService.getAll(pagination, sortDto);
   }
 
   @Get('search')
   async search(
     @Query() searchCategoryDto: SearchCategoryDto,
     @Query() paginationDto: PaginationDto,
+    @Query() sortDto?: SortCategoryDto
   ): Promise<PaginatedCategory> {
-    return await this.categoryService.search(searchCategoryDto, paginationDto);
+    return await this.categoryService.search(searchCategoryDto, paginationDto, sortDto);
   }
 
   @Get(':categoryId')
   async getById(@Param('categoryId') id: number): Promise<Category> {
-    return this.categoryService.getById(id);
+    return await this.categoryService.getById(id);
   }
 
   @Get(':categoryId/products')
   async getCategoryProducts(
     @Param('categoryId') categoryId: number,
     @Query() pagination: PaginationDto,
+    @Query() sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
     return await this.productService.getCategoryProducts(
       categoryId,
       pagination,
+      sortDto,
     );
   }
 

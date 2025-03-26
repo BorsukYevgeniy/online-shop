@@ -33,4 +33,4 @@ export type UserProductNoCreds = Omit<UserProductNoPassword, 'email'>;
 /**
  * Represents a users with products and pagination ,but without sensitive fields (`password` and `email`).
  */
-export type PaginatedUserRolesNoCreds = Paginated<UserNoCred, 'users'>;
+export type PaginatedUserNoCreds = Paginated<UserNoCred, 'users'>;

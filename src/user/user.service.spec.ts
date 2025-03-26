@@ -3,7 +3,8 @@ import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import Role from '../enum/role.enum';
+import { Role } from '../enum/role.enum';
+import { Order } from '../enum/order.enum';
 
 describe('UserService', () => {
   let service: UserService;
@@ -60,24 +61,13 @@ describe('UserService', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should find all users without filters', async () => {
+  it('should find all users without filters with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
         email: 'test@example.com',
         nickname: 'test',
         createdAt: new Date(),
-
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
         role: Role.USER,
       },
     ];
@@ -85,7 +75,10 @@ describe('UserService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
 
-    const users = await service.getAll({ page: 1, pageSize: 10 });
+    const users = await service.getAll(
+      { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
     expect(users).toEqual({
       users: mockUsers,
@@ -99,25 +92,12 @@ describe('UserService', () => {
     expect(repository.findAll).toHaveBeenCalled();
   });
 
-  it('should return all users searched by nickname', async () => {
+  it('should return all users searched by nickname with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
-        email: 'test',
         nickname: 'test',
         createdAt: new Date(),
-
-        password: 'password',
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
         role: Role.USER,
       },
     ];
@@ -128,6 +108,7 @@ describe('UserService', () => {
     const users = await service.search(
       { nickname: 'test' },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(users).toEqual({
@@ -141,25 +122,12 @@ describe('UserService', () => {
     });
   });
 
-  it('should return all users searched by nickname and date range', async () => {
+  it('should return all users searched by nickname and date range with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
-        email: 'test',
         nickname: 'test',
         createdAt: new Date(),
-
-        password: 'password',
-        products: [
-          {
-            id: 1,
-            userId: 1,
-            description: 'Product description',
-            title: 'Product title',
-            price: 100,
-            images: ['image1.jpg', 'image2.jpg'],
-          },
-        ],
         role: Role.USER,
       },
     ];
@@ -170,6 +138,7 @@ describe('UserService', () => {
     const users = await service.search(
       { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(users).toEqual({
@@ -183,22 +152,28 @@ describe('UserService', () => {
     });
   });
 
-  it('should find user by id with email', async () => {
+  it('should find user by email', async () => {
+    const email = 'test@example.com';
     const mockUser = {
       id: 1,
-      email: 'test@example.com',
+      email,
+      password: 'password',
       nickname: 'test',
       createdAt: new Date(),
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
+      role: Role.USER,
+    };
+    jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
+
+    const user = await service.getByEmail(email);
+
+    expect(user).toEqual(mockUser);
+  });
+
+  it('should find user by id', async () => {
+    const mockUser = {
+      id: 1,
+      nickname: 'test',
+      createdAt: new Date(),
       role: Role.USER,
     };
 
@@ -214,16 +189,6 @@ describe('UserService', () => {
       email: 'test@example.com',
       nickname: 'test',
       createdAt: new Date(),
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
       role: Role.USER,
     };
 
@@ -240,34 +205,6 @@ describe('UserService', () => {
     expect(repository.findById).toHaveBeenCalledWith(1);
   });
 
-  it('should find user by email', async () => {
-    const email = 'test@example.com';
-    const mockUser = {
-      id: 1,
-      email,
-      password: 'password',
-      nickname: 'test',
-      createdAt: new Date(),
-
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
-      ],
-      role: Role.USER,
-    };
-    jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
-
-    const user = await service.getByEmail(email);
-
-    expect(user).toEqual(mockUser);
-  });
-
   it('should create a new user', async () => {
     const dto: CreateUserDto = {
       email: 'test@test.com',
@@ -279,8 +216,6 @@ describe('UserService', () => {
       email: 'test',
       nickname: 'test',
       createdAt: new Date(),
-
-      products: null,
       role: Role.USER,
     };
 

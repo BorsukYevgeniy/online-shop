@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserNoPassword, UserNoCred } from './types/user.types';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
+import { SortUserDto } from './dto/sort-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -37,8 +38,12 @@ export class UserRepository {
     });
   }
 
-  async findAll(skip: number, limit: number): Promise<UserNoCred[]> {
-    const users = await this.prisma.user.findMany({
+  async findAll(
+    skip: number,
+    limit: number,
+    sortDto: SortUserDto,
+  ): Promise<UserNoCred[]> {
+    return await this.prisma.user.findMany({
       select: {
         id: true,
         nickname: true,
@@ -47,15 +52,17 @@ export class UserRepository {
       },
       skip,
       take: limit,
+      orderBy: {
+        [sortDto.sortBy]: sortDto.order,
+      },
     });
-
-    return users;
   }
 
   async findUsers(
     searchUserDto: SearchUserDto,
     skip: number,
     limit: number,
+    sortDto: SortUserDto,
   ): Promise<UserNoCred[]> {
     return await this.prisma.user.findMany({
       where: {
@@ -70,6 +77,7 @@ export class UserRepository {
       },
       skip,
       take: limit,
+      orderBy: { [sortDto.sortBy]: sortDto.order },
     });
   }
 

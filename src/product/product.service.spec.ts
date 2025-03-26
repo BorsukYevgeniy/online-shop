@@ -4,6 +4,7 @@ import { ProductRepository } from './product.repository';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
+import { Order } from '../enum/order.enum';
 
 const mockFiles: Express.Multer.File[] = [
   {
@@ -77,7 +78,7 @@ describe('ProductService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return category products', async () => {
+  it('should return category products with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -95,13 +96,17 @@ describe('ProductService', () => {
       .spyOn(repository, 'findCategoryProducts')
       .mockResolvedValue(mockProducts);
 
-    const products = await service.getCategoryProducts(1, {
-      page: 1,
-      pageSize: 1,
-    });
+    const products = await service.getCategoryProducts(
+      1,
+      {
+        page: 1,
+        pageSize: 1,
+      },
+      {sortBy: 'id', order: Order.DESC},
+    );
 
     expect(repository.countCategoryProducts).toHaveBeenCalledWith(1);
-    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1);
+    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1, {sortBy: 'id', order: Order.DESC});
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
@@ -113,7 +118,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return user products', async () => {
+  it('should return user products with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -129,13 +134,20 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'countUserProducts').mockResolvedValue(1);
     jest.spyOn(repository, 'findUserProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.getUserProducts(1, {
-      page: 1,
-      pageSize: 1,
-    });
+    const products = await service.getUserProducts(
+      1,
+      {
+        page: 1,
+        pageSize: 1,
+      },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
     expect(repository.countUserProducts).toHaveBeenCalledWith(1);
-    expect(repository.findUserProducts).toHaveBeenCalledWith(1, 0, 1);
+    expect(repository.findUserProducts).toHaveBeenCalledWith(1, 0, 1, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
@@ -147,7 +159,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return all products without filters', async () => {
+  it('should return all products without filters with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -163,9 +175,15 @@ describe('ProductService', () => {
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
 
-    const products = await service.getAll({ page: 1, pageSize: 1 });
+    const products = await service.getAll(
+      { page: 1, pageSize: 1 },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
-    expect(repository.findAll).toHaveBeenCalledWith(0, 1);
+    expect(repository.findAll).toHaveBeenCalledWith(0, 1, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
@@ -177,7 +195,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should filter products by title', async () => {
+  it('should return all products finded by title with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -196,12 +214,14 @@ describe('ProductService', () => {
     const products = await service.search(
       { title: 'Test' },
       { pageSize: 1, page: 1 },
+      {sortBy: 'id', order: Order.DESC}
     );
 
     expect(repository.findProducts).toHaveBeenCalledWith(
       { title: 'Test' },
       0,
       1,
+      {sortBy: 'id', order: Order.DESC}
     );
     expect(products).toEqual({
       products: mockProducts,
@@ -214,7 +234,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should filter products by title and price range', async () => {
+  it('should return all products finded by title and price range with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -233,12 +253,14 @@ describe('ProductService', () => {
     const products = await service.search(
       { title: 'Test', minPrice: 20, maxPrice: 20 },
       { pageSize: 1, page: 1 },
+      {}
     );
 
     expect(repository.findProducts).toHaveBeenCalledWith(
       { title: 'Test', minPrice: 20, maxPrice: 20 },
       0,
       1,
+      {}
     );
     expect(products).toEqual({
       products: mockProducts,
@@ -251,7 +273,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should filter products by title and price, range  and category ids', async () => {
+  it('should filter products by title and price, range  and category ids with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -270,12 +292,14 @@ describe('ProductService', () => {
     const products = await service.search(
       { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
       { pageSize: 1, page: 1 },
+      {sortBy: 'id', order: Order.DESC}
     );
 
     expect(repository.findProducts).toHaveBeenCalledWith(
       { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
       0,
       1,
+      {sortBy: 'id', order: Order.DESC}
     );
     expect(products).toEqual({
       products: mockProducts,

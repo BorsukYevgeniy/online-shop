@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { TokenService } from '../token/token.service';
-import AuthRequest from '../types/request.type';
+import { AuthRequest } from '../types/request.type';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { Order } from '../enum/order.enum';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -69,7 +70,7 @@ describe('ProductController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all products', async () => {
+  it('should return all products with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -92,7 +93,10 @@ describe('ProductController', () => {
       nextPage: null,
     });
 
-    const products = await controller.getAll({ page: 1, pageSize: 10 });
+    const products = await controller.getAll(
+      { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
     expect(products).toEqual({
       products: mockProducts,
@@ -105,7 +109,7 @@ describe('ProductController', () => {
     });
   });
 
-  it('should products searched by title', async () => {
+  it('should products searched by title with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -131,6 +135,7 @@ describe('ProductController', () => {
     const products = await controller.search(
       { title: 'Test' },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(products).toEqual({
@@ -146,10 +151,11 @@ describe('ProductController', () => {
     expect(service.search).toHaveBeenCalledWith(
       { title: 'Test' },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
   });
 
-  it('should products searched by price range and title', async () => {
+  it('should products searched by title and price range with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -175,6 +181,7 @@ describe('ProductController', () => {
     const products = await controller.search(
       { title: 'title', minPrice: 20, maxPrice: 60 },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(products).toEqual({
@@ -190,10 +197,11 @@ describe('ProductController', () => {
     expect(service.search).toHaveBeenCalledWith(
       { title: 'title', minPrice: 20, maxPrice: 60 },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
   });
 
-  it('should products searched by price range, title and categories', async () => {
+  it('should products searched by title, price range and categories with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -219,6 +227,7 @@ describe('ProductController', () => {
     const products = await controller.search(
       { title: 'title', minPrice: 20, maxPrice: 60, categoryIds: [1] },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(products).toEqual({
@@ -234,6 +243,7 @@ describe('ProductController', () => {
     expect(service.search).toHaveBeenCalledWith(
       { title: 'title', minPrice: 20, maxPrice: 60, categoryIds: [1] },
       { page: 1, pageSize: 10 },
+      { sortBy: 'id', order: Order.DESC },
     );
   });
 

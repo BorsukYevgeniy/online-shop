@@ -82,7 +82,7 @@ describe('UserController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /users - 200 OK - Should return users', async () => {
+  it('GET /users - 200 OK - Should return users with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
       .get('/users')
       .set('Cookie', [`accessToken=${adminAccessToken}`])
@@ -98,15 +98,15 @@ describe('UserController (e2e)', () => {
       users: [
         {
           createdAt: expect.any(String),
-          id: userId,
-          nickname: 'user',
-          role: 'USER',
-        },
-        {
-          createdAt: expect.any(String),
           id: adminId,
           nickname: 'admin',
           role: 'ADMIN',
+        },
+        {
+          createdAt: expect.any(String),
+          id: userId,
+          nickname: 'user',
+          role: 'USER',
         },
       ],
     });
@@ -127,7 +127,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/search - 200 OK - Should search user by nickname', async () => {
+  it('GET /users/search - 200 OK - Should search user by nickname with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
       .get('/users/search')
       .query({ nickname: 'use' })
@@ -151,7 +151,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/search - 200 OK - Should search user by nickname and min date', async () => {
+  it('GET /users/search - 200 OK - Should search user by nickname and min date with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
       .get('/users/search')
       .query({ nickname: 'use' })
@@ -176,7 +176,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/search - 200 OK - Should search user by nickname and max date', async () => {
+  it('GET /users/search - 200 OK - Should search user by nickname and max date with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
       .get('/users/search')
       .query({ nickname: 'use' })
@@ -201,7 +201,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/search - 200 OK - Should search user by nickname and date range', async () => {
+  it('GET /users/search - 200 OK - Should search user by nickname and date range with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
       .get('/users/search')
       .query({ nickname: 'use' })

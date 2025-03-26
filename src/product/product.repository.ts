@@ -5,6 +5,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from '@prisma/client';
+import { SortProductDto } from './dto/sort-product.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -34,10 +35,15 @@ export class ProductRepository {
     });
   }
 
-  async findAll(skip: number, limit: number): Promise<Product[]> {
+  async findAll(
+    skip: number,
+    limit: number,
+    sortDto: SortProductDto,
+  ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       skip,
       take: limit,
+      orderBy: { [sortDto.sortBy]: sortDto.order },
     });
   }
 
@@ -45,6 +51,7 @@ export class ProductRepository {
     searchProductDto: SearchProductDto,
     skip: number,
     limit: number,
+    sortDto: SortProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: {
@@ -55,6 +62,7 @@ export class ProductRepository {
         },
         categories: { some: { id: { in: searchProductDto.categoryIds } } },
       },
+      orderBy: { [sortDto.sortBy]: sortDto.order },
       skip,
       take: limit,
     });
@@ -64,9 +72,11 @@ export class ProductRepository {
     categoryId: number,
     skip: number,
     limit: number,
+    sortDto: SortProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: { categories: { some: { id: categoryId } } },
+      orderBy: { [sortDto.sortBy]: sortDto.order },
       skip,
       take: limit,
     });
@@ -76,9 +86,11 @@ export class ProductRepository {
     userId: number,
     skip: number,
     limit: number,
+    sortDto?: SortProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: { userId },
+      orderBy: { [sortDto.sortBy]: sortDto.order },
       skip,
       take: limit,
     });

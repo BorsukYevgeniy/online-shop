@@ -104,7 +104,6 @@ describe('TokenRepository', () => {
   });
 
   it('should delete expired tokens', async () => {
-    const now = new Date();
     jest
       .spyOn(prismaService.token, 'deleteMany')
       .mockResolvedValue({ count: 1 });
@@ -113,7 +112,7 @@ describe('TokenRepository', () => {
       count: 1,
     });
     expect(prismaService.token.deleteMany).toHaveBeenCalledWith({
-      where: { expiresAt: { lt: now } },
+      where: { expiresAt: { lt: expect.any(Date) } },
     });
   });
 });

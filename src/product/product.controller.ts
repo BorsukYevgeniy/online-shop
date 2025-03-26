@@ -23,6 +23,7 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import {AuthRequest} from '../types/request.type';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
+import { SortProductDto } from './dto/sort-product.dto';
 
 @Controller('products')
 export class ProductController {
@@ -31,16 +32,18 @@ export class ProductController {
   @Get()
   async getAll(
     @Query() paginationDto: PaginationDto,
+    @Query() sortDto?: SortProductDto,
   ): Promise<PaginatedProduct> {
-    return await this.productService.getAll(paginationDto);
+    return await this.productService.getAll(paginationDto, sortDto);
   }
 
   @Get('search')
   async search(
     @Query(ValidateProductDtoPipe) dto: SearchProductDto,
     @Query() pagination: PaginationDto,
+    @Query() sortDto?: SortProductDto,
   ): Promise<PaginatedProduct> {
-    return await this.productService.search(dto, pagination);
+    return await this.productService.search(dto, pagination, sortDto);
   }
 
   @Get(':productId')

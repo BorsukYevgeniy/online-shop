@@ -3,6 +3,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Category } from '@prisma/client';
+import { SortCategoryDto } from './dto/sort-category.dto';
 
 @Injectable()
 export class CategoryRepository {
@@ -16,8 +17,16 @@ export class CategoryRepository {
     });
   }
 
-  async findAll(skip: number, limit: number): Promise<Category[]> {
-    return await this.prisma.category.findMany({ skip, take: limit });
+  async findAll(
+    skip: number,
+    limit: number,
+    sortDto?: SortCategoryDto,
+  ): Promise<Category[]> {
+    return await this.prisma.category.findMany({
+      skip,
+      take: limit,
+      orderBy: { [sortDto.sortBy]: sortDto.order },
+    });
   }
 
   async findById(id: number): Promise<Category> {
@@ -28,11 +37,13 @@ export class CategoryRepository {
     name: string,
     skip: number,
     limit: number,
+    sortDto?: SortCategoryDto,
   ): Promise<Category[]> {
     return await this.prisma.category.findMany({
       where: { name: { contains: name, mode: 'insensitive' } },
       skip,
       take: limit,
+      orderBy: { [sortDto.sortBy]: sortDto.order },
     });
   }
 

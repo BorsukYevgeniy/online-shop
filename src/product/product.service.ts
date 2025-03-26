@@ -11,6 +11,7 @@ import { FileService } from '../file/file.service';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
+import { SortProductDto } from './dto/sort-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -37,13 +38,16 @@ export class ProductService {
     return;
   }
 
-  async getAll(paginationDto: PaginationDto): Promise<PaginatedProduct> {
+  async getAll(
+    paginationDto: PaginationDto,
+    sortDto: SortProductDto,
+  ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findAll(skip, pageSize),
+      this.productRepository.findAll(skip, pageSize, sortDto),
       this.productRepository.count(),
     ]);
 
@@ -59,16 +63,17 @@ export class ProductService {
       nextPage: page < totalPages ? page + 1 : null,
     };
   }
-
+  
   async search(
     dto: SearchProductDto,
     pagination: PaginationDto,
+    sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findProducts(dto, skip, pageSize),
+      this.productRepository.findProducts(dto, skip, pageSize, sortDto),
       this.productRepository.count(dto),
     ]);
 
@@ -130,12 +135,18 @@ export class ProductService {
   async getCategoryProducts(
     categoryId: number,
     pagination: PaginationDto,
+    sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findCategoryProducts(categoryId, skip, pageSize),
+      this.productRepository.findCategoryProducts(
+        categoryId,
+        skip,
+        pageSize,
+        sortDto,
+      ),
       this.productRepository.countCategoryProducts(categoryId),
     ]);
 
@@ -155,12 +166,13 @@ export class ProductService {
   async getUserProducts(
     userId: number,
     pagination: PaginationDto,
+    sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = pagination;
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findUserProducts(userId, skip, pageSize),
+      this.productRepository.findUserProducts(userId, skip, pageSize, sortDto),
       this.productRepository.countUserProducts(userId),
     ]);
 

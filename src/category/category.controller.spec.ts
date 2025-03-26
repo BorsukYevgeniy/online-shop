@@ -5,6 +5,7 @@ import { TokenService } from '../token/token.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ProductService } from '../product/product.service';
+import { Order } from '../enum/order.enum';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -51,7 +52,7 @@ describe('CategoryController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all categories', async () => {
+  it('should return all categories with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -64,16 +65,16 @@ describe('CategoryController', () => {
 
     jest.spyOn(categoryService, 'getAll').mockResolvedValue(mockCategories);
 
-    const categories = await controller.getAll({ page: 1, pageSize: 1 });
+    const categories = await controller.getAll({ page: 1, pageSize: 1 },{sortBy: 'id', order:Order.DESC});
 
     expect(categoryService.getAll).toHaveBeenCalledWith({
       page: 1,
       pageSize: 1,
-    });
+    }, {sortBy: 'id', order:Order.DESC});
     expect(categories).toEqual(mockCategories);
   });
 
-  it('should search category', async () => {
+  it('should search category by name with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -89,11 +90,13 @@ describe('CategoryController', () => {
     const categories = await controller.search(
       { name: 'TEST' },
       { page: 1, pageSize: 1 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(categoryService.search).toHaveBeenCalledWith(
       { name: 'TEST' },
       { page: 1, pageSize: 1 },
+      { sortBy: 'id', order: Order.DESC },
     );
     expect(categories).toEqual(mockCategories);
   });
@@ -134,15 +137,19 @@ describe('CategoryController', () => {
       .spyOn(productService, 'getCategoryProducts')
       .mockResolvedValue(mockProducts);
 
-    const products = await controller.getCategoryProducts(1, {
-      page: 1,
-      pageSize: 1,
-    });
+    const products = await controller.getCategoryProducts(
+      1,
+      {
+        page: 1,
+        pageSize: 1,
+      },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
     expect(productService.getCategoryProducts).toHaveBeenCalledWith(1, {
       page: 1,
       pageSize: 1,
-    });
+    }, {sortBy: 'id', order: Order.DESC});  
     expect(products).toEqual(mockProducts);
   });
 

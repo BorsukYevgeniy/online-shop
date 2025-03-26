@@ -3,6 +3,7 @@ import { CategoryService } from './category.service';
 import { CategoryRepository } from './category.repository';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Order } from '../enum/order.enum';
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -39,7 +40,7 @@ describe('CategoryService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return all categories', async () => {
+  it('should return all categories with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -55,13 +56,19 @@ describe('CategoryService', () => {
       .spyOn(repository, 'findAll')
       .mockResolvedValue(mockCategories.categories);
 
-    const categories = await service.getAll({ page: 1, pageSize: 1 });
+    const categories = await service.getAll(
+      { page: 1, pageSize: 1 },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
-    expect(repository.findAll).toHaveBeenCalledWith(0, 1);
+    expect(repository.findAll).toHaveBeenCalledWith(0, 1, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
     expect(categories).toEqual(mockCategories);
   });
 
-  it('should search category', async () => {
+  it('should search category by name with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -80,9 +87,13 @@ describe('CategoryService', () => {
     const categories = await service.search(
       { name: 'TEST' },
       { page: 1, pageSize: 1 },
+      { sortBy: 'id', order: Order.DESC },
     );
 
-    expect(repository.findByName).toHaveBeenCalledWith('TEST', 0, 1);
+    expect(repository.findByName).toHaveBeenCalledWith('TEST', 0, 1, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
     expect(categories).toEqual(mockCategories);
   });
 

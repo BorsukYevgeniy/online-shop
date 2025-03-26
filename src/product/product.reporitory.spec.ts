@@ -1,3 +1,4 @@
+import { Order } from '../enum/order.enum';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -58,45 +59,6 @@ describe('ProductRepository', () => {
     expect(productsCount).toEqual(1);
   });
 
-  it('should find products in category', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'Product A',
-        price: 100,
-        userId: 1,
-        description: 'MOCK1 description',
-        images: ['1', '2'],
-      },
-      {
-        id: 2,
-        title: 'Product B',
-        price: 50,
-        userId: 2,
-        description: 'MOCK2 description',
-        images: ['3', '4'],
-      },
-    ];
-
-    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
-
-    const products = await repository.findCategoryProducts(1, 0, 10);
-
-    expect(prisma.product.findMany).toHaveBeenCalledWith({
-      where: {
-        categories: {
-          some: {
-            id: 1,
-          },
-        },
-      },
-      skip: 0,
-      take: 10,
-    });
-
-    expect(products).toEqual(mockProducts);
-  });
-
   it('should count user products', async () => {
     jest.spyOn(prisma.product, 'count').mockResolvedValue(1);
 
@@ -109,33 +71,6 @@ describe('ProductRepository', () => {
     });
 
     expect(productsCount).toEqual(1);
-  });
-
-  it('should find user products', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'Product A',
-        price: 100,
-        userId: 1,
-        description: 'MOCK1 description',
-        images: ['1', '2'],
-      },
-    ];
-
-    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
-
-    const products = await repository.findUserProducts(1, 0, 10);
-
-    expect(prisma.product.findMany).toHaveBeenCalledWith({
-      where: {
-        userId: 1,
-      },
-      skip: 0,
-      take: 10,
-    });
-
-    expect(products).toEqual(mockProducts);
   });
 
   it('should count all products', async () => {
@@ -263,7 +198,7 @@ describe('ProductRepository', () => {
     expect(productsCount).toEqual(1);
   });
 
-  it('should return all products', async () => {
+  it('should find user products with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -273,28 +208,81 @@ describe('ProductRepository', () => {
         description: 'MOCK1 description',
         images: ['1', '2'],
       },
+    ];
+
+    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
+
+    const products = await repository.findUserProducts(1, 0, 10, {sortBy: 'id', order: Order.DESC});
+
+    expect(prisma.product.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: 1,
+      },
+      skip: 0,
+      take: 10,
+      orderBy: { id: 'desc' },
+    });
+
+    expect(products).toEqual(mockProducts);
+  });
+
+  it('should find products in category with default sorting', async () => {
+    const mockProducts = [
       {
-        id: 2,
-        title: 'Product B',
-        price: 50,
-        userId: 2,
-        description: 'MOCK2 description',
-        images: ['3', '4'],
+        id: 1,
+        title: 'Product A',
+        price: 100,
+        userId: 1,
+        description: 'MOCK1 description',
+        images: ['1', '2'],
       },
     ];
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findAll(0, 10);
+    const products = await repository.findCategoryProducts(1, 0, 10, {sortBy: 'id', order: Order.DESC});
+
+    expect(prisma.product.findMany).toHaveBeenCalledWith({
+      where: {
+        categories: {
+          some: {
+            id: 1,
+          },
+        },
+      },
+      skip: 0,
+      take: 10,
+      orderBy: { id: 'desc' },
+    });
+
+    expect(products).toEqual(mockProducts);
+  });
+
+  it('should return all products with default sorting', async () => {
+    const mockProducts = [
+      {
+        id: 1,
+        title: 'Product A',
+        price: 100,
+        userId: 1,
+        description: 'MOCK1 description',
+        images: ['1', '2'],
+      },
+    ];
+
+    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
+
+    const products = await repository.findAll(0, 10, {sortBy: 'id', order: Order.DESC})
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       skip: 0,
       take: 10,
+      orderBy: { id: 'desc' },
     });
     expect(products).toEqual(mockProducts);
   });
 
-  it('should search products by title', async () => {
+  it('should search products by title with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -308,7 +296,12 @@ describe('ProductRepository', () => {
 
     jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-    const products = await repository.findProducts({ title: 'Test' }, 0, 10);
+    const products = await repository.findProducts(
+      { title: 'Test' },
+      0,
+      10,
+      {sortBy: 'id', order: Order.DESC},
+    );
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: {
@@ -325,14 +318,14 @@ describe('ProductRepository', () => {
           },
         },
       },
-
       skip: 0,
       take: 10,
+      orderBy: { id: 'desc' },
     });
     expect(products).toEqual(mockProducts);
   });
 
-  it('should search products by title and price range', async () => {
+  it('should search products by title and price range with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -350,6 +343,7 @@ describe('ProductRepository', () => {
       { title: 'Test', minPrice: 100, maxPrice: 200 },
       0,
       10,
+      {sortBy: 'id', order: Order.DESC},
     );
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
@@ -369,11 +363,12 @@ describe('ProductRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: { id: 'desc' },
     });
     expect(products).toEqual(mockProducts);
   });
 
-  it('should search products by title and category ids', async () => {
+  it('should search products by title and category ids with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -391,6 +386,7 @@ describe('ProductRepository', () => {
       { title: 'Test', categoryIds: [1] },
       0,
       10,
+      {sortBy: 'id', order: Order.DESC},
     );
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
@@ -410,11 +406,12 @@ describe('ProductRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: { id: 'desc' },
     });
     expect(products).toEqual(mockProducts);
   });
 
-  it('should search products by title ,price range and category ids', async () => {
+  it('should search products by title ,price range and category ids with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -432,6 +429,7 @@ describe('ProductRepository', () => {
       { title: 'Test', minPrice: 100, maxPrice: 200, categoryIds: [1] },
       0,
       10,
+      {sortBy: 'id', order: Order.DESC}
     );
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
@@ -451,6 +449,7 @@ describe('ProductRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: { id: 'desc' },
     });
     expect(products).toEqual(mockProducts);
   });

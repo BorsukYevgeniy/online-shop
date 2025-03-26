@@ -9,11 +9,12 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import {
   UserNoPassword,
   UserNoCred,
-  PaginatedUserRolesNoCreds,
+  PaginatedUserNoCreds,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
+import { SortUserDto } from './dto/sort-user.dto';
 
 @Injectable()
 export class UserService {
@@ -21,12 +22,13 @@ export class UserService {
 
   async getAll(
     paginationDto: PaginationDto,
-  ): Promise<PaginatedUserRolesNoCreds> {
+    sortDto: SortUserDto,
+  ): Promise<PaginatedUserNoCreds> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
     const [users, total] = await Promise.all([
-      this.userRepository.findAll(skip, pageSize),
+      this.userRepository.findAll(skip, pageSize, sortDto),
       this.userRepository.count(),
     ]);
 
@@ -46,12 +48,13 @@ export class UserService {
   async search(
     dto: SearchUserDto,
     pagination: PaginationDto,
-  ): Promise<PaginatedUserRolesNoCreds> {
+    sortDto: SortUserDto,
+  ): Promise<PaginatedUserNoCreds> {
     const { page, pageSize }: PaginationDto = pagination;
     const skip: number = pageSize * (page - 1);
 
     const [users, total] = await Promise.all([
-      this.userRepository.findUsers(dto, skip, pageSize),
+      this.userRepository.findUsers(dto, skip, pageSize, sortDto),
       this.userRepository.count(dto),
     ]);
 

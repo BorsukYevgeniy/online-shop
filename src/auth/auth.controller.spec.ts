@@ -3,9 +3,9 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import AuthRequest from '../types/request.type';
+import {AuthRequest} from '../types/request.type';
 import { TokenService } from '../token/token.service';
-import Role from '../enum/role.enum';
+import {Role} from '../enum/role.enum';
 
 describe('AuthController', () => {
   let controller: AuthController;

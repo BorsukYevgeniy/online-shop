@@ -2,7 +2,8 @@ import { Product, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
-import Role from '../enum/role.enum';
+import { Role } from '../enum/role.enum';
+import { Order } from '../enum/order.enum';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -156,7 +157,7 @@ describe('UserRepository', () => {
     });
   });
 
-  it('should get all users', async () => {
+  it('should get all users with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -171,7 +172,10 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findAll(0, 10);
+    const users = await repository.findAll(0, 10, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       select: {
@@ -182,12 +186,15 @@ describe('UserRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: {
+        id: 'desc',
+      },
     });
 
     expect(users).toEqual(mockUsers);
   });
 
-  it('should search user by nickname', async () => {
+  it('should search user by nickname with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -202,7 +209,10 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findUsers({ nickname: 'test' }, 0, 10);
+    const users = await repository.findUsers({ nickname: 'test' }, 0, 10, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
       where: {
@@ -222,12 +232,15 @@ describe('UserRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: {
+        id: 'desc'
+      }
     });
 
     expect(users).toEqual(mockUsers);
   });
 
-  it('should search user by nickname and min date', async () => {
+  it('should search user by nickname and min date with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -249,6 +262,7 @@ describe('UserRepository', () => {
       },
       0,
       10,
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
@@ -267,12 +281,15 @@ describe('UserRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: {
+        id: 'desc',
+      },
     });
 
     expect(users).toEqual(mockUsers);
   });
 
-  it('should search user by nickname and max date', async () => {
+  it('should search user by nickname and max date with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -294,6 +311,7 @@ describe('UserRepository', () => {
       },
       0,
       10,
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
@@ -312,12 +330,15 @@ describe('UserRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: {
+        id: 'desc',
+      },
     });
 
     expect(users).toEqual(mockUsers);
   });
 
-  it('should search user by nickname and date range', async () => {
+  it('should search user by nickname and date range with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -340,6 +361,7 @@ describe('UserRepository', () => {
       },
       0,
       10,
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
@@ -360,6 +382,9 @@ describe('UserRepository', () => {
       },
       skip: 0,
       take: 10,
+      orderBy: {
+        id: 'desc',
+      },
     });
 
     expect(users).toEqual(mockUsers);

@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import Role from '../enum/role.enum';
+import {Role} from '../enum/role.enum';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
