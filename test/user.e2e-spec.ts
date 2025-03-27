@@ -53,7 +53,6 @@ describe('UserController (e2e)', () => {
       select: { id: true },
     });
 
-
     const [adminRes, userRes] = await Promise.all([
       //Login as admin
       request(app.getHttpServer())
@@ -241,6 +240,13 @@ describe('UserController (e2e)', () => {
     });
   });
 
+  it('GET /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .get(`/users/${userId-1}`)
+      .set('Cookie', [`accessToken=${userAccessToken}`])
+      .expect(404);
+  });
+
   it('GET /users/:userId/products - 200 OK - Should return produts of user', async () => {
     const { body: users } = await request(app.getHttpServer())
       .get(`/users/${userId}/products`)
@@ -272,6 +278,13 @@ describe('UserController (e2e)', () => {
     });
   });
 
+  it('PATCH /users/assing-admin/:userId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .patch(`/users/assing-admin/${userId-1}`)
+      .set('Cookie', [`accessToken=${adminAccessToken}`])
+      .expect(404);
+  });
+
   it('DELETE /users/me - 204 NO CONTENT - Should delete user by himself', async () => {
     await request(app.getHttpServer())
       .delete('/users/me')
@@ -284,5 +297,13 @@ describe('UserController (e2e)', () => {
       .delete(`/users/${adminId}`)
       .set('Cookie', [`accessToken=${adminAccessToken}`])
       .expect(204);
+  });
+
+  
+  it('DELETE /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .delete(`/users/assing-admin/${userId-1}`)
+      .set('Cookie', [`accessToken=${userAccessToken}`])
+      .expect(404);
   });
 });

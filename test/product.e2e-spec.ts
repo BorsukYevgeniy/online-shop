@@ -131,6 +131,12 @@ describe('ProductController (e2e)', () => {
     });
   });
 
+  it('GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .get(`/products/${productId -1}`)
+      .expect(404);
+  });
+
   it('GET /products/search - 200 OK - Should search the product by title', async () => {
     const { body: product } = await request(app.getHttpServer())
       .get(`/products/${productId}`)
@@ -274,6 +280,15 @@ describe('ProductController (e2e)', () => {
     });
   });
 
+  it('PATCH /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    const dto: UpdateProductDto = { title: 'New Product' };
+    await request(app.getHttpServer())
+      .patch(`/products/${productId -1}`)
+      .set('Cookie', [`accessToken=${accessToken}`])
+      .send(dto)
+      .expect(404);
+  });
+
   it('PATCH /products/:productId - 200 OK - Should update description in product', async () => {
     const dto: UpdateProductDto = { description: 'New description' };
     const { body: product } = await request(app.getHttpServer())
@@ -401,5 +416,12 @@ describe('ProductController (e2e)', () => {
       .set('Cookie', [`accessToken=${accessToken}`])
       .expect(204)
       .expect({});
+  });
+
+  it('DELETE /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .delete(`/products/${productId -1}`)
+      .set('Cookie', [`accessToken=${accessToken}`])
+      .expect(404)
   });
 });

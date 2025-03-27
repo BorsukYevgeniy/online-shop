@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryRepository } from './category.repository';
@@ -7,6 +11,8 @@ import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { PaginatedCategory } from './type/category.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
+import { instanceToInstance } from 'class-transformer';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class CategoryService {
@@ -69,21 +75,40 @@ export class CategoryService {
   }
 
   async getById(categoryId: number): Promise<Category> {
-    return this.categoryRepository.findById(categoryId);
+    const category = await this.categoryRepository.findById(categoryId);
+
+    if (!category) throw new NotFoundException('Category not found');
+
+    return category;
   }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    return this.categoryRepository.create(createCategoryDto);
+    try {
+      return await this.categoryRepository.create(createCategoryDto);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError)
+        throw new BadRequestException('Category already exists');
+    }
   }
 
   async update(
     categoryId: number,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    return this.categoryRepository.update(categoryId, updateCategoryDto);
+    try {
+      return await this.categoryRepository.update(categoryId, updateCategoryDto);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError)
+        throw new NotFoundException('Category not found');
+    }
   }
 
-  async delete(categoryrId: number): Promise<void> {
-    return this.categoryRepository.delete(categoryrId);
+  async delete(categoryId: number): Promise<void> {
+    try {
+      await this.categoryRepository.delete(categoryId);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError)
+        throw new NotFoundException('Category not found');
+    }
   }
 }

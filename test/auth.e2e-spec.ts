@@ -42,6 +42,13 @@ describe('AuthController (e2e)', () => {
     });
   });
 
+  it('POST /auth/register - 400 BAD REQUEST - Should return 400 http code', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/registration')
+      .send({ email: 'user@gmail.com', nickname: 'user', password: 'password' })
+      .expect(400);
+  });
+
   let accessToken: string, refreshToken: string;
   it('POST /auth/login - 200 OK - Should login a user', async () => {
     const res = await request(app.getHttpServer())
@@ -53,6 +60,13 @@ describe('AuthController (e2e)', () => {
     refreshToken = res.headers['set-cookie'][1].split('=')[1].split(';')[0];
   });
 
+  it('POST /auth/login - 404 NOT FOUND - Should return 404 code', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email: 'user1@gmail.com', password: 'password' })
+      .expect(404);
+  });
+
   it('POST /auth/refresh - 200 OK - Should refresh pair of JWT token', async () => {
     await request(app.getHttpServer())
       .post('/auth/refresh')
@@ -60,7 +74,7 @@ describe('AuthController (e2e)', () => {
       .expect(200);
   });
 
-  it('POST /auth/logout - 200 OK- Should logout a user', async () => {
+  it('POST /auth/logout - 200 OK - Should logout a user', async () => {
     await request(app.getHttpServer())
       .post('/auth/logout')
       .set('Cookie', [`refreshToken=${refreshToken}`])

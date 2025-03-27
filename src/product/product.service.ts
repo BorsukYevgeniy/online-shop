@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -11,6 +12,7 @@ import { PaginationDto } from 'src/dto/pagination.dto';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductService {
@@ -62,7 +64,7 @@ export class ProductService {
       nextPage: page < totalPages ? page + 1 : null,
     };
   }
-  
+
   async search(
     searchProductDto: SearchProductDto,
     paginationDto: PaginationDto,
@@ -72,7 +74,12 @@ export class ProductService {
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findProducts(searchProductDto, skip, pageSize, sortProductDto),
+      this.productRepository.findProducts(
+        searchProductDto,
+        skip,
+        pageSize,
+        sortProductDto,
+      ),
       this.productRepository.count(searchProductDto),
     ]);
 
@@ -103,9 +110,18 @@ export class ProductService {
     createProductDto: CreateProductDto,
     images: Express.Multer.File[],
   ): Promise<ProductCategory> {
-    const imagesNames: string[] = await this.fileService.createImages(images);
+    try {
+      const imagesNames: string[] = await this.fileService.createImages(images);
 
-    return await this.productRepository.create(userId, createProductDto, imagesNames);
+      return await this.productRepository.create(
+        userId,
+        createProductDto,
+        imagesNames,
+      );
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError)
+        throw new BadRequestException('Product already exist');
+    }
   }
 
   async update(
@@ -116,19 +132,33 @@ export class ProductService {
   ): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
 
-    let imagesNames: string[] = [];
+    try {
+      let imagesNames: string[] = [];
 
-    if (images && images.length > 0) {
-      imagesNames = await this.fileService.createImages(images);
+      if (images && images.length > 0) {
+        imagesNames = await this.fileService.createImages(images);
+      }
+
+      return await this.productRepository.update(
+        productId,
+        updateProductDto,
+        imagesNames,
+      );
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError)
+        throw new NotFoundException('Product not found');
     }
-
-    return await this.productRepository.update(productId, updateProductDto, imagesNames);
   }
 
   async delete(userId: number, productId: number): Promise<void> {
     await this.validateProductOwnership(userId, productId);
 
-    return await this.productRepository.delete(productId);
+    try {
+      return await this.productRepository.delete(productId);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError)
+        throw new NotFoundException('Product not found');
+    }
   }
 
   async getCategoryProducts(
@@ -171,7 +201,12 @@ export class ProductService {
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findUserProducts(userId, skip, pageSize, sortProductDto),
+      this.productRepository.findUserProducts(
+        userId,
+        skip,
+        pageSize,
+        sortProductDto,
+      ),
       this.productRepository.countUserProducts(userId),
     ]);
 

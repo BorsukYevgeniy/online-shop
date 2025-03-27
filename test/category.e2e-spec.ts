@@ -90,6 +90,14 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
+  it('POST /categories - 400 BAD REQUEST - Should return 400 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .post('/categories')
+      .send({ name: 'Category', description: 'Category description' })
+      .set('Cookie', [`accessToken=${accessToken}`])
+      .expect(400);
+  });
+
   it("GET /categories/:categoryId - 200 OK - Should get a category by it's id", async () => {
     const { body: category } = await request(app.getHttpServer())
       .get(`/categories/${categoryId}`)
@@ -100,6 +108,12 @@ describe('CategoryController (e2e)', () => {
       name: 'Category',
       description: 'Category description',
     });
+  });
+
+  it('GET /categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .get(`/categories/${categoryId - 1}`)
+      .expect(404);
   });
 
   it('GET /categories/search - 200 OK - Should search categories by name', async () => {
@@ -125,7 +139,7 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('GET /categories/:categoryId/products - 200 OK - Should get a category prpducts', async () => {
+  it('GET /categories/:categoryId/products - 200 OK - Should get a category products', async () => {
     const { body: category } = await request(app.getHttpServer())
       .get(`/categories/${categoryId}/products`)
       .expect(200);
@@ -155,6 +169,14 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
+  it('PATCH /categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .patch(`/categories/${categoryId - 1}`)
+      .send({ name: 'New category name' })
+      .set('Cookie', [`accessToken=${accessToken}`])
+      .expect(404);
+  });
+
   it('PATCH /categories/:categoryId - 200 OK - Should update name and description in category', async () => {
     const { body: category } = await request(app.getHttpServer())
       .patch(`/categories/${categoryId}`)
@@ -178,5 +200,12 @@ describe('CategoryController (e2e)', () => {
       .set('Cookie', [`accessToken=${accessToken}`])
       .expect(204)
       .expect({});
+  });
+
+  it('DELETE /categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
+    await request(app.getHttpServer())
+      .delete(`/categories/${categoryId}`)
+      .set('Cookie', [`accessToken=${accessToken}`])
+      .expect(404);
   });
 });
