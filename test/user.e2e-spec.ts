@@ -126,125 +126,74 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/search - 200 OK - Should search user by nickname with default sorting', async () => {
-    const { body: users } = await request(app.getHttpServer())
-      .get('/users/search')
-      .query({ nickname: 'use' })
-      .expect(200);
-
-    expect(users).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      prevPage: null,
-      total: 1,
-      totalPages: 1,
-      users: [
+  describe('GET /users/search - Should search users', () => {
+    it.each([
+      [
+        'GET /users/search - 200 OK - Should search user by nickname',
+        { nickname: 'use' },
+      ],
+      [
+        'GET /users/search - 200 OK - Should search user by nickname and min date',
+        { nickname: 'use', minDate: '2024-01-01' },
+      ],
+      [
+        'GET /users/search - 200 OK - Should search user by nickname and max date',
+        { nickname: 'use', maxDate: '2100-01-01' },
+      ],
+      [
+        'GET /users/search - 200 OK - Should search user by nickname and date range',
         {
-          createdAt: expect.any(String),
-          nickname: 'user',
-          id: expect.any(Number),
-          role: 'USER',
+          nickname: 'use',
+          minDate: '2022-01-01',
+          maxDate: '2100-01-01',
         },
       ],
+    ])('%s', async (_, query) => {
+      const { body: users } = await request(app.getHttpServer())
+        .get('/users/search')
+        .query(query)
+        .expect(200);
+
+      expect(users).toEqual({
+        nextPage: null,
+        page: 1,
+        pageSize: 10,
+        prevPage: null,
+        total: 1,
+        totalPages: 1,
+        users: [
+          {
+            createdAt: expect.any(String),
+            nickname: 'user',
+            id: expect.any(Number),
+            role: 'USER',
+          },
+        ],
+      });
     });
   });
 
-  it('GET /users/search - 200 OK - Should search user by nickname and min date with default sorting', async () => {
-    const { body: users } = await request(app.getHttpServer())
-      .get('/users/search')
-      .query({ nickname: 'use' })
-      .query({ minDate: '2024-01-01' })
-      .expect(200);
+  describe('GET /users/:userId - Should return user id', () => {
+    it.each([
+      ['GET /users/:userId - 200 OK - Should return user searched by id', 200],
+      ['GET /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', 404],
+    ])('%s', async (_, statusCode) => {
+      const { body } = await request(app.getHttpServer())
+        .get(`/users/${statusCode === 404 ? userId - 2 : userId}`)
+        .set('Cookie', [`accessToken=${userAccessToken}`])
+        .expect(statusCode);
 
-    expect(users).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      prevPage: null,
-      total: 1,
-      totalPages: 1,
-      users: [
-        {
-          createdAt: expect.any(String),
-          nickname: 'user',
-          id: expect.any(Number),
-          role: 'USER',
-        },
-      ],
+      expect(body).toEqual(
+        statusCode === 404
+          ? { message: 'User not found', error: 'Not Found', statusCode: 404 }
+          : {
+              createdAt: expect.any(String),
+              nickname: 'user',
+              id: expect.any(Number),
+              role: 'USER',
+            },
+      );
     });
-  });
-
-  it('GET /users/search - 200 OK - Should search user by nickname and max date with default sorting', async () => {
-    const { body: users } = await request(app.getHttpServer())
-      .get('/users/search')
-      .query({ nickname: 'use' })
-      .query({ maxDate: '2100-01-01' })
-      .expect(200);
-
-    expect(users).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      prevPage: null,
-      total: 1,
-      totalPages: 1,
-      users: [
-        {
-          createdAt: expect.any(String),
-          nickname: 'user',
-          id: expect.any(Number),
-          role: 'USER',
-        },
-      ],
-    });
-  });
-
-  it('GET /users/search - 200 OK - Should search user by nickname and date range with default sorting', async () => {
-    const { body: users } = await request(app.getHttpServer())
-      .get('/users/search')
-      .query({ nickname: 'use' })
-      .query({ minDate: '2022-01-01' })
-      .query({ maxDate: '2100-01-01' })
-      .expect(200);
-
-    expect(users).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      prevPage: null,
-      total: 1,
-      totalPages: 1,
-      users: [
-        {
-          createdAt: expect.any(String),
-          nickname: 'user',
-          id: expect.any(Number),
-          role: 'USER',
-        },
-      ],
-    });
-  });
-
-  it('GET /users/:userId - 200 OK - Should return user id', async () => {
-    const { body: users } = await request(app.getHttpServer())
-      .get(`/users/${userId}`)
-      .set('Cookie', [`accessToken=${userAccessToken}`])
-      .expect(200);
-
-    expect(users).toEqual({
-      createdAt: expect.any(String),
-      nickname: 'user',
-      id: expect.any(Number),
-      role: 'USER',
-    });
-  });
-
-  it('GET /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
-    await request(app.getHttpServer())
-      .get(`/users/${userId-1}`)
-      .set('Cookie', [`accessToken=${userAccessToken}`])
-      .expect(404);
   });
 
   it('GET /users/:userId/products - 200 OK - Should return produts of user', async () => {
@@ -264,25 +213,35 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('PATCH /users/assing-admin/:userId - 200 OK - Should assign user to admin', async () => {
-    const { body: user } = await request(app.getHttpServer())
-      .patch(`/users/assing-admin/${userId}`)
-      .set('Cookie', [`accessToken=${adminAccessToken}`])
-      .expect(200);
+  describe('PATCH /users/assing-admin/:userId - Should assign user to admin', () => {
+    it.each([
+      [
+        'PATCH /users/assing-admin/:userId - 200 OK - Should assign user to admin',
+        200,
+      ],
+      [
+        'PATCH /users/assing-admin/:userId - 404 NOT FOUND - Should return 404 HTTP code',
+        404,
+      ],
+    ])('%s', async (_, statusCode) => {
+      const { body } = await request(app.getHttpServer())
+        .patch(
+          `/users/assing-admin/${statusCode === 404 ? userId - 2 : userId}`,
+        )
+        .set('Cookie', [`accessToken=${adminAccessToken}`])
+        .expect(statusCode);
 
-    expect(user).toEqual({
-      id: expect.any(Number),
-      nickname: 'user',
-      role: 'ADMIN',
-      createdAt: expect.any(String),
+      expect(body).toEqual(
+        statusCode === 404
+          ? { error: 'Not Found', message: 'User not found', statusCode: 404 }
+          : {
+              id: expect.any(Number),
+              nickname: 'user',
+              role: 'ADMIN',
+              createdAt: expect.any(String),
+            },
+      );
     });
-  });
-
-  it('PATCH /users/assing-admin/:userId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
-    await request(app.getHttpServer())
-      .patch(`/users/assing-admin/${userId-1}`)
-      .set('Cookie', [`accessToken=${adminAccessToken}`])
-      .expect(404);
   });
 
   it('DELETE /users/me - 204 NO CONTENT - Should delete user by himself', async () => {
@@ -292,18 +251,21 @@ describe('UserController (e2e)', () => {
       .expect(204);
   });
 
-  it('DELETE /users/:userId - 204 NO CONTENT - Should delete user by id', async () => {
-    await request(app.getHttpServer())
-      .delete(`/users/${adminId}`)
-      .set('Cookie', [`accessToken=${adminAccessToken}`])
-      .expect(204);
-  });
-
-  
-  it('DELETE /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
-    await request(app.getHttpServer())
-      .delete(`/users/assing-admin/${userId-1}`)
-      .set('Cookie', [`accessToken=${userAccessToken}`])
-      .expect(404);
+  describe('DELETE /users/:userId - Should delete user by id', () => {
+    it.each([
+      [
+        'DELETE /users/:userId - 204 NO CONTENT - Should delete user by id',
+        204,
+      ],
+      [
+        'DELETE /users/:userId - 404 NOT FOUND - Should return 404 HTTP code',
+        404,
+      ],
+    ])('%s', async (_, statusCode) => {
+      await request(app.getHttpServer())
+        .delete(`/users/${statusCode === 404 ? adminId - 2 : adminId}`)
+        .set('Cookie', [`accessToken=${adminAccessToken}`])
+        .expect(statusCode);
+    });
   });
 });
