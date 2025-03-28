@@ -133,113 +133,165 @@ describe('ProductController (e2e)', () => {
 
   it('GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
     await request(app.getHttpServer())
-      .get(`/products/${productId -1}`)
+      .get(`/products/${productId - 1}`)
       .expect(404);
   });
 
   it('GET /products/search - 200 OK - Should search the product by title', async () => {
     const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
+      .get('/products/search')
       .query({ title: 'Prod' })
       .expect(200);
 
     expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      nextPage: null,
+      total: 1,
+      totalPages: 1,
+      page: 1,
+      pageSize: 10,
+      prevPage: null,
+      products: [
+        {
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        },
       ],
-      images: expect.any(Array<String>),
-      userId,
     });
   });
 
   it('GET /products/search - 200 OK - Should search the product by title and min price', async () => {
     const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
+      .get('/products/search')
       .query({ title: 'Prod' })
       .query({ minPrice: 50 })
       .expect(200);
 
     expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+      total: 1,
+      totalPages: 1,
+      prevPage: null,
+      products: [
+        {
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        },
       ],
-      images: expect.any(Array<String>),
-      userId,
     });
   });
 
   it('GET /products/search - 200 OK - Should search the product by title and max price', async () => {
     const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
+      .get('/products/search')
       .query({ title: 'Prod' })
       .query({ maxPrice: 150 })
       .expect(200);
 
     expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+      total: 1,
+      totalPages: 1,
+      prevPage: null,
+      products: [
+        {
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        },
       ],
-      images: expect.any(Array<String>),
-      userId,
     });
   });
 
   it('GET /products/search - 200 OK - Should search the product by title and price range', async () => {
     const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
+      .get('/products/search')
       .query({ title: 'Prod' })
       .query({ maxPrice: 150 })
       .query({ minPrice: 50 })
       .expect(200);
 
     expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+      total: 1,
+      totalPages: 1,
+      prevPage: null,
+      products: [
+        {
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        },
       ],
-      images: expect.any(Array<String>),
-      userId,
     });
   });
 
   it('GET /products/search - 200 OK - Should search the product by title and categories', async () => {
     const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
+      .get('/products/search')
       .query({ title: 'Prod' })
       .query({ categoryIds: [category1Id] })
       .expect(200);
 
     expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+
+      total: 1,
+      totalPages: 1,
+      prevPage: null,
+      products: [
+        {
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        },
       ],
-      images: expect.any(Array<String>),
-      userId,
     });
   });
 
   it('GET /products/search - 200 OK - Should search the product by title ,categories and price range', async () => {
     const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
+      .get('/products/search')
       .query({ title: 'Prod' })
       .query({ categoryIds: [category1Id] })
       .query({ maxPrice: 150 })
@@ -247,15 +299,25 @@ describe('ProductController (e2e)', () => {
       .expect(200);
 
     expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      nextPage: null,
+      page: 1,
+      total: 1,
+      totalPages: 1,
+      pageSize: 10,
+      prevPage: null,
+      products: [
+        {
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        },
       ],
-      images: expect.any(Array<String>),
-      userId,
     });
   });
 
@@ -283,7 +345,7 @@ describe('ProductController (e2e)', () => {
   it('PATCH /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
     const dto: UpdateProductDto = { title: 'New Product' };
     await request(app.getHttpServer())
-      .patch(`/products/${productId -1}`)
+      .patch(`/products/${productId - 1}`)
       .set('Cookie', [`accessToken=${accessToken}`])
       .send(dto)
       .expect(404);
@@ -420,8 +482,8 @@ describe('ProductController (e2e)', () => {
 
   it('DELETE /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
     await request(app.getHttpServer())
-      .delete(`/products/${productId -1}`)
+      .delete(`/products/${productId - 1}`)
       .set('Cookie', [`accessToken=${accessToken}`])
-      .expect(404)
+      .expect(404);
   });
 });
