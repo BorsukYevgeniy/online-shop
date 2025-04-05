@@ -10,6 +10,8 @@ import { ProductModule } from '../src/product/product.module';
 import { hash } from 'bcryptjs';
 import { UpdateProductDto } from 'src/product/dto/update-product.dto';
 import { SearchProductDto } from 'src/product/dto/search-product.dto';
+import { CreateProductDto } from 'src/product/dto/create-product.dto';
+import { devNull } from 'node:os';
 
 describe('ProductController (e2e)', () => {
   let app: NestExpressApplication;
@@ -88,29 +90,89 @@ describe('ProductController (e2e)', () => {
   });
 
   let productId: number;
-  it('POST /products - 201 CREATED - Should create a product', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .post('/products')
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .field('title', 'Product')
-      .field('description', 'Description')
-      .field('price', 100)
-      .field('categoryIds', [category1Id])
-      .attach('images', Buffer.from('mockImageData'), 'file1.jpg')
-      .expect(201);
-
-    productId = product.id;
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+  describe('POST /product - Should create a product', () => {
+    it.each<[string, 201 | 400, CreateProductDto | null, Buffer | null]>([
+      [
+        'POST /product - 200 OK - Should create a product',
+        201,
+        {
+          title: 'Product',
+          price: 100,
+          description: 'Description',
+          categoryIds: [category1Id],
+        },
+        Buffer.from('mockImageData'),
       ],
-      images: expect.any(Array<String>),
-      userId,
+      [
+        'POST /product - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
+        400,
+        {
+          title: 's',
+          price: 100,
+          description: 'Description',
+          categoryIds: [category1Id],
+        },
+        null,
+      ],
+      [
+        'POST /product - 400 BAD REQUEST - Should return 400 HTTP code because price not valid',
+        400,
+        {
+          title: 'Title',
+          price: -100,
+          description: 'Description',
+          categoryIds: [category1Id],
+        },
+        null,
+      ],
+      [
+        'POST /product - 400 BAD REQUEST - Should return 400 HTTP code because description not valid',
+        400,
+        {
+          title: 'Title',
+          price: 100,
+          description: 'De',
+          categoryIds: [category1Id],
+        },
+        null,
+      ],
+    ])('%s', async (_, statusCode, dto, file) => {
+      const requestBuilder = request(app.getHttpServer())
+        .post('/products')
+        .set('Cookie', [`accessToken=${accessToken}`]);
+
+      if (dto) {
+        Object.entries(dto).forEach(([key, value]) => {
+          if (key && value) {
+            requestBuilder.field(
+              key,
+              key === 'categoryIds' ? [category1Id] : value,
+            );
+          }
+        });
+      }
+
+      if (file) {
+        requestBuilder.attach('images', file);
+      }
+
+      const { body: product } = await requestBuilder.expect(statusCode);
+
+      if (statusCode === 201) {
+        productId = product.id;
+
+        expect(product).toEqual({
+          id: expect.any(Number),
+          title: 'Product',
+          description: 'Description',
+          price: 100,
+          categories: [
+            { id: category1Id, name: 'category', description: 'description' },
+          ],
+          images: expect.any(Array<String>),
+          userId,
+        });
+      }
     });
   });
 
@@ -121,7 +183,7 @@ describe('ProductController (e2e)', () => {
         200,
       ],
       [
-        'GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        'GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code because product not found',
         404,
       ],
     ])('%s', async (_, status) => {
@@ -146,30 +208,35 @@ describe('ProductController (e2e)', () => {
   });
 
   describe('GET /products/search - Should search product', () => {
-    it.each<[string, SearchProductDto]>([
+    it.each<[string, 200 | 400, SearchProductDto]>([
       [
         'GET /products/search - 200 OK - Should search the product by title',
+        200,
         { title: 'Prod' },
       ],
       [
         'GET /products/search - 200 OK - Should search the product by title and min price',
-
+        200,
         { title: 'Prod', minPrice: 50 },
       ],
       [
         'GET /products/search - 200 OK - Should search the product by title and max price',
+        200,
         { title: 'Prod', maxPrice: 150 },
       ],
       [
         'GET /products/search - 200 OK - Should search the product by title and price range',
+        200,
         { title: 'Prod', minPrice: 50, maxPrice: 150 },
       ],
       [
         'GET /products/search - 200 OK - Should search the product by title and categories',
+        200,
         { title: 'Prod', categoryIds: [category1Id] },
       ],
       [
         'GET /products/search - 200 OK - Should search the product by title ,categories and price range',
+        200,
         {
           title: 'Prod',
           categoryIds: [category1Id],
@@ -177,35 +244,57 @@ describe('ProductController (e2e)', () => {
           maxPrice: 150,
         },
       ],
-    ])('%s', async (_, dto) => {
+      [
+        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
+        400,
+        { title: '' },
+      ],
+      [
+        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because minPrice not valid',
+        400,
+        { title: 'Title', minPrice: -1 },
+      ],
+      [
+        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because maxPrice not valid',
+        400,
+        { title: 'Title', maxPrice: -1 },
+      ],
+      [
+        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        400,
+        { title: 'T', minPrice: -1, maxPrice: -10, categoryIds: [category1Id] },
+      ],
+    ])('%s', async (_, statusCode, dto) => {
       const { body } = await request(app.getHttpServer())
         .get('/products/search')
         .query(dto)
-        .expect(200);
+        .expect(statusCode);
 
-      expect(body).toEqual({
-        nextPage: null,
-        total: 1,
-        totalPages: 1,
-        page: 1,
-        pageSize: 10,
-        prevPage: null,
-        products: [
-          {
-            id: expect.any(Number),
-            title: 'Product',
-            description: 'Description',
-            price: 100,
-            images: expect.any(Array<String>),
-            userId,
-          },
-        ],
-      });
+      if (statusCode === 200) {
+        expect(body).toEqual({
+          nextPage: null,
+          total: 1,
+          totalPages: 1,
+          page: 1,
+          pageSize: 10,
+          prevPage: null,
+          products: [
+            {
+              id: expect.any(Number),
+              title: 'Product',
+              description: 'Description',
+              price: 100,
+              images: expect.any(Array<String>),
+              userId,
+            },
+          ],
+        });
+      }
     });
   });
 
-  describe('PATCH /products/:productId - Should update title in product', () => {
-    it.each<[string, 200 | 404, UpdateProductDto | null, Buffer | null]>([
+  describe('PATCH /products/:productId - Should update product', () => {
+    it.each<[string, 200 | 400 | 404, UpdateProductDto | null, Buffer | null]>([
       [
         'PATCH /products/:productId - 200 OK - Should update title in product',
         200,
@@ -234,6 +323,31 @@ describe('ProductController (e2e)', () => {
         'PATCH /products/:productId - 200 OK - Should update categories in product',
         200,
         { categoryIds: [category2Id] },
+        null,
+      ],
+      [
+        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
+        400,
+        { title: 'T' },
+        null,
+      ],
+      [
+        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because price not valid',
+        400,
+        { price: -1 },
+        null,
+      ],
+      [
+        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because description not valid',
+        400,
+        { description: 'De' },
+        null,
+      ],
+
+      [
+        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        400,
+        { title: '', price: -1, description: '' },
         null,
       ],
     ])('%s', async (_, statusCode, dto, file) => {

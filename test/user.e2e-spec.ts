@@ -8,6 +8,7 @@ import { UserModule } from '../src/user/user.module';
 import * as request from 'supertest';
 import { hash } from 'bcryptjs';
 import { ValidationPipe } from '@nestjs/common';
+import { SearchUserDto } from 'src/user/dto/search-user.dto';
 
 describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
@@ -127,49 +128,81 @@ describe('UserController (e2e)', () => {
   });
 
   describe('GET /users/search - Should search users', () => {
-    it.each([
+    it.each<
+      [
+        string,
+        200 | 400,
+        { nickname: string; minDate?: string; maxDate?: string } | null,
+      ]
+    >([
       [
         'GET /users/search - 200 OK - Should search user by nickname',
+        200,
         { nickname: 'use' },
       ],
       [
         'GET /users/search - 200 OK - Should search user by nickname and min date',
+        200,
         { nickname: 'use', minDate: '2024-01-01' },
       ],
       [
         'GET /users/search - 200 OK - Should search user by nickname and max date',
+        200,
         { nickname: 'use', maxDate: '2100-01-01' },
       ],
       [
         'GET /users/search - 200 OK - Should search user by nickname and date range',
+        200,
         {
           nickname: 'use',
           minDate: '2022-01-01',
           maxDate: '2100-01-01',
         },
       ],
-    ])('%s', async (_, query) => {
+      [
+        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because nickname not valid',
+        400,
+        { nickname: 'us' },
+      ],
+      [
+        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because minDate not valid',
+        400,
+        { nickname: 'us', minDate: '123' },
+      ],
+      [
+        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because maxDate not valid',
+        400,
+        { nickname: 'us', maxDate: '123' },
+      ],
+      [
+        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        400,
+        { nickname: 'us', maxDate: '123', minDate: '123' },
+      ],
+    ])('%s', async (_, statusCode, dto) => {
       const { body: users } = await request(app.getHttpServer())
         .get('/users/search')
-        .query(query)
-        .expect(200);
+        .query(dto)
+        .expect(statusCode);
 
-      expect(users).toEqual({
-        nextPage: null,
-        page: 1,
-        pageSize: 10,
-        prevPage: null,
-        total: 1,
-        totalPages: 1,
-        users: [
-          {
-            createdAt: expect.any(String),
-            nickname: 'user',
-            id: expect.any(Number),
-            role: 'USER',
-          },
-        ],
-      });
+      if (statusCode === 200) {
+        expect(users).toEqual({
+          nextPage: null,
+          page: 1,
+          pageSize: 10,
+          prevPage: null,
+          total: 1,
+          totalPages: 1,
+          users: [
+            {
+              createdAt: expect.any(String),
+              nickname: 'user',
+              id: expect.any(Number),
+              role: 'USER',
+            },
+          ],
+        });
+      }
     });
   });
 

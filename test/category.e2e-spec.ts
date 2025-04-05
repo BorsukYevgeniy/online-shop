@@ -10,6 +10,7 @@ import { AuthModule } from '../src/auth/auth.module';
 import { hash } from 'bcryptjs';
 import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
+import { SearchCategoryDto } from 'src/category/dto/search-category.dto';
 
 describe('CategoryController (e2e)', () => {
   let app: NestExpressApplication;
@@ -141,6 +142,44 @@ describe('CategoryController (e2e)', () => {
           id: categoryId,
           name: 'Category',
           description: 'Category description',
+        });
+      }
+    });
+  });
+
+  describe('GET /categories/search - 200 OK - Should search categories by name', () => {
+    it.each<[string, 200 | 400, SearchCategoryDto]>([
+      [
+        'GET /categories/search - 200 OK - Should search categories by name',
+        200,
+        { name: 'Categ' },
+      ],
+      [
+        'GET /categories/search - 400 BAD REQUEST - Should return 400 HTTP code because name not valid',
+        400,
+        { name: 'C' },
+      ],
+    ])('%s', async (_, statusCode, dto) => {
+      const { body: categories } = await request(app.getHttpServer())
+        .get('/categories/search')
+        .query(dto)
+        .expect(statusCode);
+
+      if (statusCode === 200) {
+        expect(categories).toEqual({
+          total: 1,
+          prevPage: null,
+          nextPage: null,
+          page: 1,
+          pageSize: 10,
+          totalPages: 1,
+          categories: [
+            {
+              id: categoryId,
+              name: 'Category',
+              description: 'Category description',
+            },
+          ],
         });
       }
     });
