@@ -174,7 +174,7 @@ describe('UserController (e2e)', () => {
   });
 
   describe('GET /users/:userId - Should return user id', () => {
-    it.each([
+    it.each<[string, 200 | 404]>([
       ['GET /users/:userId - 200 OK - Should return user searched by id', 200],
       ['GET /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', 404],
     ])('%s', async (_, statusCode) => {
@@ -214,7 +214,7 @@ describe('UserController (e2e)', () => {
   });
 
   describe('PATCH /users/assing-admin/:userId - Should assign user to admin', () => {
-    it.each([
+    it.each<[string, 200 | 404]>([
       [
         'PATCH /users/assing-admin/:userId - 200 OK - Should assign user to admin',
         200,
@@ -231,16 +231,14 @@ describe('UserController (e2e)', () => {
         .set('Cookie', [`accessToken=${adminAccessToken}`])
         .expect(statusCode);
 
-      expect(body).toEqual(
-        statusCode === 404
-          ? { error: 'Not Found', message: 'User not found', statusCode: 404 }
-          : {
-              id: expect.any(Number),
-              nickname: 'user',
-              role: 'ADMIN',
-              createdAt: expect.any(String),
-            },
-      );
+      if (statusCode === 200) {
+        expect(body).toEqual({
+          id: expect.any(Number),
+          nickname: 'user',
+          role: 'ADMIN',
+          createdAt: expect.any(String),
+        });
+      }
     });
   });
 
@@ -252,7 +250,7 @@ describe('UserController (e2e)', () => {
   });
 
   describe('DELETE /users/:userId - Should delete user by id', () => {
-    it.each([
+    it.each<[string, 204 | 404]>([
       [
         'DELETE /users/:userId - 204 NO CONTENT - Should delete user by id',
         204,

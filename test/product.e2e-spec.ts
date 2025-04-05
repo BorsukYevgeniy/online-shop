@@ -205,7 +205,7 @@ describe('ProductController (e2e)', () => {
   });
 
   describe('PATCH /products/:productId - Should update title in product', () => {
-    it.each<[string, number, UpdateProductDto | null, Buffer | null]>([
+    it.each<[string, 200 | 404, UpdateProductDto | null, Buffer | null]>([
       [
         'PATCH /products/:productId - 200 OK - Should update title in product',
         200,
@@ -236,9 +236,9 @@ describe('ProductController (e2e)', () => {
         { categoryIds: [category2Id] },
         null,
       ],
-    ])('%s', async (_, status, dto, file) => {
+    ])('%s', async (_, statusCode, dto, file) => {
       const requestBuilder = request(app.getHttpServer())
-        .patch(`/products/${status === 404 ? productId - 1 : productId}`)
+        .patch(`/products/${statusCode === 404 ? productId - 1 : productId}`)
         .set('Cookie', [`accessToken=${accessToken}`]);
 
       if (dto) {
@@ -256,9 +256,9 @@ describe('ProductController (e2e)', () => {
         requestBuilder.attach('images', file);
       }
 
-      const res = await requestBuilder.expect(status);
+      const res = await requestBuilder.expect(statusCode);
 
-      if (status === 200) {
+      if (statusCode === 200) {
         if (dto.categoryIds)
           expect(res.body.categories).toEqual([
             {
@@ -284,11 +284,11 @@ describe('ProductController (e2e)', () => {
         'DELETE /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
         404,
       ],
-    ])('%s', async (_, status) => {
+    ])('%s', async (_, statusCode) => {
       await request(app.getHttpServer())
-        .delete(`/products/${status === 404 ? productId - 1 : productId}`)
+        .delete(`/products/${statusCode === 404 ? productId - 1 : productId}`)
         .set('Cookie', [`accessToken=${accessToken}`])
-        .expect(status);
+        .expect(statusCode);
     });
   });
 });
