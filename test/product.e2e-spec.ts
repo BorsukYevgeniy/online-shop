@@ -9,6 +9,7 @@ import { PrismaService } from '../src/prisma/prisma.service';
 import { ProductModule } from '../src/product/product.module';
 import { hash } from 'bcryptjs';
 import { UpdateProductDto } from 'src/product/dto/update-product.dto';
+import { SearchProductDto } from 'src/product/dto/search-product.dto';
 
 describe('ProductController (e2e)', () => {
   let app: NestExpressApplication;
@@ -113,76 +114,23 @@ describe('ProductController (e2e)', () => {
     });
   });
 
-  it('GET /products/:productId - 200 OK - Should return the product by id', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get(`/products/${productId}`)
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'Product',
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+  describe('GET /products/:productId - Should find the product by id', () => {
+    it.each<[string, 200 | 404]>([
+      [
+        'GET /products/:productId - 200 OK - Should return the product by id',
+        200,
       ],
-      images: expect.any(Array<String>),
-      userId,
-    });
-  });
-
-  it('GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
-    await request(app.getHttpServer())
-      .get(`/products/${productId - 1}`)
-      .expect(404);
-  });
-
-  it('GET /products/search - 200 OK - Should search the product by title', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get('/products/search')
-      .query({ title: 'Prod' })
-      .expect(200);
-
-    expect(product).toEqual({
-      nextPage: null,
-      total: 1,
-      totalPages: 1,
-      page: 1,
-      pageSize: 10,
-      prevPage: null,
-      products: [
-        {
-          id: expect.any(Number),
-          title: 'Product',
-          description: 'Description',
-          price: 100,
-
-          categories: [
-            { id: category1Id, name: 'category', description: 'description' },
-          ],
-          images: expect.any(Array<String>),
-          userId,
-        },
+      [
+        'GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        404,
       ],
-    });
-  });
+    ])('%s', async (_, status) => {
+      const { body: product } = await request(app.getHttpServer())
+        .get(`/products/${status === 404 ? productId - 1 : productId}`)
+        .expect(status);
 
-  it('GET /products/search - 200 OK - Should search the product by title and min price', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get('/products/search')
-      .query({ title: 'Prod' })
-      .query({ minPrice: 50 })
-      .expect(200);
-
-    expect(product).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      total: 1,
-      totalPages: 1,
-      prevPage: null,
-      products: [
-        {
+      if (status === 200) {
+        expect(product).toEqual({
           id: expect.any(Number),
           title: 'Product',
           description: 'Description',
@@ -192,298 +140,155 @@ describe('ProductController (e2e)', () => {
           ],
           images: expect.any(Array<String>),
           userId,
-        },
-      ],
+        });
+      }
     });
   });
 
-  it('GET /products/search - 200 OK - Should search the product by title and max price', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get('/products/search')
-      .query({ title: 'Prod' })
-      .query({ maxPrice: 150 })
-      .expect(200);
+  describe('GET /products/search - Should search product', () => {
+    it.each<[string, SearchProductDto]>([
+      [
+        'GET /products/search - 200 OK - Should search the product by title',
+        { title: 'Prod' },
+      ],
+      [
+        'GET /products/search - 200 OK - Should search the product by title and min price',
 
-    expect(product).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      total: 1,
-      totalPages: 1,
-      prevPage: null,
-      products: [
+        { title: 'Prod', minPrice: 50 },
+      ],
+      [
+        'GET /products/search - 200 OK - Should search the product by title and max price',
+        { title: 'Prod', maxPrice: 150 },
+      ],
+      [
+        'GET /products/search - 200 OK - Should search the product by title and price range',
+        { title: 'Prod', minPrice: 50, maxPrice: 150 },
+      ],
+      [
+        'GET /products/search - 200 OK - Should search the product by title and categories',
+        { title: 'Prod', categoryIds: [category1Id] },
+      ],
+      [
+        'GET /products/search - 200 OK - Should search the product by title ,categories and price range',
         {
-          id: expect.any(Number),
-          title: 'Product',
-          description: 'Description',
-          price: 100,
-          categories: [
-            { id: category1Id, name: 'category', description: 'description' },
-          ],
-          images: expect.any(Array<String>),
-          userId,
+          title: 'Prod',
+          categoryIds: [category1Id],
+          minPrice: 50,
+          maxPrice: 150,
         },
       ],
+    ])('%s', async (_, dto) => {
+      const { body } = await request(app.getHttpServer())
+        .get('/products/search')
+        .query(dto)
+        .expect(200);
+
+      expect(body).toEqual({
+        nextPage: null,
+        total: 1,
+        totalPages: 1,
+        page: 1,
+        pageSize: 10,
+        prevPage: null,
+        products: [
+          {
+            id: expect.any(Number),
+            title: 'Product',
+            description: 'Description',
+            price: 100,
+            images: expect.any(Array<String>),
+            userId,
+          },
+        ],
+      });
     });
   });
 
-  it('GET /products/search - 200 OK - Should search the product by title and price range', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get('/products/search')
-      .query({ title: 'Prod' })
-      .query({ maxPrice: 150 })
-      .query({ minPrice: 50 })
-      .expect(200);
-
-    expect(product).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      total: 1,
-      totalPages: 1,
-      prevPage: null,
-      products: [
-        {
-          id: expect.any(Number),
-          title: 'Product',
-          description: 'Description',
-          price: 100,
-          categories: [
-            { id: category1Id, name: 'category', description: 'description' },
-          ],
-          images: expect.any(Array<String>),
-          userId,
-        },
+  describe('PATCH /products/:productId - Should update title in product', () => {
+    it.each<[string, number, UpdateProductDto | null, Buffer | null]>([
+      [
+        'PATCH /products/:productId - 200 OK - Should update title in product',
+        200,
+        { title: 'New Title' },
+        null,
       ],
-    });
-  });
-
-  it('GET /products/search - 200 OK - Should search the product by title and categories', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get('/products/search')
-      .query({ title: 'Prod' })
-      .query({ categoryIds: [category1Id] })
-      .expect(200);
-
-    expect(product).toEqual({
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-
-      total: 1,
-      totalPages: 1,
-      prevPage: null,
-      products: [
-        {
-          id: expect.any(Number),
-          title: 'Product',
-          description: 'Description',
-          price: 100,
-          categories: [
-            { id: category1Id, name: 'category', description: 'description' },
-          ],
-          images: expect.any(Array<String>),
-          userId,
-        },
+      [
+        'PATCH /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        404,
+        null,
+        null,
       ],
-    });
-  });
-
-  it('GET /products/search - 200 OK - Should search the product by title ,categories and price range', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .get('/products/search')
-      .query({ title: 'Prod' })
-      .query({ categoryIds: [category1Id] })
-      .query({ maxPrice: 150 })
-      .query({ mштPrice: 50 })
-      .expect(200);
-
-    expect(product).toEqual({
-      nextPage: null,
-      page: 1,
-      total: 1,
-      totalPages: 1,
-      pageSize: 10,
-      prevPage: null,
-      products: [
-        {
-          id: expect.any(Number),
-          title: 'Product',
-          description: 'Description',
-          price: 100,
-          categories: [
-            { id: category1Id, name: 'category', description: 'description' },
-          ],
-          images: expect.any(Array<String>),
-          userId,
-        },
+      [
+        'PATCH /products/:productId - 200 OK - Should update description in product',
+        200,
+        { description: 'New Description' },
+        null,
       ],
-    });
-  });
-
-  it('PATCH /products/:productId - 200 OK - Should update title in product', async () => {
-    const dto: UpdateProductDto = { title: 'New Product' };
-    const { body: product } = await request(app.getHttpServer())
-      .patch(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .send(dto)
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: dto.title,
-      description: 'Description',
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      [
+        'PATCH /products/:productId - 200 OK - Should update price in product',
+        200,
+        { price: 125 },
+        null,
       ],
-      images: expect.any(Array<String>),
-      userId,
-    });
-  });
-
-  it('PATCH /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
-    const dto: UpdateProductDto = { title: 'New Product' };
-    await request(app.getHttpServer())
-      .patch(`/products/${productId - 1}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .send(dto)
-      .expect(404);
-  });
-
-  it('PATCH /products/:productId - 200 OK - Should update description in product', async () => {
-    const dto: UpdateProductDto = { description: 'New description' };
-    const { body: product } = await request(app.getHttpServer())
-      .patch(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .send(dto)
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'New Product',
-      description: dto.description,
-      price: 100,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+      [
+        'PATCH /products/:productId - 200 OK - Should update categories in product',
+        200,
+        { categoryIds: [category2Id] },
+        null,
       ],
-      images: expect.any(Array<String>),
-      userId,
+    ])('%s', async (_, status, dto, file) => {
+      const requestBuilder = request(app.getHttpServer())
+        .patch(`/products/${status === 404 ? productId - 1 : productId}`)
+        .set('Cookie', [`accessToken=${accessToken}`]);
+
+      if (dto) {
+        Object.entries(dto).forEach(([key, value]) => {
+          if (key && value) {
+            requestBuilder.field(
+              key,
+              key === 'categoryIds' ? [category2Id] : value,
+            );
+          }
+        });
+      }
+
+      if (file) {
+        requestBuilder.attach('images', file);
+      }
+
+      const res = await requestBuilder.expect(status);
+
+      if (status === 200) {
+        if (dto.categoryIds)
+          expect(res.body.categories).toEqual([
+            {
+              id: category2Id,
+              name: 'category2',
+              description: 'description2',
+            },
+          ]);
+        else {
+          expect(res.body).toMatchObject(dto);
+        }
+      }
     });
   });
 
-  it('PATCH /products/:productId - 200 OK - Should update price in product', async () => {
-    const dto: UpdateProductDto = { price: 125 };
-    const { body: product } = await request(app.getHttpServer())
-      .patch(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .send(dto)
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'New Product',
-      description: 'New description',
-      price: dto.price,
-      categories: [
-        { id: category1Id, name: 'category', description: 'description' },
+  describe('DELETE /products/:productId - Should delete product', () => {
+    it.each<[string, 204 | 404]>([
+      [
+        'DELETE /products/:productId - 204 NO CONTENT - Should delete product',
+        204,
       ],
-      images: expect.any(Array<String>),
-      userId,
-    });
-  });
-
-  it('PATCH /products/:productId - 200 OK - Should update price in product', async () => {
-    const dto: UpdateProductDto = { categoryIds: [category2Id] };
-    const { body: product } = await request(app.getHttpServer())
-      .patch(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .send(dto)
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'New Product',
-      description: 'New description',
-      price: 125,
-      categories: [
-        {
-          id: dto.categoryIds[0],
-          name: 'category2',
-          description: 'description2',
-        },
+      [
+        'DELETE /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        404,
       ],
-      images: expect.any(Array<String>),
-      userId,
+    ])('%s', async (_, status) => {
+      await request(app.getHttpServer())
+        .delete(`/products/${status === 404 ? productId - 1 : productId}`)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .expect(status);
     });
-  });
-
-  it('PATCH /products/:productId - 200 OK - Should update images in product', async () => {
-    const { body: product } = await request(app.getHttpServer())
-      .patch(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .attach('images', Buffer.from('mockImageData2'), 'file2.jpg')
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: 'New Product',
-      description: 'New description',
-      price: 125,
-      categories: [
-        { id: category2Id, name: 'category2', description: 'description2' },
-      ],
-      images: expect.any(Array<String>),
-      userId,
-    });
-  });
-
-  it('PATCH /products/:productId - 200 OK - Should update all fields in product', async () => {
-    const dto = {
-      title: 'New Product2',
-      description: 'New description2',
-      price: 120,
-      categoryIds: [category1Id],
-    };
-    const { body: product } = await request(app.getHttpServer())
-      .patch(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .field('title', dto.title)
-      .field('description', dto.description)
-      .field('price', dto.price)
-      .field('categoryIds', dto.categoryIds)
-      .attach('images', Buffer.from('mockImageData2'), 'file2.jpg')
-      .expect(200);
-
-    expect(product).toEqual({
-      id: expect.any(Number),
-      title: dto.title,
-      description: dto.description,
-      price: dto.price,
-      categories: [
-        {
-          id: dto.categoryIds[0],
-          name: 'category',
-          description: 'description',
-        },
-      ],
-      images: expect.any(Array<String>),
-      userId,
-    });
-  });
-
-  it('DELETE /products/:productId - 204 NO CONTENT - Should delete product', async () => {
-    await request(app.getHttpServer())
-      .delete(`/products/${productId}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .expect(204)
-      .expect({});
-  });
-
-  it('DELETE /products/:productId - 404 NOT FOUND - Should return 404 HTTP code', async () => {
-    await request(app.getHttpServer())
-      .delete(`/products/${productId - 1}`)
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .expect(404);
   });
 });
