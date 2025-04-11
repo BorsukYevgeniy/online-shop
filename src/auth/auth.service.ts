@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  NotFoundException,
+  BadRequestException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { hash, compare } from 'bcryptjs';
@@ -21,7 +25,7 @@ export class AuthService {
     const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (candidate) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('User already exists');
     }
 
     const hashedPassword: string = await hash(dto.password, 3);
@@ -37,7 +41,7 @@ export class AuthService {
     const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (!candidate) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('User not found');
     }
 
     const { password: hashedPassword, role } = candidate;
@@ -48,10 +52,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new HttpException(
-        'Email or password are incorrect',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('Email or password are incorrect');
     }
 
     return await this.tokenService.generateTokens(candidate.id, role as Role);

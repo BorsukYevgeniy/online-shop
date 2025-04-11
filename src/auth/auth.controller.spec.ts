@@ -3,9 +3,10 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import {AuthRequest} from '../types/request.type';
+import { AuthRequest } from '../types/request.type';
 import { TokenService } from '../token/token.service';
-import {Role} from '../enum/role.enum';
+import { Role } from '../enum/role.enum';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -37,34 +38,52 @@ describe('AuthController', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(controller).toBeDefined();
   });
 
-  it('should register a user', async () => {
+  describe('Should register user', () => {
     const dto: CreateUserDto = {
       email: 'test@gmail.com',
       nickname: 'test',
       password: '12345',
     };
-
+    const hashedPassword = 'hashedPassword';
     const mockUser = {
       id: 1,
-      email: dto.email,
-      nickname: 'test',
+      ...dto,
+      password: hashedPassword,
       createdAt: new Date(),
-
       role: Role.USER,
     };
+    it.each<[string, boolean]>([
+      ['Should register user', true],
+      ['Should throw an error if user already exists', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        jest.spyOn(service, 'register').mockResolvedValue(mockUser);
 
-    jest.spyOn(service, 'register').mockResolvedValue(mockUser);
+        const user = await service.register(dto);
 
-    const user = await controller.registration(dto);
+        expect(user).toEqual(mockUser);
+        expect(service.register).toHaveBeenCalledWith(dto);
+      } else {
+        jest
+          .spyOn(service, 'register')
+          .mockRejectedValue(new BadRequestException('User already exists'));
 
-    expect(user).toEqual(mockUser);
+        await expect(service.register(dto)).rejects.toThrow(
+          new BadRequestException('User already exists'),
+        );
+      }
+    });
   });
 
-  it('should login a user', async () => {
+  describe('Should login user', () => {
+    const res: Partial<Response> = {
+      cookie: jest.fn(),
+      send: jest.fn(),
+    };
     const dto: CreateUserDto = {
       email: 'test@gmail.com',
       nickname: 'test',
@@ -74,35 +93,57 @@ describe('AuthController', () => {
       accessToken: 'accessToken',
       refreshToken: 'refreshToken',
     };
-    const res: Partial<Response> = {
-      cookie: jest.fn(),
-      send: jest.fn(),
-    };
 
-    jest.spyOn(service, 'login').mockResolvedValue(mockTokens);
+    it.each<[string, boolean, boolean]>([
+      ['Should login a user', true, false],
+      ['Should throw NotFoundException if user not found', false, false],
+      [
+        'Should throw BadRequestException if email or password are incorrect',
+        false,
+        true,
+      ],
+    ])('%s', async (_, isSuccess, isUserFounded) => {
+      if (isSuccess) {
+        jest.spyOn(service, 'login').mockResolvedValue(mockTokens);
 
-    await controller.login(dto, res as Response);
+        await controller.login(dto, res as Response);
 
-    expect(res.cookie).toHaveBeenCalledWith(
-      'accessToken',
-      mockTokens.accessToken,
-      {
-        httpOnly: true,
-        maxAge: 60 * 60 * 1000,
-      },
-    );
+        expect(res.cookie).toHaveBeenCalledWith(
+          'accessToken',
+          mockTokens.accessToken,
+          {
+            httpOnly: true,
+            maxAge: 60 * 60 * 1000,
+          },
+        );
 
-    expect(res.cookie).toHaveBeenCalledWith(
-      'refreshToken',
-      mockTokens.refreshToken,
-      {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-      },
-    );
+        expect(res.cookie).toHaveBeenCalledWith(
+          'refreshToken',
+          mockTokens.refreshToken,
+          {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+          },
+        );
+      } else if (!isUserFounded) {
+        jest
+          .spyOn(service, 'login')
+          .mockRejectedValue(new NotFoundException('User not found'));
+        await expect(controller.login(dto, res as Response)).rejects.toThrow(
+          new NotFoundException('User not found'),
+        );
+      } else {
+        jest
+          .spyOn(service, 'login')
+          .mockRejectedValue(new BadRequestException('User not found'));
+        await expect(controller.login(dto, res as Response)).rejects.toThrow(
+          new BadRequestException('User not found'),
+        );
+      }
+    });
   });
 
-  it('should logout a user', async () => {
+  it('Should logout a user', async () => {
     const req: AuthRequest = {
       user: {
         id: 1,
@@ -126,7 +167,7 @@ describe('AuthController', () => {
     expect(res.send).toHaveBeenCalledWith({ message: 'Logouted succesfully' });
   });
 
-  it('should logout all users', async () => {
+  it('Should logout all users', async () => {
     const req: AuthRequest = {
       user: {
         id: 1,
@@ -152,7 +193,7 @@ describe('AuthController', () => {
     });
   });
 
-  it('should refresh tokens', async () => {
+  it('Should refresh tokens', async () => {
     const req: AuthRequest = {
       user: { id: 1, roles: ['USER'] },
       cookies: { refreshToken: 'refreshToken' },

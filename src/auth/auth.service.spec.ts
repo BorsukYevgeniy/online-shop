@@ -3,8 +3,13 @@ import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import {Role} from '../enum/role.enum';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
+import { Role } from '../enum/role.enum';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -48,11 +53,11 @@ describe('AuthService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should register a user', async () => {
+  describe('Should register user', () => {
     const dto: CreateUserDto = {
       email: 'test@gmail.com',
       nickname: 'test',
@@ -61,48 +66,42 @@ describe('AuthService', () => {
     const hashedPassword = 'hashedPassword';
     const mockUser = {
       id: 1,
-      email: dto.email,
-      nickname: 'test',
-      createdAt: new Date(),
-      role: Role.USER,
-    };
-
-    jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
-    hash.mockResolvedValue(hashedPassword);
-    jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
-
-    const user = await service.register(dto);
-
-    expect(user).toEqual(mockUser);
-  });
-
-  it('should throw an error if user already exists', async () => {
-    const dto: CreateUserDto = {
-      email: 'test@gmail.com',
-      nickname: 'test',
-      password: '12345',
-    };
-    const hashedPassword = 'hashedPassword';
-    const mockUser = {
       ...dto,
-      id: 1,
-      nickname: 'test',
-      createdAt: new Date(),
-
       password: hashedPassword,
+      createdAt: new Date(),
       role: Role.USER,
     };
+    it.each<[string, boolean]>([
+      ['Should register user', true],
+      ['Should throw an error if user already exists', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
+        hash.mockResolvedValue(hashedPassword);
+        jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
 
-    jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
-    hash.mockResolvedValue(hashedPassword);
-    jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
+        const user = await service.register(dto);
 
-    await expect(service.register(dto)).rejects.toThrow(
-      new HttpException('User already exists', HttpStatus.BAD_REQUEST),
-    );
+        expect(user).toEqual(mockUser);
+
+        expect(userService.getByEmail).toHaveBeenCalledWith(dto.email);
+        expect(userService.create).toHaveBeenCalledWith({
+          ...dto,
+          password: hashedPassword,
+        });
+      } else {
+        jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
+        hash.mockResolvedValue(hashedPassword);
+        jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
+
+        await expect(service.register(dto)).rejects.toThrow(
+          new HttpException('User already exists', HttpStatus.BAD_REQUEST),
+        );
+      }
+    });
   });
 
-  it('should login a user', async () => {
+  describe('Should login user', () => {
     const dto: CreateUserDto = {
       email: 'test@gmail.com',
       nickname: 'test',
@@ -113,7 +112,6 @@ describe('AuthService', () => {
       ...dto,
       id: 1,
       password: hashedPassword,
-      nickname: 'test',
       createdAt: new Date(),
       role: Role.USER,
     };
@@ -122,56 +120,49 @@ describe('AuthService', () => {
       refreshToken: 'refreshToken',
     };
 
-    jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
-    compare.mockResolvedValue(true);
+    it.each<[string, boolean, boolean]>([
+      ['Should login a user', true, false],
+      ['Should throw NotFoundException if user not found', false, false],
+      [
+        'Should throw BadRequestException if email or password are incorrect',
+        false,
+        true,
+      ],
+    ])('%s', async (_, isSuccess, isUserFounded) => {
+      if (isSuccess) {
+        jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
+        compare.mockResolvedValue(true);
+        jest
+          .spyOn(tokenService, 'generateTokens')
+          .mockResolvedValue(mockTokens);
 
-    jest.spyOn(tokenService, 'generateTokens').mockResolvedValue(mockTokens);
+        const tokens = await service.login(dto);
 
-    const tokens = await service.login(dto);
+        expect(tokens).toEqual(mockTokens);
+        expect(userService.getByEmail).toHaveBeenCalledWith(dto.email);
+        expect(compare).toHaveBeenCalledWith(dto.password, hashedPassword);
+        expect(tokenService.generateTokens).toHaveBeenCalledWith(
+          mockUser.id,
+          mockUser.role,
+        );
+      } else if (!isUserFounded) {
+        jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
 
-    expect(tokens).toEqual(mockTokens);
+        await expect(service.login(dto)).rejects.toThrow(
+          new NotFoundException('User not found'),
+        );
+      } else {
+        jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
+        compare.mockResolvedValue(false);
+
+        await expect(service.login(dto)).rejects.toThrow(
+          new BadRequestException('Email or password are incorrect'),
+        );
+      }
+    });
   });
 
-  it('should throw an error if user not found', async () => {
-    const dto: CreateUserDto = {
-      email: 'test@gmail.com',
-      nickname: 'test',
-      password: '12345',
-    };
-    jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
-
-    await expect(service.login(dto)).rejects.toThrow(
-      new HttpException('User not found', HttpStatus.NOT_FOUND),
-    );
-  });
-
-  it('should throw an error if email or password are incorrect', async () => {
-    const dto: CreateUserDto = {
-      email: 'test@gmail.com',
-      nickname: 'test',
-      password: 'wrongPassword',
-    };
-    const mockUser = {
-      id: 1,
-      email: 'test@gmail.com',
-      nickname: 'test',
-      createdAt: new Date(),
-      password: 'hashedPassword',
-      role: Role.USER,
-    };
-
-    jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
-    compare.mockResolvedValue(false);
-
-    await expect(service.login(dto)).rejects.toThrow(
-      new HttpException(
-        'Email or password are incorrect',
-        HttpStatus.BAD_REQUEST,
-      ),
-    );
-  });
-
-  it('should logout a user', async () => {
+  it('Should logout a user', async () => {
     const refreshToken = 'refreshToken';
 
     jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({ count: 1 });
@@ -181,7 +172,7 @@ describe('AuthService', () => {
     expect(tokenService.deleteUserToken).toHaveBeenCalledWith(refreshToken);
   });
 
-  it('should logout all users', async () => {
+  it('Should logout all users', async () => {
     const userId = 1;
 
     jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({ count: 1 });
@@ -191,7 +182,7 @@ describe('AuthService', () => {
     expect(tokenService.deleteAllUsersTokens).toHaveBeenCalledWith(userId);
   });
 
-  it('should refresh tokens', async () => {
+  it('Should refresh tokens', async () => {
     const refreshToken = 'refreshToken';
 
     const mockTokens = {
