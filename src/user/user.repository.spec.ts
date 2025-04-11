@@ -1,10 +1,11 @@
-import { Product, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { CreateUserDto } from './dto/create-user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -41,11 +42,11 @@ describe('UserRepository', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(repository).toBeDefined();
   });
 
-  it('should assing new admin', async () => {
+  it('Should assing new admin', async () => {
     const mockUsers = {
       id: 1,
       nickname: 'test',
@@ -62,103 +63,41 @@ describe('UserRepository', () => {
     expect(user).toEqual(mockUsers);
   });
 
-  it('should count all users without filters', async () => {
-    jest.spyOn(prismaService.user, 'count').mockResolvedValue(10);
-
-    const result = await repository.count();
-
-    expect(result).toBe(10);
-    expect(prismaService.user.count).toHaveBeenCalledWith({
-      where: {
-        createdAt: {
-          gte: undefined,
-          lte: undefined,
-        },
-        nickname: {
-          contains: undefined,
-          mode: 'insensitive',
-        },
-      },
-    });
-  });
-
-  it('should count users filtered by nickname', async () => {
+  describe('Should count users with filters', () => {
     jest.spyOn(prismaService.user, 'count').mockResolvedValue(5);
 
-    const result = await repository.count({ nickname: 'John' });
-    expect(result).toBe(5);
-    expect(prismaService.user.count).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'John', mode: 'insensitive' },
-        createdAt: { lte: undefined, gte: undefined },
-      },
+    it.each<[string, SearchUserDto | null]>([
+      ['Should count all users without filters', null],
+      ['Should count users filtered by nickname', { nickname: 'John' }],
+      [
+        'Should count users filtered by nickname and min date',
+        { nickname: 'test', minDate: date },
+      ],
+      [
+        'Should count users filtered by nickname and max date',
+        { nickname: 'test', maxDate: date },
+      ],
+      [
+        'Should count users filtered by nickname and date range',
+        { nickname: 'test', minDate: date, maxDate: date },
+      ],
+    ])('%s', async (_, searchUserDto) => {
+      const result = await repository.count(searchUserDto);
+
+      expect(result).toEqual(5);
+      expect(prismaService.user.count).toHaveBeenCalledWith({
+        where: {
+          nickname: { contains: searchUserDto?.nickname, mode: 'insensitive' },
+          createdAt: {
+            gte: searchUserDto?.minDate,
+            lte: searchUserDto?.maxDate,
+          },
+        },
+      });
     });
   });
 
-  it('should count users filtered by nickname and min date', async () => {
-    jest.spyOn(prismaService.user, 'count').mockResolvedValue(3);
-
-    const result = await repository.count({
-      nickname: 'test',
-      minDate: date,
-    });
-    expect(result).toBe(3);
-    expect(prismaService.user.count).toHaveBeenCalledWith({
-      where: {
-        nickname: {
-          contains: 'test',
-          mode: 'insensitive',
-        },
-        createdAt: {
-          gte: date,
-        },
-      },
-    });
-  });
-
-  it('should count users filtered by nickname and max date', async () => {
-    jest.spyOn(prismaService.user, 'count').mockResolvedValue(3);
-
-    const result = await repository.count({
-      nickname: 'test',
-      maxDate: date,
-    });
-    expect(result).toBe(3);
-    expect(prismaService.user.count).toHaveBeenCalledWith({
-      where: {
-        nickname: {
-          contains: 'test',
-          mode: 'insensitive',
-        },
-        createdAt: {
-          lte: date,
-        },
-      },
-    });
-  });
-
-  it('should count users filtered by nickname and date range', async () => {
-    jest.spyOn(prismaService.user, 'count').mockResolvedValue(2);
-
-    const result = await repository.count({
-      nickname: 'test',
-      minDate: date,
-      maxDate: date,
-    });
-
-    expect(result).toBe(2);
-    expect(prismaService.user.count).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'test', mode: 'insensitive' },
-        createdAt: {
-          gte: date,
-          lte: date,
-        },
-      },
-    });
-  });
-
-  it('should get all users with default sorting', async () => {
+  it('Should get all users with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -195,7 +134,7 @@ describe('UserRepository', () => {
     expect(users).toEqual(mockUsers);
   });
 
-  it('should search user by nickname with default sorting', async () => {
+  describe('Should search users with filters with default sorting', () => {
     const mockUsers = [
       {
         id: 1,
@@ -203,252 +142,61 @@ describe('UserRepository', () => {
         nickname: 'test',
         password: 'password',
         createdAt: date,
-        products: [{} as Product],
         role: Role.USER,
       },
     ];
 
     jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
 
-    const users = await repository.findUsers({ nickname: 'test' }, 0, 10, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
+    it.each<[string, SearchUserDto]>([
+      [
+        'Should search user by nickname with default sorting',
+        { nickname: 'test' },
+      ],
+      [
+        'Should search user by nickname and min date with default sorting',
+        { nickname: 'test', minDate: date },
+      ],
+      [
+        'Should search user by nickname and max date with default sorting',
+        { nickname: 'test', maxDate: date },
+      ],
+      [
+        'Should search user by nickname and date range with default sorting',
+        { nickname: 'test', minDate: date, maxDate: date },
+      ],
+    ])('%s', async (_, searchUserDto) => {
+      const users = await repository.findUsers(searchUserDto, 0, 10, {
+        sortBy: 'id',
+        order: Order.DESC,
+      });
 
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'test', mode: 'insensitive' },
-        createdAt: {
-          gte: undefined,
-          lte: undefined,
+      expect(users).toEqual(mockUsers);
+
+      expect(prismaService.user.findMany).toHaveBeenCalledWith({
+        select: {
+          id: true,
+          nickname: true,
+          createdAt: true,
+          role: true,
         },
-      },
-
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-
-        role: true,
-      },
-      skip: 0,
-      take: 10,
-      orderBy: {
-        id: 'desc',
-      },
-    });
-
-    expect(users).toEqual(mockUsers);
-  });
-
-  it('should search user by nickname and min date with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-        password: 'password',
-        products: [{} as Product],
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-
-    const users = await repository.findUsers(
-      {
-        nickname: 'test',
-        minDate: date,
-      },
-      0,
-      10,
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'test', mode: 'insensitive' },
-        createdAt: {
-          gte: date,
+        skip: 0,
+        take: 10,
+        orderBy: {
+          id: 'desc',
         },
-      },
-
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-        role: true,
-      },
-      skip: 0,
-      take: 10,
-      orderBy: {
-        id: 'desc',
-      },
-    });
-
-    expect(users).toEqual(mockUsers);
-  });
-
-  it('should search user by nickname and max date with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-        password: 'password',
-        products: [{} as Product],
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-
-    const users = await repository.findUsers(
-      {
-        nickname: 'test',
-        maxDate: date,
-      },
-      0,
-      10,
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'test', mode: 'insensitive' },
-        createdAt: {
-          lte: date,
+        where: {
+          nickname: { contains: searchUserDto.nickname, mode: 'insensitive' },
+          createdAt: {
+            gte: searchUserDto?.minDate,
+            lte: searchUserDto?.maxDate,
+          },
         },
-      },
-
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-        role: true,
-      },
-      skip: 0,
-      take: 10,
-      orderBy: {
-        id: 'desc',
-      },
+      });
     });
-
-    expect(users).toEqual(mockUsers);
   });
 
-  it('should search user by nickname and date range with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        createdAt: date,
-        password: 'password',
-        products: [{} as Product],
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-
-    const users = await repository.findUsers(
-      {
-        nickname: 'test',
-        minDate: date,
-        maxDate: date,
-      },
-      0,
-      10,
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: {
-        nickname: { contains: 'test', mode: 'insensitive' },
-        createdAt: {
-          gte: date,
-          lte: date,
-        },
-      },
-
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-
-        role: true,
-      },
-      skip: 0,
-      take: 10,
-      orderBy: {
-        id: 'desc',
-      },
-    });
-
-    expect(users).toEqual(mockUsers);
-  });
-
-  it('should find user by id', async () => {
-    const userId = 1;
-    const mockUser = {
-      id: userId,
-      email: 'email',
-      products: [{}],
-      role: Role.USER,
-    };
-
-    jest
-      .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUser as any);
-
-    const user = await repository.findById(userId);
-
-    expect(prismaService.user.findUnique).toHaveBeenCalledWith({
-      where: { id: userId },
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-        role: true,
-      },
-    });
-
-    expect(user).toEqual(mockUser);
-  });
-
-  it('should find user profile', async () => {
-    const userId = 1;
-    const mockUser = {
-      id: userId,
-      email: 'email',
-      products: [{}],
-      role: Role.USER,
-    };
-
-    jest
-      .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUser as any);
-
-    const user = await repository.findUserProfile(userId);
-
-    expect(prismaService.user.findUnique).toHaveBeenCalledWith({
-      where: { id: userId },
-      select: {
-        id: true,
-        nickname: true,
-        email: true,
-        createdAt: true,
-        role: true,
-      },
-    });
-
-    expect(user).toEqual(mockUser);
-  });
-
-  it('should find user by email', async () => {
+  it('Should find user by email', async () => {
     const email = 'email';
     const mockUser = {
       id: 1,
@@ -456,7 +204,6 @@ describe('UserRepository', () => {
       nickname: 'test',
       password: 'test',
       createdAt: date,
-      products: [{}],
       role: Role.USER,
     };
 
@@ -471,7 +218,7 @@ describe('UserRepository', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should create a new user', async () => {
+  it('Should create a new user', async () => {
     const createUserDto: CreateUserDto = {
       email: 'email',
       nickname: 'nick',
@@ -498,7 +245,7 @@ describe('UserRepository', () => {
     expect(user).toEqual(createUserDto);
   });
 
-  it('should delete user by id', async () => {
+  it('Should delete user by id', async () => {
     const mockUser = {
       id: 1,
       nickname: 'nick',

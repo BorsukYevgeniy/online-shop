@@ -5,6 +5,8 @@ import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
+import { SearchUserDto } from './dto/search-user.dto';
+import { UserNoCred } from './types/user.types';
 
 describe('UserService', () => {
   let service: UserService;
@@ -41,11 +43,11 @@ describe('UserService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should assing new admin', async () => {
+  it('Should assing new admin', async () => {
     const mockUser = {
       id: 1,
       nickname: 'test',
@@ -61,7 +63,7 @@ describe('UserService', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should find all users without filters with default sorting', async () => {
+  it('Should find all users without filters with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -90,9 +92,10 @@ describe('UserService', () => {
       prevPage: null,
     });
     expect(repository.findAll).toHaveBeenCalled();
+    expect(repository.count).toHaveBeenCalled();
   });
 
-  it('should return all users searched by nickname with default sorting', async () => {
+  describe('Should search users with filters wtih default sorting', () => {
     const mockUsers = [
       {
         id: 1,
@@ -101,58 +104,55 @@ describe('UserService', () => {
         role: Role.USER,
       },
     ];
-
     jest.spyOn(repository, 'count').mockResolvedValue(1);
     jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
 
-    const users = await service.search(
-      { nickname: 'test' },
-      { page: 1, pageSize: 10 },
-      { sortBy: 'id', order: Order.DESC },
-    );
+    it.each<[string, SearchUserDto]>([
+      [
+        'Should return all users searched by nickname with default sorting',
+        { nickname: 'test' },
+      ],
+      [
+        'Should return all users searched by nickname and minDate with default sorting',
+        { nickname: 'test', minDate: new Date() },
+      ],
+      [
+        'Should return all users searched by nickname and maxDate with default sorting',
+        { nickname: 'test', maxDate: new Date() },
+      ],
+      [
+        'Should return all users searched by nickname and date range with default sorting',
+        { nickname: 'test', minDate: new Date(), maxDate: new Date() },
+      ],
+    ])('%s', async (_, searchUserDto) => {
+      const users = await service.search(
+        searchUserDto,
+        {
+          page: 1,
+          pageSize: 10,
+        },
+        { sortBy: 'id', order: Order.DESC },
+      );
 
-    expect(users).toEqual({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 1,
-      nextPage: null,
-      prevPage: null,
+      expect(users).toEqual({
+        users: mockUsers,
+        total: 1,
+        page: 1,
+        pageSize: 10,
+        totalPages: 1,
+        nextPage: null,
+        prevPage: null,
+      });
+
+      expect(repository.findUsers).toHaveBeenCalledWith(searchUserDto, 0, 10, {
+        sortBy: 'id',
+        order: Order.DESC,
+      });
+      expect(repository.count).toHaveBeenCalledWith(searchUserDto);
     });
   });
 
-  it('should return all users searched by nickname and date range with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        nickname: 'test',
-        createdAt: new Date(),
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
-
-    const users = await service.search(
-      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
-      { page: 1, pageSize: 10 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(users).toEqual({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 1,
-      nextPage: null,
-      prevPage: null,
-    });
-  });
-
-  it('should find user by email', async () => {
+  it('Should find user by email', async () => {
     const email = 'test@example.com';
     const mockUser = {
       id: 1,
@@ -169,21 +169,29 @@ describe('UserService', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should find user by id', async () => {
-    const mockUser = {
-      id: 1,
-      nickname: 'test',
-      createdAt: new Date(),
-      role: Role.USER,
-    };
+  describe('Should find user by id', () => {
+    it.each<[string, UserNoCred | null]>([
+      [
+        'Should find user by id',
+        { id: 1, nickname: 'test', createdAt: new Date(), role: Role.USER },
+      ],
+      ['Should throw NotFoundException because user not found', null],
+    ])('%s', async (_, mockUser) => {
+      jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
+      if (mockUser) {
+        const user = await service.getById(mockUser.id);
 
-    const user = await service.getById(1);
-    expect(user).toEqual(mockUser);
+        expect(user).toEqual(mockUser);
+        expect(repository.findById).toHaveBeenCalledWith(mockUser.id);
+      } else {
+        await expect(service.getById(1)).rejects.toThrow(NotFoundException);
+        expect(repository.findById).toHaveBeenCalledWith(1);
+      }
+    });
   });
 
-  it('should find user profile', async () => {
+  it('Should find user profile', async () => {
     const mockUser = {
       id: 1,
       email: 'test@example.com',
@@ -198,14 +206,7 @@ describe('UserService', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should throw NotFoundException if user not found by id', async () => {
-    jest.spyOn(repository, 'findById').mockResolvedValue(null);
-
-    await expect(service.getById(1)).rejects.toThrow(NotFoundException);
-    expect(repository.findById).toHaveBeenCalledWith(1);
-  });
-
-  it('should create a new user', async () => {
+  it('Should create a new user', async () => {
     const dto: CreateUserDto = {
       email: 'test@test.com',
       nickname: 'test',
@@ -224,10 +225,10 @@ describe('UserService', () => {
     const user = await service.create(dto);
 
     expect(user).toEqual(mockUser);
-    expect(repository.create).toHaveBeenCalledWith(dto)
+    expect(repository.create).toHaveBeenCalledWith(dto);
   });
 
-  it('should delete a user by id', async () => {
+  it('Should delete a user by id', async () => {
     await service.delete(1);
 
     expect(repository.delete).toHaveBeenCalledWith(1);

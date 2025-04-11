@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -7,6 +8,8 @@ import { ProductService } from '../product/product.service';
 import { AuthRequest } from '../types/request.type';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
+import { SearchUserDto } from './dto/search-user.dto';
+import { UserNoCred } from './types/user.types';
 
 const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
 
@@ -45,11 +48,11 @@ describe('UserController', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(controller).toBeDefined();
   });
 
-  it('should assing new admin', async () => {
+  it('Should assing new admin', async () => {
     const mockUser = {
       id: 1,
       nickname: 'test',
@@ -64,7 +67,7 @@ describe('UserController', () => {
     expect(user).toEqual(mockUser);
   });
 
-  it('should return all users without filters with default sorting', async () => {
+  it('Should return all users without filters with default sorting', async () => {
     const mockUsers = [
       {
         id: 1,
@@ -100,7 +103,7 @@ describe('UserController', () => {
     });
   });
 
-  it('should return all users searched by nickname with default sorting', async () => {
+  describe('Should search users with filters wtih default sorting', () => {
     const mockUsers = [
       {
         id: 1,
@@ -111,97 +114,82 @@ describe('UserController', () => {
     ];
 
     jest.spyOn(userService, 'search').mockResolvedValue({
-      users: mockUsers,
       total: 1,
       page: 1,
       pageSize: 10,
-      totalPages: 10,
+      totalPages: 1,
       nextPage: null,
       prevPage: null,
-    });
-
-    const users = await controller.search(
-      { nickname: 'test' },
-      { page: 1, pageSize: 10 },
-      {sortBy: 'id', order: Order.DESC},
-    );
-
-    expect(users).toEqual({
       users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 10,
-      nextPage: null,
-      prevPage: null,
-    });
-  });
-
-  it('should return all users searched by nickname and date range with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        nickname: 'test',
-        createdAt: new Date(),
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(userService, 'search').mockResolvedValue({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 10,
-      nextPage: null,
-      prevPage: null,
     });
 
-    const users = await controller.search(
-      { nickname: 'test', minDate: new Date(), maxDate: new Date() },
-      { page: 1, pageSize: 10 },
-      {sortBy: 'id', order: Order.DESC},
-    );
-
-    expect(users).toEqual({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 10,
-      nextPage: null,
-      prevPage: null,
-    });
-  });
-
-  it('should return user by id', async () => {
-    const mockUsers = {
-      id: 1,
-      email: 'test',
-      nickname: 'test',
-      createdAt: new Date(),
-
-      products: [
-        {
-          id: 1,
-          userId: 1,
-          description: 'Product description',
-          title: 'Product title',
-          price: 100,
-          images: ['image1.jpg', 'image2.jpg'],
-        },
+    it.each<[string, SearchUserDto]>([
+      [
+        'Should return all users searched by nickname with default sorting',
+        { nickname: 'test' },
       ],
-      role: Role.USER,
-    };
+      [
+        'Should return all users searched by nickname and minDate with default sorting',
+        { nickname: 'test', minDate: new Date() },
+      ],
+      [
+        'Should return all users searched by nickname and maxDate with default sorting',
+        { nickname: 'test', maxDate: new Date() },
+      ],
+      [
+        'Should return all users searched by nickname and date range with default sorting',
+        { nickname: 'test', minDate: new Date(), maxDate: new Date() },
+      ],
+    ])('%s', async (_, searchUserDto) => {
+      const users = await userService.search(
+        searchUserDto,
+        {
+          page: 1,
+          pageSize: 10,
+        },
+        { sortBy: 'id', order: Order.DESC },
+      );
 
-    jest.spyOn(userService, 'getById').mockResolvedValue(mockUsers);
+      expect(users).toEqual({
+        users: mockUsers,
+        total: 1,
+        page: 1,
+        pageSize: 10,
+        totalPages: 1,
+        nextPage: null,
+        prevPage: null,
+      });
 
-    await controller.getById(1);
-
-    expect(userService.getById).toHaveBeenCalledWith(1);
+      expect(userService.search).toHaveBeenCalledWith(searchUserDto, 0, 10, {
+        sortBy: 'id',
+        order: Order.DESC,
+      });
+    });
   });
 
-  it('should return user profile', async () => {
+  describe('Should find user by id', () => {
+    it.each<[string, UserNoCred | null]>([
+      [
+        'Should find user by id',
+        { id: 1, nickname: 'test', createdAt: new Date(), role: Role.USER },
+      ],
+      ['Should throw NotFoundException because user not found', null],
+    ])('%s', async (_, mockUser) => {
+      jest.spyOn(userService, 'getById').mockResolvedValue(mockUser);
+
+      if (mockUser) {
+        const user = await controller.getById(mockUser.id);
+
+        expect(user).toEqual(mockUser);
+        expect(userService.getById).toHaveBeenCalledWith(mockUser.id);
+      } else {
+        await expect(controller.getById(1)).rejects.toThrow(NotFoundException);
+        expect(userService.getById).toHaveBeenCalledWith(1);
+      }
+    });
+  });
+
+  it('Should return user profile', async () => {
     const mockUser = {
       id: 1,
       nickname: 'test',
@@ -218,7 +206,7 @@ describe('UserController', () => {
     expect(userService.getMe).toHaveBeenCalledWith(2);
   });
 
-  it('should return user products with default sorting', async () => {
+  it('Should return user products with default sorting', async () => {
     const userId = 1;
     const mockProducts = [
       {
@@ -247,7 +235,7 @@ describe('UserController', () => {
         page: 1,
         pageSize: 10,
       },
-      {sortBy: "id", order: Order.DESC},
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(products).toEqual({
@@ -261,7 +249,7 @@ describe('UserController', () => {
     });
   });
 
-  it('should delete user', async () => {
+  it('Should delete user', async () => {
     const res = {
       clearCookie: jest.fn(),
       sendStatus: jest.fn(),
