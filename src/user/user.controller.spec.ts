@@ -113,16 +113,6 @@ describe('UserController', () => {
       },
     ];
 
-    jest.spyOn(userService, 'search').mockResolvedValue({
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 1,
-      nextPage: null,
-      prevPage: null,
-      users: mockUsers,
-    });
-
     it.each<[string, SearchUserDto]>([
       [
         'Should return all users searched by nickname with default sorting',
@@ -141,6 +131,16 @@ describe('UserController', () => {
         { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       ],
     ])('%s', async (_, searchUserDto) => {
+      jest.spyOn(userService, 'search').mockResolvedValue({
+        total: 1,
+        page: 1,
+        pageSize: 10,
+        totalPages: 1,
+        nextPage: null,
+        prevPage: null,
+        users: mockUsers,
+      });
+
       const users = await userService.search(
         searchUserDto,
         {
@@ -160,7 +160,7 @@ describe('UserController', () => {
         prevPage: null,
       });
 
-      expect(userService.search).toHaveBeenCalledWith(searchUserDto, 0, 10, {
+      expect(userService.search).toHaveBeenCalledWith(searchUserDto, {page: 1, pageSize: 10}, {
         sortBy: 'id',
         order: Order.DESC,
       });
@@ -183,6 +183,10 @@ describe('UserController', () => {
         expect(user).toEqual(mockUser);
         expect(userService.getById).toHaveBeenCalledWith(mockUser.id);
       } else {
+        jest
+          .spyOn(userService, 'getById')
+          .mockRejectedValue(new NotFoundException('User not found'));
+
         await expect(controller.getById(1)).rejects.toThrow(NotFoundException);
         expect(userService.getById).toHaveBeenCalledWith(1);
       }

@@ -64,8 +64,6 @@ describe('UserRepository', () => {
   });
 
   describe('Should count users with filters', () => {
-    jest.spyOn(prismaService.user, 'count').mockResolvedValue(5);
-
     it.each<[string, SearchUserDto | null]>([
       ['Should count all users without filters', null],
       ['Should count users filtered by nickname', { nickname: 'John' }],
@@ -82,6 +80,8 @@ describe('UserRepository', () => {
         { nickname: 'test', minDate: date, maxDate: date },
       ],
     ])('%s', async (_, searchUserDto) => {
+      jest.spyOn(prismaService.user, 'count').mockResolvedValue(5);
+
       const result = await repository.count(searchUserDto);
 
       expect(result).toEqual(5);
@@ -146,8 +146,6 @@ describe('UserRepository', () => {
       },
     ];
 
-    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-
     it.each<[string, SearchUserDto]>([
       [
         'Should search user by nickname with default sorting',
@@ -166,6 +164,7 @@ describe('UserRepository', () => {
         { nickname: 'test', minDate: date, maxDate: date },
       ],
     ])('%s', async (_, searchUserDto) => {
+      jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
       const users = await repository.findUsers(searchUserDto, 0, 10, {
         sortBy: 'id',
         order: Order.DESC,

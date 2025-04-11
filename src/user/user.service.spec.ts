@@ -104,8 +104,6 @@ describe('UserService', () => {
         role: Role.USER,
       },
     ];
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
 
     it.each<[string, SearchUserDto]>([
       [
@@ -125,6 +123,9 @@ describe('UserService', () => {
         { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       ],
     ])('%s', async (_, searchUserDto) => {
+      jest.spyOn(repository, 'count').mockResolvedValue(1);
+      jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
+
       const users = await service.search(
         searchUserDto,
         {
