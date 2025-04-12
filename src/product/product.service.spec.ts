@@ -5,36 +5,17 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
 import { Order } from '../enum/order.enum';
+import { SearchProductDto } from './dto/search-product.dto';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 const mockFiles: Express.Multer.File[] = [
-  {
-    fieldname: 'image',
-    originalname: 'file1.jpg',
-    encoding: '7bit',
-    mimetype: 'image/jpeg',
-    buffer: Buffer.from('mockImageData'), // Моковані дані
-    size: 12345,
-    stream: null,
-    destination: '',
-    filename: 'file1.jpg',
-    path: '',
-  },
-  {
-    fieldname: 'image',
-    originalname: 'file2.jpg',
-    encoding: '7bit',
-    mimetype: 'image/jpeg',
-    buffer: Buffer.from('mockImageData'),
-    size: 12345,
-    stream: null,
-    destination: '',
-    filename: 'file2.jpg',
-    path: '',
-  },
+  { filename: 'file1.jpg' } as Express.Multer.File,
+  { filename: 'file2.jpg' } as Express.Multer.File,
 ];
 
 describe('ProductService', () => {
   let service: ProductService;
+  let fileService: FileService;
   let repository: ProductRepository;
 
   beforeEach(async () => {
@@ -67,6 +48,7 @@ describe('ProductService', () => {
     }).compile();
 
     service = module.get<ProductService>(ProductService);
+    fileService = module.get<FileService>(FileService);
     repository = module.get<ProductRepository>(ProductRepository);
   });
 
@@ -74,11 +56,11 @@ describe('ProductService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should return category products with default sorting', async () => {
+  it('Should return category products with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -102,11 +84,14 @@ describe('ProductService', () => {
         page: 1,
         pageSize: 1,
       },
-      {sortBy: 'id', order: Order.DESC},
+      { sortBy: 'id', order: Order.DESC },
     );
 
     expect(repository.countCategoryProducts).toHaveBeenCalledWith(1);
-    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1, {sortBy: 'id', order: Order.DESC});
+    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1, {
+      sortBy: 'id',
+      order: Order.DESC,
+    });
     expect(products).toEqual({
       products: mockProducts,
       total: 1,
@@ -118,7 +103,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return user products with default sorting', async () => {
+  it('Should return user products with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -159,7 +144,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return all products without filters with default sorting', async () => {
+  it('Should return all products without filters with default sorting', async () => {
     const mockProducts = [
       {
         id: 1,
@@ -195,7 +180,7 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return all products finded by title with default sorting', async () => {
+  describe('Should search product with filters', () => {
     const mockProducts = [
       {
         id: 1,
@@ -208,112 +193,60 @@ describe('ProductService', () => {
       },
     ];
 
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
+    it.each<[string, SearchProductDto]>([
+      [
+        'Should return all products finded by title with default sorting',
+        { title: 'Test' },
+      ],
+      [
+        'Should filter products by title and and category ids with default sorting',
+        { title: 'Test', categoryIds: [1] },
+      ],
+      [
+        'Should return all products finded by title and min price with default sorting',
+        { title: 'Test', minPrice: 20 },
+      ],
+      [
+        'Should return all products finded by title and min price with default sorting',
+        { title: 'Test', maxPrice: 20 },
+      ],
+      [
+        'Should return all products finded by title and price range with default sorting',
+        { title: 'Test', minPrice: 20, maxPrice: 20 },
+      ],
+      [
+        'Should filter products by title and price, range  and category ids with default sorting',
+        { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
+      ],
+    ])('%s', async (_, searchDto) => {
+      jest.spyOn(repository, 'count').mockResolvedValue(1);
+      jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
 
-    const products = await service.search(
-      { title: 'Test' },
-      { pageSize: 1, page: 1 },
-      {sortBy: 'id', order: Order.DESC}
-    );
+      const products = await service.search(
+        searchDto,
+        { page: 1, pageSize: 10 },
+        { sortBy: 'id', order: Order.DESC },
+      );
 
-    expect(repository.findProducts).toHaveBeenCalledWith(
-      { title: 'Test' },
-      0,
-      1,
-      {sortBy: 'id', order: Order.DESC}
-    );
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 1,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
+      expect(products).toEqual({
+        products: mockProducts,
+        total: 1,
+        pageSize: 10,
+        page: 1,
+        totalPages: 1,
+        prevPage: null,
+        nextPage: null,
+      });
+
+      expect(repository.findProducts).toHaveBeenCalledWith(searchDto, 0, 10, {
+        sortBy: 'id',
+        order: Order.DESC,
+      });
+      expect(repository.count).toHaveBeenCalledWith(searchDto);
     });
   });
 
-  it('should return all products finded by title and price range with default sorting', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'title',
-        price: 50,
-        userId: 1,
-        description: 'description',
-        images: ['1', '2'],
-        categories: [{ id: 1, name: 'test', description: 'test' }],
-      },
-    ];
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
-
-    const products = await service.search(
-      { title: 'Test', minPrice: 20, maxPrice: 20 },
-      { pageSize: 1, page: 1 },
-      {}
-    );
-
-    expect(repository.findProducts).toHaveBeenCalledWith(
-      { title: 'Test', minPrice: 20, maxPrice: 20 },
-      0,
-      1,
-      {}
-    );
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 1,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-  });
-
-  it('should filter products by title and price, range  and category ids with default sorting', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'title',
-        price: 50,
-        userId: 1,
-        description: 'description',
-        images: ['1', '2'],
-        categories: [{ id: 1, name: 'test', description: 'test' }],
-      },
-    ];
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
-
-    const products = await service.search(
-      { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
-      { pageSize: 1, page: 1 },
-      {sortBy: 'id', order: Order.DESC}
-    );
-
-    expect(repository.findProducts).toHaveBeenCalledWith(
-      { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
-      0,
-      1,
-      {sortBy: 'id', order: Order.DESC}
-    );
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 1,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-  });
-
-  it('should find product by id', async () => {
-    const productId = 3;
+  describe('Should find product by id', () => {
     const mockProduct = {
       id: 1,
       title: 'title',
@@ -324,16 +257,25 @@ describe('ProductService', () => {
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
+    it.each<[string, boolean]>([
+      ['Should find product by id', true],
+      ['Should throw NotFoundException because product not found', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
+        const product = await service.getById(1);
 
-    const product = await service.getById(productId);
+        expect(product).toEqual(mockProduct);
+        expect(repository.findById).toHaveBeenCalledWith(1);
+      } else {
+        jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
-    expect(repository.findById).toHaveBeenCalledWith(productId);
-
-    expect(product).toEqual(mockProduct);
+        await expect(service.getById(1)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 
-  it('should create product', async () => {
+  it('Should create product', async () => {
     const userId = 1;
     const images = ['1', '2'];
 
@@ -360,111 +302,100 @@ describe('ProductService', () => {
     expect(product).toEqual(mockProduct);
   });
 
-  it('should update all fields in product', async () => {
-    const productId = 2;
-    const userId = 1;
-    const images = ['image1.jpg', 'image2.jpg'];
-    const dto: UpdateProductDto = {
+  describe('should update product', () => {
+    const mockProduct = {
+      id: 1,
       title: 'Updated Title',
-      description: 'Updated Description',
       price: 100,
-      categoryIds: [1],
-    };
-
-    const mockProduct = {
-      id: productId,
-      userId,
-      title: dto.title,
-      description: dto.description,
-      price: dto.price,
-      images,
-      categories: [{ id: 1, name: 'test', description: 'test' }],
-    };
-
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
-    jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
-
-    const product = await service.update(userId, productId, dto, mockFiles);
-
-    expect(product).toEqual(mockProduct);
-  });
-
-  it('should update only title in product', async () => {
-    const userId = 1;
-    const productId = 1;
-    const imageNames = ['image1.jpg'];
-    const dto: UpdateProductDto = {
-      title: 'Updated Title',
-    };
-
-    const mockProduct = {
-      id: productId,
       userId: 1,
-      title: dto.title,
-      description: 'Old Description',
-      price: 50,
-      images: imageNames,
+      description: 'Description',
+      images: ['1', '2'],
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
-    jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
+    it.each<
+      [string, UpdateProductDto, Express.Multer.File[] | null, boolean, boolean]
+    >([
+      [
+        'should update all fields in product',
+        {
+          title: 'Updated Title',
+          price: 100,
+          categoryIds: [1],
+          description: 'Description',
+        },
+        mockFiles,
+        true,
+        true,
+      ],
+      [
+        'should update title in product',
+        { title: 'Updated Title' },
+        null,
+        true,
+        true,
+      ],
+      [
+        'should update description in product',
+        { description: 'Updated Description' },
+        null,
+        true,
+        true,
+      ],
+      ['should update price in product', { price: 52 }, null, true, true],
+      [
+        'should update categories in product',
+        { categoryIds: [1, 2] },
+        null,
+        true,
+        true,
+      ],
+      ['should update images in product', {}, mockFiles, true, true],
+      ['Should throw ForbiddenException', {}, null, false, true],
+      ['Should throw NotFoundException', {}, null, false, false],
+    ])('%s', async (_, dto, files, isSuccess, isProductFounded) => {
+      if (isSuccess && isProductFounded) {
+        jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
+        jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
 
-    const product = await service.update(userId, productId, dto);
+        if (files)
+          jest
+            .spyOn(fileService, 'createImages')
+            .mockResolvedValue(files.map((file) => file.filename));
 
-    expect(product).toEqual(mockProduct);
+        const product = await service.update(
+          mockProduct.userId,
+          mockProduct.id,
+          dto,
+          files,
+        );
+
+        expect(product).toEqual(mockProduct);
+        expect(repository.findById).toHaveBeenCalledWith(mockProduct.id);
+        expect(repository.update).toHaveBeenCalledWith(
+          mockProduct.id,
+          dto,
+          files ? files.map((file) => file.filename) : [],
+        );
+      } else if (!isProductFounded && !isSuccess) {
+        jest.spyOn(repository, 'findById').mockResolvedValue(null);
+
+        await expect(
+          service.update(mockProduct.userId, mockProduct.id, dto, files),
+        ).rejects.toThrow(NotFoundException);
+      } else {
+        jest
+          .spyOn(repository, 'findById')
+          .mockResolvedValue({ ...mockProduct, userId: 2 });
+
+        await expect(
+          service.update(mockProduct.userId, mockProduct.id, dto, files),
+        ).rejects.toThrow(ForbiddenException);
+      }
+    });
   });
 
-  it('should update only price in product', async () => {
-    const userId = 1;
-    const productId = 1;
-    const dto: UpdateProductDto = {
-      price: 52,
-    };
-    const imageNames = ['image1.jpg'];
-
-    const mockProduct = {
-      id: productId,
-      userId: 1,
-      title: 'Old title',
-      description: 'Old Description',
-      price: dto.price,
-      images: imageNames,
-      categories: [{ id: 1, name: 'test', description: 'test' }],
-    };
-
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
-    jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
-
-    const product = await service.update(userId, productId, dto);
-
-    expect(product).toEqual(mockProduct);
-  });
-
-  it('should update images in product', async () => {
-    const userId = 1;
-    const productId = 1;
-    const imageName = ['1.jpg'];
-    const dto: UpdateProductDto = {};
-    const mockProduct = {
-      id: productId,
-      userId: 1,
-      title: 'Old title',
-      description: 'Old Description',
-      price: 50,
-      images: imageName,
-      categories: [{ id: 1, name: 'test', description: 'test' }],
-    };
-
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
-    jest.spyOn(repository, 'update').mockResolvedValue(mockProduct);
-
-    const product = await service.update(userId, productId, dto, mockFiles);
-
-    expect(product).toEqual(mockProduct);
-  });
-
-  it('should delete product by id', async () => {
+  it('Should delete product by id', async () => {
     const mockProduct = {
       id: 1,
       userId: 1,

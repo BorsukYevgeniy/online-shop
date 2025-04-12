@@ -96,7 +96,7 @@ export class ProductRepository {
     });
   }
 
-  async findById(productId: number): Promise<ProductCategory> {
+  async findById(productId: number): Promise<ProductCategory | null> {
     return await this.prisma.product.findUnique({
       where: { id: productId },
       include: { categories: true },

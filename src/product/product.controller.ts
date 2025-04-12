@@ -69,8 +69,8 @@ export class ProductController {
   @UseInterceptors(ImagesInterceptor())
   async update(
     @Req() req: AuthRequest,
-    @Body() dto: UpdateProductDto,
     @Param('productId') productId: number,
+    @Body() dto: UpdateProductDto,
     @UploadedFiles() images?: Express.Multer.File[],
   ): Promise<ProductCategory> {
     return await this.productService.update(
