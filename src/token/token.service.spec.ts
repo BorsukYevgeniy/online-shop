@@ -3,7 +3,7 @@ import { TokenService } from './token.service';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import {Role} from '../enum/role.enum';
+import { Role } from '../enum/role.enum';
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -43,11 +43,11 @@ describe('TokenService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should generate and save tokens', async () => {
+  it('Should generate and save tokens', async () => {
     const userId = 1;
     const accessToken = 'access-token';
     const refreshToken = 'refresh-token';
@@ -71,7 +71,7 @@ describe('TokenService', () => {
     expect(result).toEqual({ accessToken, refreshToken });
   });
 
-  it('should verify refresh token', async () => {
+  it('Should verify refresh token', async () => {
     const refreshToken = 'refresh-token';
     const payload = { id: 1, roles: ['user'] };
 
@@ -85,7 +85,7 @@ describe('TokenService', () => {
     expect(result).toEqual(payload);
   });
 
-  it('should verify access token', async () => {
+  it('Should verify access token', async () => {
     const accessToken = 'access-token';
     const payload = { id: 1, roles: ['user'] };
 
@@ -99,7 +99,7 @@ describe('TokenService', () => {
     expect(result).toEqual(payload);
   });
 
-  it('should return user tokens', async () => {
+  it('Should return user tokens', async () => {
     const userId = 1;
     const tokens = [
       { id: 1, token: 'token', userId: 1, expiresAt: new Date() },
@@ -113,7 +113,7 @@ describe('TokenService', () => {
     expect(result).toEqual(tokens);
   });
 
-  it('should delete all user tokens', async () => {
+  it('Should delete all user tokens', async () => {
     const userId = 1;
 
     jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({ count: 1 });
@@ -123,7 +123,7 @@ describe('TokenService', () => {
     expect(repository.deleteAllUsersTokens).toHaveBeenCalledWith(userId);
   });
 
-  it('should delete user tokens', async () => {
+  it('Should delete user tokens', async () => {
     const token = 'token';
 
     jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({ count: 1 });

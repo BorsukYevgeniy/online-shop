@@ -110,18 +110,13 @@ export class ProductService {
     createProductDto: CreateProductDto,
     images: Express.Multer.File[],
   ): Promise<ProductCategory> {
-    try {
-      const imagesNames: string[] = await this.fileService.createImages(images);
+    const imagesNames: string[] = await this.fileService.createImages(images);
 
-      return await this.productRepository.create(
-        userId,
-        createProductDto,
-        imagesNames,
-      );
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError)
-        throw new BadRequestException('Product already exist');
-    }
+    return await this.productRepository.create(
+      userId,
+      createProductDto,
+      imagesNames,
+    );
   }
 
   async update(

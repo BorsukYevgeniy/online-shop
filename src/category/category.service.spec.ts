@@ -4,6 +4,8 @@ import { CategoryRepository } from './category.repository';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Order } from '../enum/order.enum';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -36,11 +38,11 @@ describe('CategoryService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should return all categories with default sorting', async () => {
+  it('Should return all categories with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -68,7 +70,7 @@ describe('CategoryService', () => {
     expect(categories).toEqual(mockCategories);
   });
 
-  it('should search category by name with default sorting', async () => {
+  it('Should search category by name with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -97,95 +99,122 @@ describe('CategoryService', () => {
     expect(categories).toEqual(mockCategories);
   });
 
-  it('should find category by id', async () => {
-    const mockCategories = { id: 1, name: 'TEST', description: 'TEST' };
+  describe('Should find category by id', () => {
+    it.each<[string, boolean]>([
+      ['Should find category by id', true],
+      ['Should throw NotFoundException because category not found', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        const mockCategories = { id: 1, name: 'TEST', description: 'TEST' };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockCategories);
+        jest.spyOn(repository, 'findById').mockResolvedValue(mockCategories);
 
-    const categories = await service.getById(1);
+        const categories = await service.getById(1);
 
-    expect(repository.findById).toHaveBeenCalledWith(1);
-    expect(categories).toEqual(mockCategories);
+        expect(repository.findById).toHaveBeenCalledWith(1);
+        expect(categories).toEqual(mockCategories);
+      } else {
+        jest.spyOn(repository, 'findById').mockResolvedValue(null);
+
+        await expect(service.getById(0)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 
-  it('should create category', async () => {
-    const dto: CreateCategoryDto = {
-      name: 'TEST',
-      description: 'TEST',
-    };
+  describe('Should create category', () => {
+    it.each<[string, CreateCategoryDto, boolean]>([
+      [
+        'Should create category',
+        { name: 'Category', description: 'Description' },
+        true,
+      ],
+      [
+        'Should throw BadRequestException because category already exists',
+        { name: 'Category', description: 'Description' },
+        true,
+      ],
+    ])('%s', async (_, dto, isSuccess) => {
+      if (isSuccess) {
+        const mockCategory = {
+          id: 1,
+          ...dto,
+        };
 
-    const mockCategory = {
-      id: 1,
-      ...dto,
-    };
+        jest.spyOn(repository, 'create').mockResolvedValue(mockCategory);
 
-    jest.spyOn(repository, 'create').mockResolvedValue(mockCategory);
-    const category = await service.create(dto);
+        const category = await service.create(dto);
 
-    expect(repository.create).toHaveBeenCalledWith(dto);
-    expect(mockCategory).toEqual(category);
+        expect(repository.create).toHaveBeenCalledWith(dto);
+        expect(mockCategory).toEqual(category);
+      } else {
+        jest.spyOn(repository, 'create').mockRejectedValue(
+          new PrismaClientKnownRequestError('Category already exists', {
+            clientVersion: '4.0.0',
+            code: 'P2002',
+          }),
+        );
+
+        await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      }
+    });
   });
 
-  it('should update name in category', async () => {
-    const dto: UpdateCategoryDto = {
-      name: 'TEST',
-    };
+  describe('Should update category', () => {
+    it.each<[string, UpdateCategoryDto]>([
+      ['Should update name in category', { name: 'TEST' }],
+      ['Should update description in category', { description: 'TEST' }],
+      [
+        'Should update all fields in category',
+        { name: 'TEST', description: 'TEST' },
+      ],
+      ['Should throw NotFoundException because category not found', {}],
+    ])('%s', async (_, dto) => {
+      if (dto) {
+        const mockCategory = {
+          id: 1,
+          name: 'TEST',
+          description: 'Test',
+          ...dto,
+        };
 
-    const mockCategory = {
-      id: 1,
-      description: 'TEST',
-      name: dto.name,
-    };
+        jest.spyOn(repository, 'update').mockResolvedValue(mockCategory);
 
-    jest.spyOn(repository, 'update').mockResolvedValue(mockCategory);
+        const category = await service.update(1, dto);
 
-    const category = await service.update(1, dto);
+        expect(repository.update).toHaveBeenCalledWith(1, dto);
+        expect(mockCategory).toEqual(category);
+      } else {
+        jest.spyOn(repository, 'update').mockRejectedValue(
+          new PrismaClientKnownRequestError('Category not found', {
+            clientVersion: '4.0.0',
+            code: 'P2025',
+          }),
+        );
 
-    expect(repository.update).toHaveBeenCalledWith(1, dto);
-    expect(mockCategory).toEqual(category);
+        await expect(service.update(1, dto)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 
-  it('should update description in category', async () => {
-    const dto: UpdateCategoryDto = {
-      description: 'TEST',
-    };
+  describe('Should delete category', () => {
+    it.each<[string, number]>([
+      ['Should delete category', 1],
+      ['Should throw NotFoundException because category not found', 0],
+    ])('%s', async (_, id) => {
+      if (id) {
+        jest.spyOn(repository, 'delete').mockResolvedValue(undefined);
+        await service.delete(id);
 
-    const mockCategory = {
-      id: 1,
-      name: 'TEST',
-      description: dto.description,
-    };
-
-    jest.spyOn(repository, 'update').mockResolvedValue(mockCategory);
-    const category = await service.update(1, dto);
-
-    expect(repository.update).toHaveBeenCalledWith(1, dto);
-    expect(mockCategory).toEqual(category);
-  });
-
-  it('should update all fields in category', async () => {
-    const dto: UpdateCategoryDto = {
-      description: 'TEST',
-      name: 'TEST',
-    };
-
-    const mockCategory = {
-      id: 1,
-      name: dto.name,
-      description: dto.description,
-    };
-
-    jest.spyOn(repository, 'update').mockResolvedValue(mockCategory);
-
-    const category = await service.update(1, dto);
-
-    expect(repository.update).toHaveBeenCalledWith(1, dto);
-    expect(mockCategory).toEqual(category);
-  });
-
-  it('should remove category', async () => {
-    await service.delete(1);
-
-    expect(repository.delete).toHaveBeenCalledWith(1);
+        expect(repository.delete).toHaveBeenCalledWith(id);
+      } else {
+        jest.spyOn(repository, 'delete').mockRejectedValue(
+          new PrismaClientKnownRequestError('Category not found', {
+            clientVersion: '4.0.0',
+            code: 'P2025',
+          }),
+        );
+        await expect(service.delete(id)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 });

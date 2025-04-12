@@ -52,7 +52,7 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('Should assing new admin', async () => {
+  describe('Should assing new admin', () => {
     const mockUser = {
       id: 1,
       nickname: 'test',
@@ -60,12 +60,29 @@ describe('UserController', () => {
       role: Role.USER,
     };
 
-    jest.spyOn(userService, 'assignAdmin').mockResolvedValue(mockUser);
+    it.each<[string, boolean]>([
+      ['Should assing new admin', true],
+      ['Should throw NotFoundException because user not found', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        jest.spyOn(userService, 'assignAdmin').mockResolvedValue(mockUser);
 
-    const user = await controller.assignAdmin(1);
+        const user = await controller.assignAdmin(1);
 
-    expect(user).toEqual(mockUser);
+        expect(user).toEqual(mockUser);
+      } else if (!isSuccess) {
+        jest
+          .spyOn(userService, 'assignAdmin')
+          .mockRejectedValue(new NotFoundException());
+
+        await expect(controller.assignAdmin(2)).rejects.toThrow(
+          NotFoundException,
+        );
+      }
+    });
   });
+
+
 
   it('Should return all users without filters with default sorting', async () => {
     const mockUsers = [
@@ -160,10 +177,14 @@ describe('UserController', () => {
         prevPage: null,
       });
 
-      expect(userService.search).toHaveBeenCalledWith(searchUserDto, {page: 1, pageSize: 10}, {
-        sortBy: 'id',
-        order: Order.DESC,
-      });
+      expect(userService.search).toHaveBeenCalledWith(
+        searchUserDto,
+        { page: 1, pageSize: 10 },
+        {
+          sortBy: 'id',
+          order: Order.DESC,
+        },
+      );
     });
   });
 
@@ -253,15 +274,35 @@ describe('UserController', () => {
     });
   });
 
-  it('Should delete user', async () => {
+  describe('Should delete user', () => {
     const res = {
       clearCookie: jest.fn(),
       sendStatus: jest.fn(),
     } as unknown as Response;
 
-    await controller.deleteMe(req, res);
+    it('Should delete user by himself', async () => {
+      await controller.deleteMe(req, res);
 
-    expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
-    expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
+      expect(userService.delete).toHaveBeenCalledWith(req.user.id);
+      expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
+      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
+    });
+
+    it.each<[string, boolean]>([
+      ['Should delete user by id', true],
+      ['Should throw NotFoundException', true],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        await controller.delete(1);
+
+        expect(userService.delete).toHaveBeenCalledWith(1);
+      } else {
+        jest
+          .spyOn(userService, 'delete')
+          .mockRejectedValue(new NotFoundException());
+
+        expect(controller.delete).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 });

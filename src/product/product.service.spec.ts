@@ -7,6 +7,9 @@ import { FileService } from '../file/file.service';
 import { Order } from '../enum/order.enum';
 import { SearchProductDto } from './dto/search-product.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Product } from '@prisma/client';
+import { title } from 'process';
+import { ProductCategory } from './types/product.types';
 
 const mockFiles: Express.Multer.File[] = [
   { filename: 'file1.jpg' } as Express.Multer.File,
@@ -302,22 +305,22 @@ describe('ProductService', () => {
     expect(product).toEqual(mockProduct);
   });
 
-  describe('should update product', () => {
-    const mockProduct = {
+  describe('Should update product', () => {
+    const mockProduct: ProductCategory = {
+      title: 'title',
+      description: 'description',
       id: 1,
-      title: 'Updated Title',
+      images: ['1.png'],
       price: 100,
       userId: 1,
-      description: 'Description',
-      images: ['1', '2'],
-      categories: [{ id: 1, name: 'test', description: 'test' }],
+      categories: [{ id: 1, name: 'name', description: 'description' }],
     };
 
     it.each<
       [string, UpdateProductDto, Express.Multer.File[] | null, boolean, boolean]
     >([
       [
-        'should update all fields in product',
+        'Should update all fields in product',
         {
           title: 'Updated Title',
           price: 100,
@@ -329,28 +332,28 @@ describe('ProductService', () => {
         true,
       ],
       [
-        'should update title in product',
+        'Should update title in product',
         { title: 'Updated Title' },
         null,
         true,
         true,
       ],
       [
-        'should update description in product',
+        'Should update description in product',
         { description: 'Updated Description' },
         null,
         true,
         true,
       ],
-      ['should update price in product', { price: 52 }, null, true, true],
+      ['Should update price in product', { price: 52 }, null, true, true],
       [
-        'should update categories in product',
+        'Should update categories in product',
         { categoryIds: [1, 2] },
         null,
         true,
         true,
       ],
-      ['should update images in product', {}, mockFiles, true, true],
+      ['Should update images in product', {}, mockFiles, true, true],
       ['Should throw ForbiddenException', {}, null, false, true],
       ['Should throw NotFoundException', {}, null, false, false],
     ])('%s', async (_, dto, files, isSuccess, isProductFounded) => {
@@ -395,21 +398,43 @@ describe('ProductService', () => {
     });
   });
 
-  it('Should delete product by id', async () => {
-    const mockProduct = {
+  describe('Should delete product by id', () => {
+    const mockProduct: ProductCategory = {
+      title: 'title',
+      description: 'description',
       id: 1,
+      images: ['1.png'],
+      price: 100,
       userId: 1,
-      price: 22,
-      title: 'TEST',
-      description: 'Test',
-      images: ['13', '14'],
-      categories: [{ id: 1, name: 'test', description: 'test' }],
+      categories: [{ id: 1, name: 'name', description: 'description' }],
     };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
+    it.each<[string, boolean, boolean]>([
+      ['Should delete product by id', true, true],
+      ['Should throw NotFoundException', false, true],
+      ['Should throw FobbiddedException', false, true],
+    ])('%s', async (_, isSuccess, isProductFounded) => {
+      if (isSuccess && isProductFounded) {
+        jest.spyOn(repository, 'findById').mockResolvedValue(mockProduct);
 
-    await service.delete(1, 1);
+        await service.delete(1, 1);
 
-    expect(repository.delete).toHaveBeenCalledWith(1);
+        expect(repository.delete).toHaveBeenCalledWith(1);
+      } else if (!isSuccess && isProductFounded) {
+        jest
+          .spyOn(repository, 'findById')
+          .mockResolvedValue({ ...mockProduct, userId: 2 });
+
+        await expect(
+          service.delete(mockProduct.userId, mockProduct.id),
+        ).rejects.toThrow(ForbiddenException);
+      } else {
+        jest.spyOn(repository, 'findById').mockResolvedValue(null);
+
+        await expect(
+          service.delete(mockProduct.userId, mockProduct.id),
+        ).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 });

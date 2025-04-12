@@ -33,11 +33,11 @@ describe('TokenRepository', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(tokensRepository).toBeDefined();
   });
 
-  it('should create a new token', async () => {
+  it('Should create a new token', async () => {
     const userId = 1;
     const refreshToken = 'refreshToken';
     const expiresAt = new Date();
@@ -57,7 +57,7 @@ describe('TokenRepository', () => {
     });
   });
 
-  it('should find user tokens by userId', async () => {
+  it('Should find user tokens by userId', async () => {
     const userId = 1;
     const tokens: Token[] = [
       {
@@ -75,7 +75,7 @@ describe('TokenRepository', () => {
     });
   });
 
-  it('should delete all user tokens by user id', async () => {
+  it('Should delete all user tokens by user id', async () => {
     const userId = 1;
     jest
       .spyOn(prismaService.token, 'deleteMany')
@@ -89,7 +89,7 @@ describe('TokenRepository', () => {
     });
   });
 
-  it('should delete user tokens by token', async () => {
+  it('Should delete user tokens by token', async () => {
     const token = 'refreshToken';
     jest
       .spyOn(prismaService.token, 'deleteMany')
@@ -103,7 +103,7 @@ describe('TokenRepository', () => {
     });
   });
 
-  it('should delete expired tokens', async () => {
+  it('Should delete expired tokens', async () => {
     jest
       .spyOn(prismaService.token, 'deleteMany')
       .mockResolvedValue({ count: 1 });

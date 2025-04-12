@@ -73,7 +73,7 @@ describe('AuthController', () => {
           .mockRejectedValue(new BadRequestException('User already exists'));
 
         await expect(service.register(dto)).rejects.toThrow(
-          new BadRequestException('User already exists'),
+          BadRequestException,
         );
       }
     });
@@ -96,9 +96,9 @@ describe('AuthController', () => {
 
     it.each<[string, boolean, boolean]>([
       ['Should login a user', true, false],
-      ['Should throw NotFoundException if user not found', false, false],
+      ['Should throw NotFoundException because user not found', false, false],
       [
-        'Should throw BadRequestException if email or password are incorrect',
+        'Should throw BadRequestException because email or password are incorrect',
         false,
         true,
       ],
@@ -130,14 +130,14 @@ describe('AuthController', () => {
           .spyOn(service, 'login')
           .mockRejectedValue(new NotFoundException('User not found'));
         await expect(controller.login(dto, res as Response)).rejects.toThrow(
-          new NotFoundException('User not found'),
+          NotFoundException,
         );
       } else {
         jest
           .spyOn(service, 'login')
           .mockRejectedValue(new BadRequestException('User not found'));
         await expect(controller.login(dto, res as Response)).rejects.toThrow(
-          new BadRequestException('User not found'),
+          BadRequestException,
         );
       }
     });

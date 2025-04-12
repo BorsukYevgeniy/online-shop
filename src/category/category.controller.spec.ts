@@ -6,6 +6,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ProductService } from '../product/product.service';
 import { Order } from '../enum/order.enum';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -48,11 +49,11 @@ describe('CategoryController', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all categories with default sorting', async () => {
+  it('Should return all categories with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -65,16 +66,22 @@ describe('CategoryController', () => {
 
     jest.spyOn(categoryService, 'getAll').mockResolvedValue(mockCategories);
 
-    const categories = await controller.getAll({ page: 1, pageSize: 1 },{sortBy: 'id', order:Order.DESC});
+    const categories = await controller.getAll(
+      { page: 1, pageSize: 1 },
+      { sortBy: 'id', order: Order.DESC },
+    );
 
-    expect(categoryService.getAll).toHaveBeenCalledWith({
-      page: 1,
-      pageSize: 1,
-    }, {sortBy: 'id', order:Order.DESC});
+    expect(categoryService.getAll).toHaveBeenCalledWith(
+      {
+        page: 1,
+        pageSize: 1,
+      },
+      { sortBy: 'id', order: Order.DESC },
+    );
     expect(categories).toEqual(mockCategories);
   });
 
-  it('should search category by name with default sorting', async () => {
+  it('Should search category by name with default sorting', async () => {
     const mockCategories = {
       categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
       total: 1,
@@ -101,18 +108,33 @@ describe('CategoryController', () => {
     expect(categories).toEqual(mockCategories);
   });
 
-  it('should find category by id', async () => {
-    const mockCategories = { id: 1, name: 'TEST', description: 'TEST' };
+  describe('Should find category by id', () => {
+    it.each<[string, boolean]>([
+      ['Should find category by id', true],
+      ['Should throw NotFoundException because category not found', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        const mockCategories = { id: 1, name: 'TEST', description: 'TEST' };
 
-    jest.spyOn(categoryService, 'getById').mockResolvedValue(mockCategories);
+        jest
+          .spyOn(categoryService, 'getById')
+          .mockResolvedValue(mockCategories);
 
-    const categories = await controller.getById(1);
+        const categories = await controller.getById(1);
 
-    expect(categoryService.getById).toHaveBeenCalledWith(1);
-    expect(categories).toEqual(mockCategories);
+        expect(categoryService.getById).toHaveBeenCalledWith(1);
+        expect(categories).toEqual(mockCategories);
+      } else {
+        jest
+          .spyOn(categoryService, 'getById')
+          .mockRejectedValue(new NotFoundException('Category not found'));
+
+        await expect(controller.getById(0)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 
-  it('should return category products', async () => {
+  it('Should return category products', async () => {
     const mockProducts = {
       products: [
         {
@@ -146,89 +168,108 @@ describe('CategoryController', () => {
       { sortBy: 'id', order: Order.DESC },
     );
 
-    expect(productService.getCategoryProducts).toHaveBeenCalledWith(1, {
-      page: 1,
-      pageSize: 1,
-    }, {sortBy: 'id', order: Order.DESC});  
+    expect(productService.getCategoryProducts).toHaveBeenCalledWith(
+      1,
+      {
+        page: 1,
+        pageSize: 1,
+      },
+      { sortBy: 'id', order: Order.DESC },
+    );
     expect(products).toEqual(mockProducts);
   });
 
-  it('should create category', async () => {
-    const dto: CreateCategoryDto = {
-      name: 'TEST',
-      description: 'TEST',
-    };
+  describe('Should create category', () => {
+    it.each<[string, CreateCategoryDto, boolean]>([
+      [
+        'Should create category',
+        { name: 'Category', description: 'Description' },
+        true,
+      ],
+      [
+        'Should throw BadRequestException because category already exists',
+        { name: 'Category', description: 'Description' },
+        true,
+      ],
+    ])('%s', async (_, dto, isSuccess) => {
+      if (isSuccess) {
+        const mockCategory = {
+          id: 1,
+          ...dto,
+        };
 
-    const mockCategory = {
-      id: 1,
-      ...dto,
-    };
+        jest.spyOn(categoryService, 'create').mockResolvedValue(mockCategory);
 
-    jest.spyOn(categoryService, 'create').mockResolvedValue(mockCategory);
-    const category = await controller.create(dto);
+        const category = await controller.create(dto);
 
-    expect(categoryService.create).toHaveBeenCalledWith(dto);
-    expect(mockCategory).toEqual(category);
+        expect(categoryService.create).toHaveBeenCalledWith(dto);
+        expect(mockCategory).toEqual(category);
+      } else {
+        jest
+          .spyOn(categoryService, 'create')
+          .mockRejectedValue(
+            new BadRequestException('Category already exists', {}),
+          );
+
+        await expect(controller.create(dto)).rejects.toThrow(
+          BadRequestException,
+        );
+      }
+    });
   });
 
-  it('should update name in category', async () => {
-    const dto: UpdateCategoryDto = {
-      name: 'TEST',
-    };
+  describe('Should update category', () => {
+    it.each<[string, UpdateCategoryDto, boolean]>([
+      ['Should update name in category', { name: 'TEST' }, true],
+      ['Should update description in category', { description: 'TEST' }, true],
+      [
+        'Should update all fields in category',
+        { name: 'TEST', description: 'TEST' },
+        true,
+      ],
+      ['Should throw NotFoundException because product not found', {}, false],
+    ])('%s', async (_, dto, isSuccess) => {
+      if (isSuccess) {
+        const mockCategory = {
+          id: 1,
+          name: 'TEST',
+          description: 'Test',
+          ...dto,
+        };
 
-    const mockCategory = {
-      id: 1,
-      description: 'TEST',
-      name: dto.name,
-    };
+        jest.spyOn(categoryService, 'update').mockResolvedValue(mockCategory);
 
-    jest.spyOn(categoryService, 'update').mockResolvedValue(mockCategory);
-    const category = await controller.update(1, dto);
+        const category = await controller.update(1, dto);
 
-    expect(categoryService.update).toHaveBeenCalledWith(1, dto);
-    expect(mockCategory).toEqual(category);
+        expect(categoryService.update).toHaveBeenCalledWith(1, dto);
+        expect(mockCategory).toEqual(category);
+      } else {
+        jest
+          .spyOn(categoryService, 'update')
+          .mockRejectedValue(new NotFoundException('Category not found'));
+        await expect(controller.update(1, dto)).rejects.toThrow(
+          NotFoundException,
+        );
+      }
+    });
   });
 
-  it('should update description in category', async () => {
-    const dto: UpdateCategoryDto = {
-      description: 'TEST',
-    };
+  describe('Should delete category', () => {
+    it.each<[string, number]>([
+      ['Should delete category', 1],
+      ['Should throw NotFoundException because category not found', 0],
+    ])('%s', async (_, id) => {
+      if (id) {
+        jest.spyOn(categoryService, 'delete').mockResolvedValue(undefined);
+        await controller.delete(id);
 
-    const mockCategory = {
-      id: 1,
-      name: 'TEST',
-      description: dto.description,
-    };
-
-    jest.spyOn(categoryService, 'update').mockResolvedValue(mockCategory);
-    const category = await controller.update(1, dto);
-
-    expect(categoryService.update).toHaveBeenCalledWith(1, dto);
-    expect(mockCategory).toEqual(category);
-  });
-
-  it('should update all fields in category', async () => {
-    const dto: UpdateCategoryDto = {
-      description: 'TEST',
-      name: 'TEST',
-    };
-
-    const mockCategory = {
-      id: 1,
-      name: dto.name,
-      description: dto.description,
-    };
-
-    jest.spyOn(categoryService, 'update').mockResolvedValue(mockCategory);
-    const category = await controller.update(1, dto);
-
-    expect(categoryService.update).toHaveBeenCalledWith(1, dto);
-    expect(mockCategory).toEqual(category);
-  });
-
-  it('should remove category', async () => {
-    await controller.delete(1);
-
-    expect(categoryService.delete).toHaveBeenCalledWith(1);
+        expect(categoryService.delete).toHaveBeenCalledWith(id);
+      } else {
+        jest
+          .spyOn(categoryService, 'delete')
+          .mockRejectedValue(new NotFoundException('Category not found'));
+        await expect(controller.delete(id)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 });

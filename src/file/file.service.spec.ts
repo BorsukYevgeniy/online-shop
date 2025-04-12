@@ -16,48 +16,36 @@ describe('FileService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', async () => {
+  it('Should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('should create files and return file names', async () => {
+  it('Should create files and return file names', async () => {
     const mockImages = [
       {
-        fieldname: 'image',
-        originalname: 'file1.jpg',
+        fieldname: 'file',
+        originalname: 'TradeHistory.csv',
         encoding: '7bit',
-        mimetype: 'image/jpeg',
-        buffer: Buffer.from('mockImageData'),
-        size: 12345,
-        stream: null,
-        destination: '',
-        filename: 'file1.jpg',
-        path: '',
-      },
+        mimetype: 'text/csv',
+        buffer: Buffer.from(__dirname),
+        size: 51828,
+      } as Express.Multer.File,
       {
-        fieldname: 'image',
-        originalname: 'file1.jpg',
+        fieldname: 'file',
+        originalname: 'TradeHistory.csv',
         encoding: '7bit',
-        mimetype: 'image/jpeg',
-        buffer: Buffer.from('mockImageData'),
-        size: 12345,
-        stream: null,
-        destination: '',
-        filename: 'file1.jpg',
-        path: '',
-      },
+        mimetype: 'text/csv',
+        buffer: Buffer.from(__dirname),
+        size: 51828,
+      } as Express.Multer.File,
       {
-        fieldname: 'image',
-        originalname: 'file1.jpg',
+        fieldname: 'file',
+        originalname: 'TradeHistory.csv',
         encoding: '7bit',
-        mimetype: 'image/jpeg',
-        buffer: Buffer.from('mockImageData'),
-        size: 12345,
-        stream: null,
-        destination: '',
-        filename: 'file1.jpg',
-        path: '',
-      },
+        mimetype: 'text/csv',
+        buffer: Buffer.from(__dirname),
+        size: 51828,
+      } as Express.Multer.File,
     ];
 
     const result = await service.createImages(mockImages);

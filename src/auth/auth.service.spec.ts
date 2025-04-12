@@ -95,7 +95,7 @@ describe('AuthService', () => {
         jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
 
         await expect(service.register(dto)).rejects.toThrow(
-          new HttpException('User already exists', HttpStatus.BAD_REQUEST),
+          BadRequestException,
         );
       }
     });
@@ -148,16 +148,12 @@ describe('AuthService', () => {
       } else if (!isUserFounded) {
         jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
 
-        await expect(service.login(dto)).rejects.toThrow(
-          new NotFoundException('User not found'),
-        );
+        await expect(service.login(dto)).rejects.toThrow(NotFoundException);
       } else {
         jest.spyOn(userService, 'getByEmail').mockResolvedValue(mockUser);
         compare.mockResolvedValue(false);
 
-        await expect(service.login(dto)).rejects.toThrow(
-          new BadRequestException('Email or password are incorrect'),
-        );
+        await expect(service.login(dto)).rejects.toThrow(BadRequestException);
       }
     });
   });

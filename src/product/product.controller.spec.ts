@@ -8,12 +8,14 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { Order } from '../enum/order.enum';
 import { SearchProductDto } from './dto/search-product.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Role } from '../enum/role.enum';
+import { ProductCategory } from './types/product.types';
 
 describe('ProductController', () => {
   let controller: ProductController;
   let service: ProductService;
 
-  const req: AuthRequest = { user: { id: 1, roles: ['1'] } } as any;
+  const req: AuthRequest = { user: { id: 1, role: Role.ADMIN } } as AuthRequest;
 
   const mockFiles: Express.Multer.File[] = [
     { filename: 'file1.jpg' } as Express.Multer.File,
@@ -312,21 +314,45 @@ describe('ProductController', () => {
     });
   });
 
-  it('Should delete product by id', async () => {
-    const mockProduct = {
+  describe('Should delete product by id', () => {
+    const mockProduct: ProductCategory = {
+      title: 'title',
+      description: 'description',
       id: 1,
+      images: ['1.png'],
+      price: 100,
       userId: 1,
-      price: 22,
-      title: 'TEST',
-      description: 'Test',
-      images: ['13', '14'],
-      categories: [{ id: 1, name: 'test', description: 'test' }],
+      categories: [{ id: 1, name: 'name', description: 'description' }],
     };
 
-    jest.spyOn(service, 'getById').mockResolvedValue(mockProduct);
+    it.each<[string, boolean, boolean]>([
+      ['Should delete product by id', true, true],
+      ['Should throw NotFoundException', false, true],
+      ['Should throw FobbiddedException', false, true],
+    ])('%s', async (_, isSuccess, isProductFounded) => {
+      if (isSuccess && isProductFounded) {
+        jest.spyOn(service, 'delete').mockResolvedValue();
 
-    await controller.delete(req, 1);
+        await controller.delete(req, 1);
 
-    expect(service.delete).toHaveBeenCalledWith(req.user.id, 1);
+        expect(service.delete).toHaveBeenCalledWith(1,1);
+      } else if (!isSuccess && isProductFounded) {
+        jest
+          .spyOn(service, 'delete')
+          .mockRejectedValue(new ForbiddenException());
+
+        await expect(
+          service.delete(mockProduct.userId, mockProduct.id),
+        ).rejects.toThrow(ForbiddenException);
+      } else {
+        jest
+          .spyOn(service, 'delete')
+          .mockRejectedValue(new NotFoundException());
+
+        await expect(
+          service.delete(mockProduct.userId, mockProduct.id),
+        ).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 });

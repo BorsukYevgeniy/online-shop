@@ -21,7 +21,7 @@ import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
 import { ProductService } from './product.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
-import {AuthRequest} from '../types/request.type';
+import { AuthRequest } from '../types/request.type';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SortProductDto } from './dto/sort-product.dto';
 

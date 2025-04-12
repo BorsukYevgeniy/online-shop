@@ -47,7 +47,7 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
-  it('Should assing new admin', async () => {
+  describe('Should assing new admin', () => {
     const mockUser = {
       id: 1,
       nickname: 'test',
@@ -55,12 +55,24 @@ describe('UserService', () => {
       role: Role.USER,
     };
 
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
-    jest.spyOn(repository, 'assignAdmin').mockResolvedValue(mockUser);
+    it.each<[string, boolean]>([
+      ['Should assing new admin', true],
+      ['Should throw NotFoundException because user not found', false],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        jest.spyOn(repository, 'findById').mockResolvedValue(mockUser);
+        jest.spyOn(repository, 'assignAdmin').mockResolvedValue(mockUser);
 
-    const user = await service.assignAdmin(1);
+        const user = await service.assignAdmin(1);
 
-    expect(user).toEqual(mockUser);
+        expect(user).toEqual(mockUser);
+      } else if (!isSuccess) {
+        jest.spyOn(repository, 'findById').mockResolvedValue(null);
+
+        expect(repository.assignAdmin).not.toHaveBeenCalled();
+        await expect(service.assignAdmin(2)).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 
   it('Should find all users without filters with default sorting', async () => {
@@ -229,9 +241,22 @@ describe('UserService', () => {
     expect(repository.create).toHaveBeenCalledWith(dto);
   });
 
-  it('Should delete a user by id', async () => {
-    await service.delete(1);
+  describe('Should delete user', () => {
+    it.each<[string, boolean]>([
+      ['Should delete user by id', true],
+      ['Should throw NotFoundException', true],
+    ])('%s', async (_, isSuccess) => {
+      if (isSuccess) {
+        await service.delete(1);
 
-    expect(repository.delete).toHaveBeenCalledWith(1);
+        expect(repository.delete).toHaveBeenCalledWith(1);
+      } else {
+        jest
+          .spyOn(repository, 'delete')
+          .mockRejectedValue(new NotFoundException());
+
+        expect(service.delete).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 });

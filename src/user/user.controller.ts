@@ -74,7 +74,11 @@ export class UserController {
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
-    return await this.productService.getUserProducts(userId, paginationDto, sortDto);
+    return await this.productService.getUserProducts(
+      userId,
+      paginationDto,
+      sortDto,
+    );
   }
 
   // Привоїти користувачу роль адміна

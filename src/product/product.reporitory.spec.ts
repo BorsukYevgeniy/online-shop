@@ -391,7 +391,6 @@ describe('ProductRepository', () => {
     });
   });
 
-  ;
   it('Should delete product by id', async () => {
     await repository.delete(1);
 

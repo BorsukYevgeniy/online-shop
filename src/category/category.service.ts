@@ -11,7 +11,6 @@ import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { PaginatedCategory } from './type/category.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
-import { instanceToInstance } from 'class-transformer';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -96,7 +95,10 @@ export class CategoryService {
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     try {
-      return await this.categoryRepository.update(categoryId, updateCategoryDto);
+      return await this.categoryRepository.update(
+        categoryId,
+        updateCategoryDto,
+      );
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError)
         throw new NotFoundException('Category not found');

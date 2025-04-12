@@ -110,12 +110,6 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    try {
-      return await this.userRepository.assignAdmin(userId);
-    } catch (e: unknown) {
-      if (e instanceof PrismaClientKnownRequestError) {
-        throw new BadRequestException('User already has admin role');
-      }
-    }
+    return await this.userRepository.assignAdmin(userId);
   }
 }
