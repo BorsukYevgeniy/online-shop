@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -16,6 +17,8 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductService {
+  private readonly logger: Logger = new Logger(ProductService.name);
+
   constructor(
     private readonly productRepository: ProductRepository,
     private readonly fileService: FileService,
@@ -29,14 +32,22 @@ export class ProductService {
       await this.productRepository.findById(productId);
 
     if (!product) {
+      this.logger.warn(
+        `User ${userId} tried to access a product ${productId} that does not exist`,
+      );
       throw new NotFoundException('Product not found');
     }
 
     if (product.userId !== userId) {
+      this.logger.warn(
+        `User ${userId} tried to access a product ${productId} that does not belong to them`,
+      );
       throw new ForbiddenException();
     }
 
-    return;
+    this.logger.log(
+      `User ${userId} access to the product ${productId} is allowed`,
+    );
   }
 
   async getAll(
@@ -53,6 +64,8 @@ export class ProductService {
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
+
+    this.logger.log('Products fetched successfully, total: ' + total);
 
     return {
       products,
@@ -83,6 +96,8 @@ export class ProductService {
       this.productRepository.count(searchProductDto),
     ]);
 
+    this.logger.log('Products searched successfully, total: ' + total);
+
     const totalPages: number = Math.ceil(total / pageSize);
 
     return {
@@ -100,8 +115,12 @@ export class ProductService {
     const product: ProductCategory | null =
       await this.productRepository.findById(productId);
 
-    if (!product) throw new NotFoundException('Product not found');
+    if (!product) {
+      this.logger.warn(`Product ${productId} doesnt exist`);
+      throw new NotFoundException('Product not found');
+    }
 
+    this.logger.log(`Product ${productId} fetched successfully`);
     return product;
   }
 
@@ -112,11 +131,16 @@ export class ProductService {
   ): Promise<ProductCategory> {
     const imagesNames: string[] = await this.fileService.createImages(images);
 
-    return await this.productRepository.create(
+    const product = await this.productRepository.create(
       userId,
       createProductDto,
       imagesNames,
     );
+
+    this.logger.log(
+      `Product ${product.id} created successfully by user ${userId}`,
+    );
+    return product;
   }
 
   async update(
@@ -134,14 +158,22 @@ export class ProductService {
         imagesNames = await this.fileService.createImages(images);
       }
 
-      return await this.productRepository.update(
+      const product = await this.productRepository.update(
         productId,
         updateProductDto,
         imagesNames,
       );
+
+      this.logger.log(
+        `Product ${product.id} updated successfully by user ${userId}`,
+      );
+      return product;
     } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError)
+      if (e instanceof PrismaClientKnownRequestError) {
+        this.logger.warn(`Product ${productId} doesnt exist`);
+
         throw new NotFoundException('Product not found');
+      }
     }
   }
 
@@ -149,10 +181,15 @@ export class ProductService {
     await this.validateProductOwnership(userId, productId);
 
     try {
-      return await this.productRepository.delete(productId);
+      await this.productRepository.delete(productId);
+      this.logger.log(
+        `Product ${productId} deleted successfully by user ${userId}`,
+      );
     } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError)
+      if (e instanceof PrismaClientKnownRequestError) {
+        this.logger.warn(`Product ${productId} doesnt exist`);
         throw new NotFoundException('Product not found');
+      }
     }
   }
 
@@ -175,6 +212,10 @@ export class ProductService {
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
+
+    this.logger.log(
+      `Products fetched successfully for category ${categoryId}, total: ${total}`,
+    );
 
     return {
       products,
@@ -206,6 +247,10 @@ export class ProductService {
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
+
+    this.logger.log(
+      `Products fetched successfully for user ${userId}, total: ${total}`,
+    );
 
     return {
       products,

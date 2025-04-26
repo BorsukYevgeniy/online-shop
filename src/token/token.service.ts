@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -15,6 +20,8 @@ export class TokenService {
 
   private readonly accessTokenExpirationTime: string;
   private readonly refreshTokenExpirationTime: string;
+
+  private readonly logger: Logger = new Logger(TokenService.name);
 
   constructor(
     private readonly tokenRepositry: TokenRepository,
@@ -33,44 +40,67 @@ export class TokenService {
   }
 
   async generateTokens(userId: number, role: Role): Promise<Tokens> {
-    const accessToken: string = await this.jwtService.signAsync(
-      { id: userId, role },
-      { expiresIn: this.accessTokenExpirationTime, secret: this.accessSecret },
-    );
+    try {
+      const accessToken: string = await this.jwtService.signAsync(
+        { id: userId, role },
+        {
+          expiresIn: this.accessTokenExpirationTime,
+          secret: this.accessSecret,
+        },
+      );
 
-    const refreshToken: string = await this.jwtService.signAsync(
-      { id: userId, role },
-      {
-        expiresIn: this.refreshTokenExpirationTime,
-        secret: this.refreshSecret,
-      },
-    );
+      const refreshToken: string = await this.jwtService.signAsync(
+        { id: userId, role },
+        {
+          expiresIn: this.refreshTokenExpirationTime,
+          secret: this.refreshSecret,
+        },
+      );
 
-    await this.saveToken(userId, refreshToken);
-    return { accessToken, refreshToken };
+      await this.saveToken(userId, refreshToken);
+
+      this.logger.log(`Generated tokens for user ${userId}`);
+      return { accessToken, refreshToken };
+    } catch (error) {
+      this.logger.error('Error generating tokens', { message: error.message });
+      throw new UnauthorizedException('Error generating tokens');
+    }
   }
 
   async verifyRefreshToken(refreshToken: string): Promise<TokenPayload> {
-    return await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
-      secret: this.refreshSecret,
-    });
+    try {
+      return await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
+        secret: this.refreshSecret,
+      });
+    } catch (error) {
+      this.logger.warn('Invalid refresh token', { message: error.message });
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 
   async verifyAccessToken(accessToken: string): Promise<TokenPayload> {
-    return await this.jwtService.verifyAsync<TokenPayload>(accessToken, {
-      secret: this.accessSecret,
-    });
+    try {
+      return await this.jwtService.verifyAsync<TokenPayload>(accessToken, {
+        secret: this.accessSecret,
+      });
+    } catch (error) {
+      this.logger.warn('Invalid refresh token', { message: error.message });
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 
   async getUserTokens(userId: number): Promise<Token[] | null> {
+    this.logger.log(`Fetching tokens for user ${userId}`);
     return await this.tokenRepositry.findUserTokens(userId);
   }
 
   async deleteUserToken(token: string): Promise<DeletingCount> {
+    this.logger.log(`Deleting token`);
     return await this.tokenRepositry.deleteUserToken(token);
   }
 
   async deleteAllUsersTokens(userId: number): Promise<DeletingCount> {
+    this.logger.log(`Deleting all tokens for user ${userId}`);
     return await this.tokenRepositry.deleteAllUsersTokens(userId);
   }
 
@@ -81,6 +111,12 @@ export class TokenService {
     const expiredAt: Date = new Date();
     expiredAt.setDate(expiredAt.getDate() + 7);
 
-    return await this.tokenRepositry.create(userId, refreshToken, expiredAt);
+    try {
+      this.logger.log(`Saving token for user ${userId}`);
+      return await this.tokenRepositry.create(userId, refreshToken, expiredAt);
+    } catch (error) {
+      this.logger.error('Error saving token', { message: error.message });
+      throw new InternalServerErrorException('Failed to save token');
+    }
   }
 }

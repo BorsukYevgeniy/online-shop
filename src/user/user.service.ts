@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
@@ -18,6 +19,8 @@ import { SortUserDto } from './dto/sort-user.dto';
 
 @Injectable()
 export class UserService {
+  private readonly logger: Logger = new Logger(UserService.name);
+
   constructor(private readonly userRepository: UserRepository) {}
 
   async getAll(
@@ -33,6 +36,8 @@ export class UserService {
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
+
+    this.logger.log('Users fetched successfully, total: ' + total);
 
     return {
       users,
@@ -60,6 +65,8 @@ export class UserService {
 
     const totalPages: number = Math.ceil(total / pageSize);
 
+    this.logger.log('Users searched successfully, total: ' + total);
+
     return {
       users,
       total,
@@ -75,29 +82,61 @@ export class UserService {
     const user: UserNoCred | null = await this.userRepository.findById(userId);
 
     if (!user) {
+      this.logger.warn(`User ${userId} doesnt exist`);
       throw new NotFoundException('User not found');
     }
 
+    this.logger.log(`User ${userId} fetched successfully`);
     return user;
   }
 
   async getMe(userId: number): Promise<UserNoPassword> {
-    return await this.userRepository.findUserProfile(userId);
+    const user = await this.userRepository.findUserProfile(userId);
+
+    if (!user) {
+      this.logger.warn(`User ${userId} doesnt exist`);
+      throw new NotFoundException('User not found');
+    }
+
+    this.logger.log(`User ${userId} fetched successfully`);
+    return user;
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOneByEmail(email);
+    const user = await this.userRepository.findOneByEmail(email);
+
+    if (!user) {
+      this.logger.warn(`User with email ${email} doesnt exist`);
+    } else {
+      this.logger.log(`User with email ${email} fetched successfully`);
+      return user;
+    }
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserNoPassword> {
-    return await this.userRepository.create(createUserDto);
+    try {
+      const user = await this.userRepository.create(createUserDto);
+
+      this.logger.log(`User ${user.id} created successfully`);
+      return user;
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        this.logger.warn(
+          `User with ${e.meta.target} ${createUserDto[e.meta.target as string]} already exists`,
+        );
+        throw new BadRequestException('User with this email already exists');
+      }
+    }
   }
 
   async delete(userId: number): Promise<void> {
     try {
-      return await this.userRepository.delete(userId);
+      await this.userRepository.delete(userId);
+
+      this.logger.log(`User ${userId} deleted successfully`);
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
+        this.logger.warn(`User ${userId} doesnt exist`);
         throw new NotFoundException('User not found');
       }
     }
@@ -107,9 +146,13 @@ export class UserService {
     const candidate: UserNoCred = await this.userRepository.findById(userId);
 
     if (!candidate) {
+      this.logger.warn(`User ${userId} doesnt exist`);
       throw new NotFoundException('User not found');
     }
 
-    return await this.userRepository.assignAdmin(userId);
+    const user = await this.userRepository.assignAdmin(userId);
+
+    this.logger.log(`User ${userId} assigned as admin successfully`);
+    return user;
   }
 }

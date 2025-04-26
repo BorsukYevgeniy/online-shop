@@ -2,6 +2,7 @@ import {
   NotFoundException,
   BadRequestException,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
@@ -16,6 +17,8 @@ import { Role } from '../enum/role.enum';
 
 @Injectable()
 export class AuthService {
+  private readonly logger: Logger = new Logger(AuthService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
@@ -25,6 +28,7 @@ export class AuthService {
     const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (candidate) {
+      this.logger.warn(`User already exists: ${dto.email}`);
       throw new BadRequestException('User already exists');
     }
 
@@ -34,6 +38,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
+    this.logger.log(`New user registered: ${user.email}`);
     return user;
   }
 
@@ -41,6 +46,7 @@ export class AuthService {
     const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (!candidate) {
+      this.logger.warn(`User not found: ${dto.email}`);
       throw new NotFoundException('User not found');
     }
 
@@ -52,9 +58,11 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
+      this.logger.warn(`Invalid password for user: ${dto.email}`);
       throw new BadRequestException('Email or password are incorrect');
     }
 
+    this.logger.log(`User logged in: ${dto.email}`);
     return await this.tokenService.generateTokens(candidate.id, role as Role);
   }
 
@@ -77,8 +85,14 @@ export class AuthService {
       (token) => token.token === refreshToken,
     );
 
-    if (!validToken) throw new Error('Invalid refresh token');
+    if (!validToken) {
+      this.logger.warn(`Invalid refresh token for user ID: ${id}`);
+      throw new BadRequestException('Invalid refresh token');
+    }
+    
+    const tokens = await this.tokenService.generateTokens(id, role);
 
-    return this.tokenService.generateTokens(id, role);
+    this.logger.log(`Refresh token successful for user ID: ${id}`);
+    return tokens;
   }
 }

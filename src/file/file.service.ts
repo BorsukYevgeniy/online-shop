@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { promises as fsPromises } from 'fs';
 import {
   join as joinPath,
@@ -9,6 +13,8 @@ import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
 export class FileService {
+  private readonly logger: Logger = new Logger(FileService.name);
+
   async createImages(images: Express.Multer.File[]): Promise<string[]> {
     try {
       const fileNames: string[] = [];
@@ -17,6 +23,7 @@ export class FileService {
       try {
         await fsPromises.access(filePath);
       } catch {
+        this.logger.debug(`Directory does not exist, creating: ${filePath}`);
         await fsPromises.mkdir(filePath, { recursive: true });
       }
 
@@ -35,9 +42,11 @@ export class FileService {
 
       await Promise.all(writePromises);
 
+      this.logger.log(`Files written to disk: ${fileNames.join(', ')}`);
       return fileNames;
     } catch (e: unknown) {
-      console.error(e);
+      this.logger.error('Error writing files to disk', e);
+
       throw new InternalServerErrorException('Error writing files to disk');
     }
   }

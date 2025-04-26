@@ -4,7 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
+  const logger: Logger = new Logger('Bootstrap');
 
   const app = await NestFactory.create(AppModule);
 
