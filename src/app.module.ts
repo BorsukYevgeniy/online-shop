@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
@@ -11,6 +11,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { join as joinPath } from 'path';
 import { CategoryModule } from './category/category.module';
+
+import { LoggerMiddleware } from './middleware/logger.middleware';
+
 @Module({
   imports: [
     PrismaModule,
@@ -27,4 +30,8 @@ import { CategoryModule } from './category/category.module';
     CategoryModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  async configure(consumer: MiddlewareConsumer): Promise<void> {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
