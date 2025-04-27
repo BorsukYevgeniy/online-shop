@@ -22,52 +22,20 @@ export class CategoryService {
 
   async getAll(
     paginationDto: PaginationDto,
-    sortCategoryDto?: SortCategoryDto,
+    sortDto?: SortCategoryDto,
+    searchDto?: SearchCategoryDto,
   ): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;
 
     const [categories, total] = await Promise.all([
-      this.categoryRepository.findAll(skip, pageSize, sortCategoryDto),
-      this.categoryRepository.count(),
+      this.categoryRepository.findAll(skip, pageSize, sortDto, searchDto),
+      this.categoryRepository.count(searchDto),
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
 
     this.logger.log('Categories fetched successfully, total: ' + total);
-
-    return {
-      categories,
-      total,
-      pageSize,
-      page,
-      totalPages,
-      prevPage: page > 1 ? page - 1 : null,
-      nextPage: page < totalPages ? page + 1 : null,
-    };
-  }
-
-  async search(
-    searchCategoryDto: SearchCategoryDto,
-    paginationDto: PaginationDto,
-    sortCategoryDto?: SortCategoryDto,
-  ): Promise<PaginatedCategory> {
-    const { page, pageSize }: PaginationDto = paginationDto;
-    const skip: number = (page - 1) * pageSize;
-
-    const [categories, total] = await Promise.all([
-      this.categoryRepository.findByName(
-        searchCategoryDto.name,
-        skip,
-        pageSize,
-        sortCategoryDto,
-      ),
-      this.categoryRepository.count(searchCategoryDto.name),
-    ]);
-
-    const totalPages: number = Math.ceil(total / pageSize);
-
-    this.logger.log('Categories searched successfully, total: ' + total);
 
     return {
       categories,

@@ -4,15 +4,16 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Category } from '@prisma/client';
 import { SortCategoryDto } from './dto/sort-category.dto';
+import { SearchCategoryDto } from './dto/search-category.dto';
 
 @Injectable()
 export class CategoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async count(name?: string): Promise<number> {
+  async count(searchDto?: SearchCategoryDto): Promise<number> {
     return await this.prisma.category.count({
       where: {
-        name: { contains: name, mode: 'insensitive' },
+        name: { contains: searchDto?.name, mode: 'insensitive' },
       },
     });
   }
@@ -21,8 +22,12 @@ export class CategoryRepository {
     skip: number,
     take: number,
     sortDto?: SortCategoryDto,
+    searchDto?: SearchCategoryDto,
   ): Promise<Category[]> {
     return await this.prisma.category.findMany({
+      where: {
+        name: { contains: searchDto?.name, mode: 'insensitive' },
+      },
       skip,
       take,
       orderBy: { [sortDto.sortBy]: sortDto.order },
@@ -31,20 +36,6 @@ export class CategoryRepository {
 
   async findById(categoryId: number): Promise<Category> {
     return await this.prisma.category.findUnique({ where: { id: categoryId } });
-  }
-
-  async findByName(
-    categoryName: string,
-    skip: number,
-    take: number,
-    sortCategoryDto?: SortCategoryDto,
-  ): Promise<Category[]> {
-    return await this.prisma.category.findMany({
-      where: { name: { contains: categoryName, mode: 'insensitive' } },
-      skip,
-      take,
-      orderBy: { [sortCategoryDto.sortBy]: sortCategoryDto.order },
-    });
   }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {

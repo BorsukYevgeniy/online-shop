@@ -127,31 +127,32 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('GET /users/search - Should search users', () => {
+  describe('GET /users - Should return all users and search him', () => {
     it.each<
       [
         string,
         200 | 400,
-        { nickname: string; minDate?: string; maxDate?: string } | null,
+        { nickname?: string; minDate?: string; maxDate?: string } | null,
       ]
     >([
+      ['GET /users - 200 OK - Should return all users', 200, null],
       [
-        'GET /users/search - 200 OK - Should search user by nickname',
+        'GET /users - 200 OK - Should search user by nickname',
         200,
         { nickname: 'use' },
       ],
       [
-        'GET /users/search - 200 OK - Should search user by nickname and min date',
+        'GET /users - 200 OK - Should search user by nickname and min date',
         200,
         { nickname: 'use', minDate: '2024-01-01' },
       ],
       [
-        'GET /users/search - 200 OK - Should search user by nickname and max date',
+        'GET /users - 200 OK - Should search user by nickname and max date',
         200,
         { nickname: 'use', maxDate: '2100-01-01' },
       ],
       [
-        'GET /users/search - 200 OK - Should search user by nickname and date range',
+        'GET /users - 200 OK - Should search user by nickname and date range',
         200,
         {
           nickname: 'use',
@@ -160,32 +161,56 @@ describe('UserController (e2e)', () => {
         },
       ],
       [
-        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because nickname not valid',
+        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because nickname not valid',
         400,
         { nickname: 'us' },
       ],
       [
-        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because minDate not valid',
+        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because minDate not valid',
         400,
         { nickname: 'us', minDate: '123' },
       ],
       [
-        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because maxDate not valid',
+        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because maxDate not valid',
         400,
         { nickname: 'us', maxDate: '123' },
       ],
       [
-        'GET /users/search - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
         400,
         { nickname: 'us', maxDate: '123', minDate: '123' },
       ],
     ])('%s', async (_, statusCode, dto) => {
       const { body: users } = await request(app.getHttpServer())
-        .get('/users/search')
+        .get('/users')
         .query(dto)
+        .set('Cookie', [`accessToken=${userAccessToken}`])
         .expect(statusCode);
 
-      if (statusCode === 200) {
+      if (statusCode === 200 && !dto) {
+        expect(users).toEqual({
+          nextPage: null,
+          page: 1,
+          pageSize: 10,
+          prevPage: null,
+          total: 2,
+          totalPages: 1,
+          users: [
+            {
+              createdAt: expect.any(String),
+              id: expect.any(Number),
+              nickname: 'admin',
+              role: 'ADMIN',
+            },
+            {
+              createdAt: expect.any(String),
+              id: expect.any(Number),
+              nickname: 'user',
+              role: 'USER',
+            },
+          ],
+        });
+      } else if (statusCode === 200 && dto) {
         expect(users).toEqual({
           nextPage: null,
           page: 1,

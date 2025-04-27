@@ -82,44 +82,6 @@ describe('UserController', () => {
     });
   });
 
-
-
-  it('Should return all users without filters with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        nickname: 'test',
-        createdAt: new Date(),
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(userService, 'getAll').mockResolvedValue({
-      users: mockUsers,
-      page: 1,
-      total: 1,
-      pageSize: 10,
-      totalPages: 1,
-      nextPage: null,
-      prevPage: null,
-    });
-
-    const users = await controller.getAll(
-      { page: 1, pageSize: 10 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(users).toEqual({
-      users: mockUsers,
-      page: 1,
-      total: 1,
-      pageSize: 10,
-      totalPages: 1,
-      nextPage: null,
-      prevPage: null,
-    });
-  });
-
   describe('Should search users with filters wtih default sorting', () => {
     const mockUsers = [
       {
@@ -130,7 +92,8 @@ describe('UserController', () => {
       },
     ];
 
-    it.each<[string, SearchUserDto]>([
+    it.each<[string, SearchUserDto | null]>([
+      ['Should return all users with default sorting', null],
       [
         'Should return all users searched by nickname with default sorting',
         { nickname: 'test' },
@@ -148,7 +111,7 @@ describe('UserController', () => {
         { nickname: 'test', minDate: new Date(), maxDate: new Date() },
       ],
     ])('%s', async (_, searchUserDto) => {
-      jest.spyOn(userService, 'search').mockResolvedValue({
+      jest.spyOn(userService, 'getAll').mockResolvedValue({
         total: 1,
         page: 1,
         pageSize: 10,
@@ -158,13 +121,13 @@ describe('UserController', () => {
         users: mockUsers,
       });
 
-      const users = await userService.search(
-        searchUserDto,
+      const users = await userService.getAll(
         {
           page: 1,
           pageSize: 10,
         },
         { sortBy: 'id', order: Order.DESC },
+        searchUserDto,
       );
 
       expect(users).toEqual({
@@ -177,13 +140,13 @@ describe('UserController', () => {
         prevPage: null,
       });
 
-      expect(userService.search).toHaveBeenCalledWith(
-        searchUserDto,
+      expect(userService.getAll).toHaveBeenCalledWith(
         { page: 1, pageSize: 10 },
         {
           sortBy: 'id',
           order: Order.DESC,
         },
+        searchUserDto,
       );
     });
   });

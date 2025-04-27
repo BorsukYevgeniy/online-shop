@@ -147,56 +147,20 @@ describe('ProductService', () => {
     });
   });
 
-  it('Should return all products without filters with default sorting', async () => {
+  describe('Should return all products and search him', () => {
     const mockProducts = [
       {
         id: 1,
-        title: 'title',
-        price: 50,
+        title: 'Test',
+        price: 20,
         userId: 1,
         description: 'description',
         images: ['1', '2'],
         categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
-
-    const products = await service.getAll(
-      { page: 1, pageSize: 1 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(repository.findAll).toHaveBeenCalledWith(0, 1, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 1,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-  });
-
-  describe('Should search product with filters', () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'title',
-        price: 50,
-        userId: 1,
-        description: 'description',
-        images: ['1', '2'],
-        categories: [{ id: 1, name: 'test', description: 'test' }],
-      },
-    ];
-
-    it.each<[string, SearchProductDto]>([
+    it.each<[string, SearchProductDto | null]>([
+      ['Should return all products with default sorting', null],
       [
         'Should return all products finded by title with default sorting',
         { title: 'Test' },
@@ -223,12 +187,12 @@ describe('ProductService', () => {
       ],
     ])('%s', async (_, searchDto) => {
       jest.spyOn(repository, 'count').mockResolvedValue(1);
-      jest.spyOn(repository, 'findProducts').mockResolvedValue(mockProducts);
+      jest.spyOn(repository, 'findAll').mockResolvedValue(mockProducts);
 
-      const products = await service.search(
-        searchDto,
+      const products = await service.getAll(
         { page: 1, pageSize: 10 },
         { sortBy: 'id', order: Order.DESC },
+        searchDto,
       );
 
       expect(products).toEqual({
@@ -241,10 +205,16 @@ describe('ProductService', () => {
         nextPage: null,
       });
 
-      expect(repository.findProducts).toHaveBeenCalledWith(searchDto, 0, 10, {
-        sortBy: 'id',
-        order: Order.DESC,
-      });
+      expect(repository.findAll).toHaveBeenCalledWith(
+        0,
+        10,
+        {
+          sortBy: 'id',
+          order: Order.DESC,
+        },
+        searchDto,
+      );
+
       expect(repository.count).toHaveBeenCalledWith(searchDto);
     });
   });

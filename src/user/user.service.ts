@@ -26,46 +26,19 @@ export class UserService {
   async getAll(
     paginationDto: PaginationDto,
     sortUserDto: SortUserDto,
+    searchDto: SearchUserDto,
   ): Promise<PaginatedUserNoCreds> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = pageSize * (page - 1);
 
     const [users, total] = await Promise.all([
-      this.userRepository.findAll(skip, pageSize, sortUserDto),
-      this.userRepository.count(),
+      this.userRepository.findAll(skip, pageSize, sortUserDto, searchDto),
+      this.userRepository.count(searchDto),
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
 
     this.logger.log('Users fetched successfully, total: ' + total);
-
-    return {
-      users,
-      total,
-      page,
-      pageSize,
-      totalPages,
-      prevPage: page > 1 ? page - 1 : null,
-      nextPage: page < totalPages ? page + 1 : null,
-    };
-  }
-
-  async search(
-    searchUserDto: SearchUserDto,
-    paginationDto: PaginationDto,
-    sortUserDto: SortUserDto,
-  ): Promise<PaginatedUserNoCreds> {
-    const { page, pageSize }: PaginationDto = paginationDto;
-    const skip: number = pageSize * (page - 1);
-
-    const [users, total] = await Promise.all([
-      this.userRepository.findUsers(searchUserDto, skip, pageSize, sortUserDto),
-      this.userRepository.count(searchUserDto),
-    ]);
-
-    const totalPages: number = Math.ceil(total / pageSize);
-
-    this.logger.log('Users searched successfully, total: ' + total);
 
     return {
       users,

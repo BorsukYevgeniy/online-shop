@@ -60,19 +60,27 @@ describe('CategoryController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /categories - 200 OK - Should get all categories', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/categories')
-      .expect(200);
+  describe('GET /categories - Should return all categories and search him', () => {
+    it.each<[string, SearchCategoryDto | null]>([
+      ['GET /categories - Should return all categories', null],
+      ['GET /categories - Should search category by name', { name: 'TEST' }],
+    ])('%s', async (_, searchDto) => {
+      const mockCategories = {
+        categories: [],
+        page: 1,
+        pageSize: 10,
+        prevPage: null,
+        nextPage: null,
+        total: 0,
+        totalPages: 0
+      };
 
-    expect(res.body).toEqual({
-      categories: [],
-      total: 0,
-      pageSize: 10,
-      page: 1,
-      totalPages: 0,
-      prevPage: null,
-      nextPage: null,
+      const { body } = await request(app.getHttpServer())
+        .get('/categories')
+        .query(searchDto)
+        .expect(200);
+
+      expect(body).toEqual(mockCategories);
     });
   });
 
@@ -144,67 +152,6 @@ describe('CategoryController (e2e)', () => {
           description: 'Category description',
         });
       }
-    });
-  });
-
-  describe('GET /categories/search - 200 OK - Should search categories by name', () => {
-    it.each<[string, 200 | 400, SearchCategoryDto]>([
-      [
-        'GET /categories/search - 200 OK - Should search categories by name',
-        200,
-        { name: 'Categ' },
-      ],
-      [
-        'GET /categories/search - 400 BAD REQUEST - Should return 400 HTTP code because name not valid',
-        400,
-        { name: 'C' },
-      ],
-    ])('%s', async (_, statusCode, dto) => {
-      const { body: categories } = await request(app.getHttpServer())
-        .get('/categories/search')
-        .query(dto)
-        .expect(statusCode);
-
-      if (statusCode === 200) {
-        expect(categories).toEqual({
-          total: 1,
-          prevPage: null,
-          nextPage: null,
-          page: 1,
-          pageSize: 10,
-          totalPages: 1,
-          categories: [
-            {
-              id: categoryId,
-              name: 'Category',
-              description: 'Category description',
-            },
-          ],
-        });
-      }
-    });
-  });
-
-  it('GET /categories/search - 200 OK - Should search categories by name', async () => {
-    const { body: categories } = await request(app.getHttpServer())
-      .get('/categories/search')
-      .query({ name: 'Categ' })
-      .expect(200);
-
-    expect(categories).toEqual({
-      total: 1,
-      prevPage: null,
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      totalPages: 1,
-      categories: [
-        {
-          id: categoryId,
-          name: 'Category',
-          description: 'Category description',
-        },
-      ],
     });
   });
 

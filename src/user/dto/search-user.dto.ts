@@ -3,26 +3,27 @@ import {
   IsString,
   MaxLength,
   MinLength,
-  IsDate,
-  IsNotEmpty,
+  Matches,
+  IsDateString,
+  IsDate
 } from 'class-validator';
 import { ToDate, Trim } from '../../decorators';
 
 export class SearchUserDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @Trim()
   @MinLength(3)
   @MaxLength(15)
-  readonly nickname: string;
+  readonly nickname?: string;
 
   @IsOptional()
-  @IsDate({ message: 'Date should be in YYYY-MM-DD format' })
+  @IsDate()
   @ToDate()
   readonly minDate?: Date;
 
   @IsOptional()
-  @IsDate({ message: 'Date should be in YYYY-MM-DD format1' })
+  @IsDate()
   @ToDate()
   readonly maxDate?: Date;
 }

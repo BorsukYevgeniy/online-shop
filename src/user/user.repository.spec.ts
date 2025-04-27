@@ -97,43 +97,6 @@ describe('UserRepository', () => {
     });
   });
 
-  it('Should get all users with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'email',
-        nickname: 'test',
-        password: 'test',
-        createdAt: date,
-
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-
-    const users = await repository.findAll(0, 10, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
-
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      select: {
-        id: true,
-        nickname: true,
-        createdAt: true,
-        role: true,
-      },
-      skip: 0,
-      take: 10,
-      orderBy: {
-        id: 'desc',
-      },
-    });
-
-    expect(users).toEqual(mockUsers);
-  });
-
   describe('Should search users with filters with default sorting', () => {
     const mockUsers = [
       {
@@ -146,7 +109,8 @@ describe('UserRepository', () => {
       },
     ];
 
-    it.each<[string, SearchUserDto]>([
+    it.each<[string, SearchUserDto | null]>([
+      ['Should search user by nickname with default sorting', null],
       [
         'Should search user by nickname with default sorting',
         { nickname: 'test' },
@@ -165,10 +129,13 @@ describe('UserRepository', () => {
       ],
     ])('%s', async (_, searchUserDto) => {
       jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
-      const users = await repository.findUsers(searchUserDto, 0, 10, {
-        sortBy: 'id',
-        order: Order.DESC,
-      });
+
+      const users = await repository.findAll(
+        0,
+        10,
+        { sortBy: 'id', order: Order.DESC },
+        searchUserDto,
+      );
 
       expect(users).toEqual(mockUsers);
 
@@ -185,7 +152,7 @@ describe('UserRepository', () => {
           id: 'desc',
         },
         where: {
-          nickname: { contains: searchUserDto.nickname, mode: 'insensitive' },
+          nickname: { contains: searchUserDto?.nickname, mode: 'insensitive' },
           createdAt: {
             gte: searchUserDto?.minDate,
             lte: searchUserDto?.maxDate,

@@ -75,38 +75,6 @@ describe('UserService', () => {
     });
   });
 
-  it('Should find all users without filters with default sorting', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        email: 'test@example.com',
-        nickname: 'test',
-        createdAt: new Date(),
-        role: Role.USER,
-      },
-    ];
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
-
-    const users = await service.getAll(
-      { page: 1, pageSize: 10 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(users).toEqual({
-      users: mockUsers,
-      total: 1,
-      page: 1,
-      pageSize: 10,
-      totalPages: 1,
-      nextPage: null,
-      prevPage: null,
-    });
-    expect(repository.findAll).toHaveBeenCalled();
-    expect(repository.count).toHaveBeenCalled();
-  });
-
   describe('Should search users with filters wtih default sorting', () => {
     const mockUsers = [
       {
@@ -117,7 +85,11 @@ describe('UserService', () => {
       },
     ];
 
-    it.each<[string, SearchUserDto]>([
+    it.each<[string, SearchUserDto | null]>([
+      [
+        'Should return all users with default sorting',
+        null
+      ],
       [
         'Should return all users searched by nickname with default sorting',
         { nickname: 'test' },
@@ -136,15 +108,15 @@ describe('UserService', () => {
       ],
     ])('%s', async (_, searchUserDto) => {
       jest.spyOn(repository, 'count').mockResolvedValue(1);
-      jest.spyOn(repository, 'findUsers').mockResolvedValue(mockUsers);
+      jest.spyOn(repository, 'findAll').mockResolvedValue(mockUsers);
 
-      const users = await service.search(
-        searchUserDto,
+      const users = await service.getAll(
         {
           page: 1,
           pageSize: 10,
         },
         { sortBy: 'id', order: Order.DESC },
+        searchUserDto,
       );
 
       expect(users).toEqual({
@@ -157,10 +129,15 @@ describe('UserService', () => {
         prevPage: null,
       });
 
-      expect(repository.findUsers).toHaveBeenCalledWith(searchUserDto, 0, 10, {
-        sortBy: 'id',
-        order: Order.DESC,
-      });
+      expect(repository.findAll).toHaveBeenCalledWith(
+        0,
+        10,
+        {
+          sortBy: 'id',
+          order: Order.DESC,
+        },
+        searchUserDto,
+      );
       expect(repository.count).toHaveBeenCalledWith(searchUserDto);
     });
   });

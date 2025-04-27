@@ -7,6 +7,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ProductService } from '../product/product.service';
 import { Order } from '../enum/order.enum';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { SearchCategoryDto } from './dto/search-category.dto';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -53,59 +54,36 @@ describe('CategoryController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('Should return all categories with default sorting', async () => {
-    const mockCategories = {
-      categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
-      total: 1,
-      page: 1,
-      pageSize: 1,
-      prevPage: null,
-      nextPage: null,
-      totalPages: 1,
-    };
-
-    jest.spyOn(categoryService, 'getAll').mockResolvedValue(mockCategories);
-
-    const categories = await controller.getAll(
-      { page: 1, pageSize: 1 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(categoryService.getAll).toHaveBeenCalledWith(
-      {
+  describe('Should return all categories and search him', () => {
+    it.each<[string, SearchCategoryDto | null]>([
+      ['Should return all categories', null],
+      ['Should search category by name', { name: 'TEST' }],
+    ])('%s', async (_, searchDto) => {
+      const mockCategories = {
+        categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
+        total: 1,
         page: 1,
         pageSize: 1,
-      },
-      { sortBy: 'id', order: Order.DESC },
-    );
-    expect(categories).toEqual(mockCategories);
-  });
+        prevPage: null,
+        nextPage: null,
+        totalPages: 1,
+      };
 
-  it('Should search category by name with default sorting', async () => {
-    const mockCategories = {
-      categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
-      total: 1,
-      page: 1,
-      pageSize: 1,
-      prevPage: null,
-      nextPage: null,
-      totalPages: 1,
-    };
+      jest.spyOn(categoryService, 'getAll').mockResolvedValue(mockCategories);
 
-    jest.spyOn(categoryService, 'search').mockResolvedValue(mockCategories);
+      const categories = await controller.getAll(
+        { page: 1, pageSize: 1 },
+        { sortBy: 'id', order: Order.DESC },
+        searchDto,
+      );
 
-    const categories = await controller.search(
-      { name: 'TEST' },
-      { page: 1, pageSize: 1 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(categoryService.search).toHaveBeenCalledWith(
-      { name: 'TEST' },
-      { page: 1, pageSize: 1 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-    expect(categories).toEqual(mockCategories);
+      expect(categoryService.getAll).toHaveBeenCalledWith(
+        { page: 1, pageSize: 1 },
+        { sortBy: 'id', order: Order.DESC },
+        searchDto,
+      );
+      expect(categories).toEqual(mockCategories);
+    });
   });
 
   describe('Should find category by id', () => {

@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Order } from '../enum/order.enum';
+import { SearchCategoryDto } from './dto/search-category.dto';
 
 describe('CategoryRepository', () => {
   let repository: CategoryRepository;
@@ -41,57 +42,49 @@ describe('CategoryRepository', () => {
     expect(repository).toBeDefined();
   });
 
-  it('Should count categories', async () => {
-    jest.spyOn(prisma.category, 'count').mockResolvedValue(1);
+  describe('Should count categories with filters', () => {
+    it.each<[string, SearchCategoryDto | null]>([
+      ['Should count all categories', null],
+      ['Should count categories with name filter', { name: 'TEST' }],
+    ])('%s', async (_, searchDto) => {
+      jest.spyOn(prisma.category, 'count').mockResolvedValue(1);
 
-    const count = await repository.count();
+      const count = await repository.count(searchDto);
 
-    expect(count).toEqual(1);
+      expect(prisma.category.count).toHaveBeenCalledWith({
+        where: { name: { contains: searchDto?.name, mode: 'insensitive' } },
+      });
+      expect(count).toEqual(1);
+    });
   });
 
-  it('Should count categories finded by name', async () => {
-    jest.spyOn(prisma.category, 'count').mockResolvedValue(1);
+  describe('should return all categories and search him', () => {
+    it.each<[string, SearchCategoryDto | null]>([
+      ['Should return all categories', null],
+      ['Should search category by name', { name: 'TEST' }],
+    ])('%s', async (_, searchDto) => {
+      const mockCategories = [{ id: 1, name: 'TEST', description: 'TEST' }];
 
-    const count = await repository.count('test');
+      jest.spyOn(prisma.category, 'findMany').mockResolvedValue(mockCategories);
 
-    expect(count).toEqual(1);
-  });
+      const categories = await repository.findAll(
+        0,
+        1,
+        {
+          sortBy: 'id',
+          order: Order.DESC,
+        },
+        searchDto,
+      );
 
-  it('Should return all categories with default sorting', async () => {
-    const mockCategories = [{ id: 1, name: 'TEST', description: 'TEST' }];
-
-    jest.spyOn(prisma.category, 'findMany').mockResolvedValue(mockCategories);
-
-    const categories = await repository.findAll(0, 1, {
-      sortBy: 'id',
-      order: Order.DESC,
+      expect(prisma.category.findMany).toHaveBeenCalledWith({
+        where: { name: { contains: searchDto?.name, mode: 'insensitive' } },
+        skip: 0,
+        take: 1,
+        orderBy: { id: 'desc' },
+      });
+      expect(categories).toEqual(mockCategories);
     });
-
-    expect(prisma.category.findMany).toHaveBeenCalledWith({
-      skip: 0,
-      take: 1,
-      orderBy: { id: 'desc' },
-    });
-    expect(categories).toEqual(mockCategories);
-  });
-
-  it('Should search category by name with default sorting', async () => {
-    const mockCategories = [{ id: 1, name: 'TEST', description: 'TEST' }];
-
-    jest.spyOn(prisma.category, 'findMany').mockResolvedValue(mockCategories);
-
-    const categories = await repository.findByName('TEST', 0, 1, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
-
-    expect(prisma.category.findMany).toHaveBeenCalledWith({
-      where: { name: { contains: 'TEST', mode: 'insensitive' } },
-      skip: 0,
-      take: 1,
-      orderBy: { id: 'desc' },
-    });
-    expect(categories).toEqual(mockCategories);
   });
 
   it('Should find category by id', async () => {

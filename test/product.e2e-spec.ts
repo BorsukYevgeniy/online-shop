@@ -73,19 +73,85 @@ describe('ProductController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /products - 200 OK - Should return all products', async () => {
-    const { body: products } = await request(app.getHttpServer())
-      .get('/products')
-      .expect(200);
+  describe('GET /products - 200 OK - Should return all products and search him', () => {
+    it.each<[string, 200 | 400, SearchProductDto | null]>([
+      [
+        'GET /products - 200 OK - Should return all products',
+        200,
+        null,
+      ],
+      [
+        'GET /products - 200 OK - Should search the product by title',
+        200,
+        { title: 'Prod' },
+      ],
+      [
+        'GET /products - 200 OK - Should search the product by title and min price',
+        200,
+        { title: 'Prod', minPrice: 50 },
+      ],
+      [
+        'GET /products - 200 OK - Should search the product by title and max price',
+        200,
+        { title: 'Prod', maxPrice: 150 },
+      ],
+      [
+        'GET /products - 200 OK - Should search the product by title and price range',
+        200,
+        { title: 'Prod', minPrice: 50, maxPrice: 150 },
+      ],
+      [
+        'GET /products - 200 OK - Should search the product by title and categories',
+        200,
+        { title: 'Prod', categoryIds: [category1Id] },
+      ],
+      [
+        'GET /products - 200 OK - Should search the product by title ,categories and price range',
+        200,
+        {
+          title: 'Prod',
+          categoryIds: [category1Id],
+          minPrice: 50,
+          maxPrice: 150,
+        },
+      ],
+      [
+        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
+        400,
+        { title: '' },
+      ],
+      [
+        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because minPrice not valid',
+        400,
+        { title: 'Title', minPrice: -1 },
+      ],
+      [
+        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because maxPrice not valid',
+        400,
+        { title: 'Title', maxPrice: -1 },
+      ],
+      [
+        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        400,
+        { title: 'T', minPrice: -1, maxPrice: -10, categoryIds: [category1Id] },
+      ],
+    ])('%s', async (_, statusCode, dto) => {
+      const { body } = await request(app.getHttpServer())
+        .get('/products')
+        .query(dto)
+        .expect(statusCode);
 
-    expect(products).toEqual({
-      total: 0,
-      prevPage: null,
-      nextPage: null,
-      page: 1,
-      pageSize: 10,
-      totalPages: 0,
-      products: [],
+      if (statusCode === 200) {
+        expect(body).toEqual({
+          nextPage: null,
+          total: 0,
+          totalPages: 0,
+          page: 1,
+          pageSize: 10,
+          prevPage: null,
+          products: [],
+        });
+      }
     });
   });
 
@@ -202,92 +268,6 @@ describe('ProductController (e2e)', () => {
           ],
           images: expect.any(Array<String>),
           userId,
-        });
-      }
-    });
-  });
-
-  describe('GET /products/search - Should search product', () => {
-    it.each<[string, 200 | 400, SearchProductDto]>([
-      [
-        'GET /products/search - 200 OK - Should search the product by title',
-        200,
-        { title: 'Prod' },
-      ],
-      [
-        'GET /products/search - 200 OK - Should search the product by title and min price',
-        200,
-        { title: 'Prod', minPrice: 50 },
-      ],
-      [
-        'GET /products/search - 200 OK - Should search the product by title and max price',
-        200,
-        { title: 'Prod', maxPrice: 150 },
-      ],
-      [
-        'GET /products/search - 200 OK - Should search the product by title and price range',
-        200,
-        { title: 'Prod', minPrice: 50, maxPrice: 150 },
-      ],
-      [
-        'GET /products/search - 200 OK - Should search the product by title and categories',
-        200,
-        { title: 'Prod', categoryIds: [category1Id] },
-      ],
-      [
-        'GET /products/search - 200 OK - Should search the product by title ,categories and price range',
-        200,
-        {
-          title: 'Prod',
-          categoryIds: [category1Id],
-          minPrice: 50,
-          maxPrice: 150,
-        },
-      ],
-      [
-        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
-        400,
-        { title: '' },
-      ],
-      [
-        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because minPrice not valid',
-        400,
-        { title: 'Title', minPrice: -1 },
-      ],
-      [
-        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because maxPrice not valid',
-        400,
-        { title: 'Title', maxPrice: -1 },
-      ],
-      [
-        'GET /products/search - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
-        400,
-        { title: 'T', minPrice: -1, maxPrice: -10, categoryIds: [category1Id] },
-      ],
-    ])('%s', async (_, statusCode, dto) => {
-      const { body } = await request(app.getHttpServer())
-        .get('/products/search')
-        .query(dto)
-        .expect(statusCode);
-
-      if (statusCode === 200) {
-        expect(body).toEqual({
-          nextPage: null,
-          total: 1,
-          totalPages: 1,
-          page: 1,
-          pageSize: 10,
-          prevPage: null,
-          products: [
-            {
-              id: expect.any(Number),
-              title: 'Product',
-              description: 'Description',
-              price: 100,
-              images: expect.any(Array<String>),
-              userId,
-            },
-          ],
         });
       }
     });

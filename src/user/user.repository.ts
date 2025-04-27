@@ -43,8 +43,16 @@ export class UserRepository {
     skip: number,
     take: number,
     sortDto: SortUserDto,
+    searchUserDto?: SearchUserDto,
   ): Promise<UserNoCred[]> {
     return await this.prisma.user.findMany({
+      where: {
+        nickname: { contains: searchUserDto?.nickname, mode: 'insensitive' },
+        createdAt: {
+          gte: searchUserDto?.minDate,
+          lte: searchUserDto?.maxDate,
+        },
+      },
       select: {
         id: true,
         nickname: true,

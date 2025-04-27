@@ -53,12 +53,12 @@ describe('ProductController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('Should return all products with default sorting', async () => {
+  describe('Should return all products and search him with default sorting', () => {
     const mockProducts = [
       {
         id: 1,
-        title: 'title',
-        price: 50,
+        title: 'Test',
+        price: 20,
         userId: 1,
         description: 'description',
         images: ['1', '2'],
@@ -66,46 +66,8 @@ describe('ProductController', () => {
       },
     ];
 
-    jest.spyOn(service, 'getAll').mockResolvedValue({
-      products: mockProducts,
-      total: 1,
-      pageSize: 10,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-
-    const products = await controller.getAll(
-      { page: 1, pageSize: 10 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 10,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-  });
-
-  describe('Should search product with filters', () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'title',
-        price: 50,
-        userId: 1,
-        description: 'description',
-        images: ['1', '2'],
-        categories: [{ id: 1, name: 'test', description: 'test' }],
-      },
-    ];
-
-    it.each<[string, SearchProductDto]>([
+    it.each<[string, SearchProductDto | null]>([
+      ['Should return all products with default sorting', null],
       [
         'Should return all products finded by title with default sorting',
         { title: 'Test' },
@@ -127,11 +89,12 @@ describe('ProductController', () => {
         { title: 'Test', minPrice: 20, maxPrice: 20 },
       ],
       [
-        'Should filter products by title and price, range  and category ids with default sorting',
+        'Should return all products finded by title and price, range  and category ids with default sorting',
         { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
       ],
     ])('%s', async (_, searchDto) => {
-      jest.spyOn(service, 'search').mockResolvedValue({
+      
+      jest.spyOn(service, 'getAll').mockResolvedValue({
         total: 1,
         totalPages: 1,
         nextPage: null,
@@ -141,10 +104,10 @@ describe('ProductController', () => {
         products: mockProducts,
       });
 
-      const products = await controller.search(
-        searchDto,
+      const products = await controller.getAll(
         { page: 1, pageSize: 10 },
         { sortBy: 'id', order: Order.DESC },
+        searchDto,
       );
 
       expect(products).toEqual({
@@ -157,13 +120,13 @@ describe('ProductController', () => {
         nextPage: null,
       });
 
-      expect(service.search).toHaveBeenCalledWith(
-        searchDto,
+      expect(service.getAll).toHaveBeenCalledWith(
         { page: 1, pageSize: 10 },
         {
           sortBy: 'id',
           order: Order.DESC,
         },
+        searchDto,
       );
     });
   });
@@ -335,7 +298,7 @@ describe('ProductController', () => {
 
         await controller.delete(req, 1);
 
-        expect(service.delete).toHaveBeenCalledWith(1,1);
+        expect(service.delete).toHaveBeenCalledWith(1, 1);
       } else if (!isSuccess && isProductFounded) {
         jest
           .spyOn(service, 'delete')

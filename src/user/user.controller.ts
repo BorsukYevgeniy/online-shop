@@ -38,28 +38,19 @@ export class UserController {
   ) {}
 
   @Get()
-  @RequieredRoles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  // @UseGuards(AuthGuard)
   async getAll(
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortUserDto,
+    @Query(ValidateUserFilterPipe) searchDto: SearchUserDto,
   ): Promise<PaginatedUserNoCreds> {
-    return await this.userService.getAll(paginationDto, sortDto);
+    return await this.userService.getAll(paginationDto, sortDto, searchDto);
   }
 
   @Get('me')
   @UseGuards(AuthGuard)
   async getMe(@Req() req: AuthRequest): Promise<UserNoPassword> {
     return await this.userService.getMe(req.user.id);
-  }
-
-  @Get('search')
-  async search(
-    @Query(ValidateUserFilterPipe) dto: SearchUserDto,
-    @Query() pagination: PaginationDto,
-    @Query() sortDto: SortUserDto,
-  ): Promise<PaginatedUserNoCreds> {
-    return await this.userService.search(dto, pagination, sortDto);
   }
 
   @Get(':userId')

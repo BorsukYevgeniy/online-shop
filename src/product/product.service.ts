@@ -52,53 +52,21 @@ export class ProductService {
 
   async getAll(
     paginationDto: PaginationDto,
-    sortProductDto: SortProductDto,
+    sortDto: SortProductDto,
+    searchDto?: SearchProductDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = paginationDto;
 
     const skip: number = (page - 1) * pageSize;
 
     const [products, total] = await Promise.all([
-      this.productRepository.findAll(skip, pageSize, sortProductDto),
-      this.productRepository.count(),
+      this.productRepository.findAll(skip, pageSize, sortDto, searchDto),
+      this.productRepository.count(searchDto),
     ]);
 
     const totalPages: number = Math.ceil(total / pageSize);
 
     this.logger.log('Products fetched successfully, total: ' + total);
-
-    return {
-      products,
-      total,
-      pageSize,
-      page,
-      totalPages,
-      prevPage: page > 1 ? page - 1 : null,
-      nextPage: page < totalPages ? page + 1 : null,
-    };
-  }
-
-  async search(
-    searchProductDto: SearchProductDto,
-    paginationDto: PaginationDto,
-    sortProductDto: SortProductDto,
-  ): Promise<PaginatedProduct> {
-    const { pageSize, page }: PaginationDto = paginationDto;
-    const skip: number = (page - 1) * pageSize;
-
-    const [products, total] = await Promise.all([
-      this.productRepository.findProducts(
-        searchProductDto,
-        skip,
-        pageSize,
-        sortProductDto,
-      ),
-      this.productRepository.count(searchProductDto),
-    ]);
-
-    this.logger.log('Products searched successfully, total: ' + total);
-
-    const totalPages: number = Math.ceil(total / pageSize);
 
     return {
       products,

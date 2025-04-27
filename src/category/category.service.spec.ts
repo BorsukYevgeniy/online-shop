@@ -6,6 +6,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Order } from '../enum/order.enum';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { SearchCategoryDto } from './dto/search-category.dto';
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -42,61 +43,42 @@ describe('CategoryService', () => {
     expect(service).toBeDefined();
   });
 
-  it('Should return all categories with default sorting', async () => {
-    const mockCategories = {
-      categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
-      total: 1,
-      page: 1,
-      pageSize: 1,
-      prevPage: null,
-      nextPage: null,
-      totalPages: 1,
-    };
+  describe('Should return all categories and search him', () => {
+    it.each<[string, SearchCategoryDto | null]>([
+      ['Should return all categories', null],
+      ['Should search category by name', { name: 'TEST' }],
+    ])('%s', async (_, searchDto) => {
+      const mockCategories = {
+        categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
+        total: 1,
+        page: 1,
+        pageSize: 1,
+        prevPage: null,
+        nextPage: null,
+        totalPages: 1,
+      };
 
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest
-      .spyOn(repository, 'findAll')
-      .mockResolvedValue(mockCategories.categories);
+      jest.spyOn(repository, 'count').mockResolvedValue(mockCategories.total);
+      jest
+        .spyOn(repository, 'findAll')
+        .mockResolvedValue(mockCategories.categories);
 
-    const categories = await service.getAll(
-      { page: 1, pageSize: 1 },
-      { sortBy: 'id', order: Order.DESC },
-    );
+      const categories = await service.getAll(
+        { page: 1, pageSize: 1 },
+        { sortBy: 'id', order: Order.DESC },
+        searchDto,
+      );
 
-    expect(repository.findAll).toHaveBeenCalledWith(0, 1, {
-      sortBy: 'id',
-      order: Order.DESC,
+      expect(repository.findAll).toHaveBeenCalledWith(
+        0,
+        1,
+        { sortBy: 'id', order: Order.DESC },
+        searchDto,
+      );
+      expect(repository.count).toHaveBeenCalledWith(searchDto);
+
+      expect(categories).toEqual(mockCategories);
     });
-    expect(categories).toEqual(mockCategories);
-  });
-
-  it('Should search category by name with default sorting', async () => {
-    const mockCategories = {
-      categories: [{ id: 1, name: 'TEST', description: 'TEST' }],
-      total: 1,
-      page: 1,
-      pageSize: 1,
-      prevPage: null,
-      nextPage: null,
-      totalPages: 1,
-    };
-
-    jest.spyOn(repository, 'count').mockResolvedValue(1);
-    jest
-      .spyOn(repository, 'findByName')
-      .mockResolvedValue(mockCategories.categories);
-
-    const categories = await service.search(
-      { name: 'TEST' },
-      { page: 1, pageSize: 1 },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(repository.findByName).toHaveBeenCalledWith('TEST', 0, 1, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
-    expect(categories).toEqual(mockCategories);
   });
 
   describe('Should find category by id', () => {

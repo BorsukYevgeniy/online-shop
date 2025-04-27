@@ -174,34 +174,7 @@ describe('ProductRepository', () => {
     expect(products).toEqual(mockProducts);
   });
 
-  it('Should return all products with default sorting', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'Product A',
-        price: 100,
-        userId: 1,
-        description: 'MOCK1 description',
-        images: ['1', '2'],
-      },
-    ];
-
-    jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
-
-    const products = await repository.findAll(0, 10, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
-
-    expect(prisma.product.findMany).toHaveBeenCalledWith({
-      skip: 0,
-      take: 10,
-      orderBy: { id: 'desc' },
-    });
-    expect(products).toEqual(mockProducts);
-  });
-
-  describe('Should search products with filters', () => {
+  describe('Should get all products and search products with filters', () => {
     const mockProducts = [
       {
         id: 1,
@@ -212,7 +185,8 @@ describe('ProductRepository', () => {
         images: ['9', '10'],
       },
     ];
-    it.each<[string, SearchProductDto]>([
+    it.each<[string, SearchProductDto | null]>([
+      ['Should get all products with default sorting', null],
       [
         'Should search products by title with default sorting',
         { title: 'Test' },
@@ -240,23 +214,28 @@ describe('ProductRepository', () => {
     ])('%s', async (_, dto) => {
       jest.spyOn(prisma.product, 'findMany').mockResolvedValue(mockProducts);
 
-      const products = await repository.findProducts(dto, 0, 10, {
-        sortBy: 'id',
-        order: Order.DESC,
-      });
+      const products = await repository.findAll(
+        0,
+        10,
+        {
+          sortBy: 'id',
+          order: Order.DESC,
+        },
+        dto,
+      );
 
       expect(products).toEqual(mockProducts);
       expect(prisma.product.findMany).toHaveBeenCalledWith({
         where: {
-          title: { contains: dto.title, mode: 'insensitive' },
+          title: { contains: dto?.title, mode: 'insensitive' },
           price: {
-            gte: dto.minPrice,
-            lte: dto.maxPrice,
+            gte: dto?.minPrice,
+            lte: dto?.maxPrice,
           },
           categories: {
             some: {
               id: {
-                in: dto.categoryIds,
+                in: dto?.categoryIds,
               },
             },
           },

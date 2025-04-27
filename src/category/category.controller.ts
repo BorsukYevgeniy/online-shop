@@ -36,22 +36,11 @@ export class CategoryController {
   async getAll(
     @Query() pagination: PaginationDto,
     @Query() sortDto?: SortCategoryDto,
+    @Query() searchDto?: SearchCategoryDto,
   ): Promise<PaginatedCategory> {
-    return await this.categoryService.getAll(pagination, sortDto);
+    return await this.categoryService.getAll(pagination, sortDto, searchDto);
   }
 
-  @Get('search')
-  async search(
-    @Query() searchCategoryDto: SearchCategoryDto,
-    @Query() paginationDto: PaginationDto,
-    @Query() sortDto?: SortCategoryDto,
-  ): Promise<PaginatedCategory> {
-    return await this.categoryService.search(
-      searchCategoryDto,
-      paginationDto,
-      sortDto,
-    );
-  }
 
   @Get(':categoryId')
   async getById(@Param('categoryId') id: number): Promise<Category> {
