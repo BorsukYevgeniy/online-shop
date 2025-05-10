@@ -38,18 +38,20 @@ export class RolesGuard implements CanActivate {
         throw new UnauthorizedException('Access token is missing in cookies');
       }
 
-      const { id, role: userRole } =
-        await this.tokenService.verifyAccessToken(accessToken);
+      const payload = await this.tokenService.verifyAccessToken(accessToken);
 
-      req.user = { id, role: userRole };
+      req.user = payload;
 
-      if (requiredRole === userRole) {
-        this.logger.log(`User authenticated: ${id}, Role: ${userRole}`);
+      if (requiredRole === payload.role) {
+        this.logger.log(
+          `User authenticated: ${payload.id}, Role: ${payload.role}, isVerified: ${payload.isVerified},
+              `,
+        );
         return true;
       }
 
       this.logger.warn(
-        `User role ${userRole} does not match required role ${requiredRole}`,
+        `User role ${payload.role} does not match required role ${requiredRole}`,
       );
       return false;
     } catch (e: unknown) {

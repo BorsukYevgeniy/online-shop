@@ -19,7 +19,7 @@ import { SearchProductDto } from './dto/search-product.dto';
 import { PaginationDto } from '../dto/pagination.dto';
 import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
 import { ProductService } from './product.service';
-import { AuthGuard } from '../auth/guards/jwt-auth.guard';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { AuthRequest } from '../types/request.type';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
@@ -46,7 +46,7 @@ export class ProductController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   async create(
     @Req() req: AuthRequest,
@@ -57,7 +57,7 @@ export class ProductController {
   }
 
   @Patch(':productId')
-  @UseGuards(AuthGuard)
+  @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   async update(
     @Req() req: AuthRequest,
@@ -74,7 +74,7 @@ export class ProductController {
   }
 
   @Delete(':productId')
-  @UseGuards(AuthGuard)
+  @UseGuards(VerifiedUserGuard)
   @HttpCode(204)
   async delete(
     @Req() req: AuthRequest,

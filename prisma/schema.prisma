@@ -8,25 +8,31 @@ datasource db {
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   title       String
   description String
   price       Float
   images      String[]
-  userId      Int
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categories  Category[]
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categories Category[]
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  nickname  String    @unique
-  email     String    @unique
+  id        Int      @id @default(autoincrement())
+  nickname  String   @unique
+  email     String   @unique
   password  String
-  createdAt DateTime  @default(now())
-  tokens    Token[]
-  products  Product[]
-  role      Roles      @default(USER)
+  createdAt DateTime @default(now())
+
+  tokens   Token[]
+  products Product[]
+  role     Roles     @default(USER)
+
+  isVerified       Boolean @default(false)
+  verificationLink String  @unique @default(uuid(4))
 }
 
 model Token {
@@ -34,14 +40,16 @@ model Token {
   userId    Int
   token     String
   expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Category {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
+  id          Int    @id @default(autoincrement())
+  name        String @unique
   description String
-  products    Product[]
+
+  products Product[]
 }
 
 enum Roles {

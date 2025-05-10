@@ -2,6 +2,11 @@ import { User } from '@prisma/client';
 import { Paginated } from 'src/types/pagination.type';
 
 /**
+ * Represents a user without the `verificationLink` field for security reasons.
+ */
+type UserNoVLink = Omit<User, 'verificationLink'>;
+
+/**
  * Represents a user with roles but without the `password` field for security reasons.
  */
 export type UserNoPassword = Omit<User, 'password'>;
@@ -9,13 +14,16 @@ export type UserNoPassword = Omit<User, 'password'>;
 /**
  * Represents a user with roles but without `products` ,`password` and `email` field for security reasons.
  */
-export type UserNoCred = Omit<UserNoPassword, 'email'>;
+export type UserNoCred = Omit<
+  Omit<UserNoPassword, 'verificationLink'>,
+  'email'
+>;
 
 /**
  * Represents a user with roles and a list of products they own.
  * The `password` field is omitted for security reasons.
  */
-export type UserProductNoPassword = Omit<User, 'password'> & {
+export type UserProductNoPassword = Omit<UserNoVLink, 'password'> & {
   products: {
     id: number;
     userId: number;

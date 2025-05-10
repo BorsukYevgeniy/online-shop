@@ -9,8 +9,8 @@ import { TokenService } from '../../token/token.service';
 import { AuthRequest } from '../../types/request.type';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  private readonly logger: Logger = new Logger(AuthGuard.name);
+export class VerifiedUserGuard implements CanActivate {
+  private readonly logger: Logger = new Logger(VerifiedUserGuard.name);
 
   constructor(private readonly tokenService: TokenService) {}
 
@@ -27,11 +27,16 @@ export class AuthGuard implements CanActivate {
       const payload = await this.tokenService.verifyAccessToken(accessToken);
       req.user = payload;
 
-      this.logger.log(
-        `User authenticated: ${payload.id}, Role: ${payload.role}, isVerified: ${payload.isVerified},
+      if (payload.isVerified) {
+        this.logger.log(
+          `User authenticated: ${payload.id}, Role: ${payload.role}, isVerified: ${payload.isVerified},
       `,
-      );
-      return true;
+        );
+        return true;
+      }
+
+      this.logger.warn(`User id: ${payload.id} does not match verifiсation`);
+      return false;
     } catch (e: unknown) {
       this.logger.error('Invalid access token', e);
       throw new UnauthorizedException('Invalid token');

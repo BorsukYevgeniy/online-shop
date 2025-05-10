@@ -7,6 +7,7 @@ import {
   BadRequestException,
   UseGuards,
   HttpCode,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -89,5 +90,13 @@ export class AuthController {
     });
 
     res.send({ message: 'Token refreshed' });
+  }
+
+  @Post('verify/:link')
+  @HttpCode(200)
+  async verify(@Param('link') link: string) {
+    await this.authService.verifyUser(link);
+
+    return { message: 'User verified succesfully' };
   }
 }

@@ -38,7 +38,7 @@ export class UserController {
   ) {}
 
   @Get()
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async getAll(
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortUserDto,

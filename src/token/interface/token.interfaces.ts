@@ -8,4 +8,5 @@ export interface Tokens {
 export interface TokenPayload {
   id: number;
   role: Role;
+  isVerified: boolean;
 }

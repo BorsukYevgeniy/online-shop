@@ -86,6 +86,22 @@ export class UserService {
     }
   }
 
+  async getByVerificationLink(verificationLink: string): Promise<User | null> {
+    const user =
+      await this.userRepository.findOneByVerificationLink(verificationLink);
+
+    if (!user) {
+      this.logger.warn(
+        `User with verification link ${verificationLink} doesnt exist`,
+      );
+    } else {
+      this.logger.log(
+        `User with verification link ${verificationLink} fetched successfully`,
+      );
+      return user;
+    }
+  }
+
   async create(createUserDto: CreateUserDto): Promise<UserNoPassword> {
     try {
       const user = await this.userRepository.create(createUserDto);
@@ -127,5 +143,9 @@ export class UserService {
 
     this.logger.log(`User ${userId} assigned as admin successfully`);
     return user;
+  }
+
+  async verify(verificationLink: string): Promise<UserNoCred> {
+    return await this.userRepository.verify(verificationLink);
   }
 }

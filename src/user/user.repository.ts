@@ -5,10 +5,25 @@ import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 import { SortUserDto } from './dto/sort-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { DeletingCount } from 'src/types/deleting-count.type';
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async verify(verificationLink: string) {
+    return await this.prisma.user.update({
+      where: { verificationLink },
+      data: { isVerified: true },
+      select: {
+        id: true,
+        nickname: true,
+        createdAt: true,
+        role: true,
+        isVerified: true,
+      },
+    });
+  }
 
   async assignAdmin(userId: number): Promise<UserNoCred> {
     const updatedUser = await this.prisma.user.update({
@@ -17,6 +32,7 @@ export class UserRepository {
         id: true,
         nickname: true,
         createdAt: true,
+        isVerified: true,
         role: true,
       },
       data: {
@@ -58,6 +74,7 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
         role: true,
+        isVerified: true,
       },
       skip,
       take,
@@ -83,6 +100,7 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
         role: true,
+        isVerified: true,
       },
       skip,
       take,
@@ -97,7 +115,7 @@ export class UserRepository {
         id: true,
         nickname: true,
         createdAt: true,
-
+        isVerified: true,
         role: true,
       },
     });
@@ -114,6 +132,8 @@ export class UserRepository {
         email: true,
         createdAt: true,
         role: true,
+        isVerified: true,
+        verificationLink: true,
       },
     });
 
@@ -126,15 +146,25 @@ export class UserRepository {
     });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserNoPassword> {
+  async findOneByVerificationLink(
+    verificationLink: string,
+  ): Promise<User | null> {
+    return await this.prisma.user.findUnique({
+      where: { verificationLink },
+    });
+  }
+
+  async create(createDto: CreateUserDto): Promise<UserNoPassword> {
     const user = await this.prisma.user.create({
-      data: createUserDto,
+      data: createDto,
       select: {
         id: true,
         email: true,
         nickname: true,
         createdAt: true,
         role: true,
+        isVerified: true,
+        verificationLink: true,
       },
     });
 
@@ -144,6 +174,12 @@ export class UserRepository {
   async delete(userId: number): Promise<void> {
     await this.prisma.user.delete({
       where: { id: userId },
+    });
+  }
+
+  async deleteUnverifiedUsers(): Promise<DeletingCount> {
+    return await this.prisma.user.deleteMany({
+      where: { isVerified: false },
     });
   }
 }

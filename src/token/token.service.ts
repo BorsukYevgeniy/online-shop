@@ -39,10 +39,10 @@ export class TokenService {
     );
   }
 
-  async generateTokens(userId: number, role: Role): Promise<Tokens> {
+  async generateTokens(tokenPayload: TokenPayload): Promise<Tokens> {
     try {
       const accessToken: string = await this.jwtService.signAsync(
-        { id: userId, role },
+        tokenPayload,
         {
           expiresIn: this.accessTokenExpirationTime,
           secret: this.accessSecret,
@@ -50,16 +50,16 @@ export class TokenService {
       );
 
       const refreshToken: string = await this.jwtService.signAsync(
-        { id: userId, role },
+        tokenPayload,
         {
           expiresIn: this.refreshTokenExpirationTime,
           secret: this.refreshSecret,
         },
       );
 
-      await this.saveToken(userId, refreshToken);
+      await this.saveToken(tokenPayload.id, refreshToken);
 
-      this.logger.log(`Generated tokens for user ${userId}`);
+      this.logger.log(`Generated tokens for user ${tokenPayload.id}`);
       return { accessToken, refreshToken };
     } catch (error) {
       this.logger.error('Error generating tokens', { message: error.message });
