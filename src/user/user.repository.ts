@@ -11,16 +11,17 @@ import { DeletingCount } from 'src/types/deleting-count.type';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async verify(verificationLink: string) {
+  async verify(verificationLink: string): Promise<UserNoCred> {
     return await this.prisma.user.update({
       where: { verificationLink },
-      data: { isVerified: true },
+      data: { isVerified: true, verifiedAt: new Date() },
       select: {
         id: true,
         nickname: true,
         createdAt: true,
         role: true,
         isVerified: true,
+        verifiedAt: true,
       },
     });
   }
@@ -34,6 +35,7 @@ export class UserRepository {
         createdAt: true,
         isVerified: true,
         role: true,
+        verifiedAt: true,
       },
       data: {
         role: 'ADMIN',
@@ -75,6 +77,7 @@ export class UserRepository {
         createdAt: true,
         role: true,
         isVerified: true,
+        verifiedAt: true,
       },
       skip,
       take,
@@ -101,6 +104,7 @@ export class UserRepository {
         createdAt: true,
         role: true,
         isVerified: true,
+        verifiedAt: true,
       },
       skip,
       take,
@@ -116,6 +120,7 @@ export class UserRepository {
         nickname: true,
         createdAt: true,
         isVerified: true,
+        verifiedAt: true,
         role: true,
       },
     });
@@ -134,6 +139,7 @@ export class UserRepository {
         role: true,
         isVerified: true,
         verificationLink: true,
+        verifiedAt: true,
       },
     });
 
@@ -165,6 +171,7 @@ export class UserRepository {
         role: true,
         isVerified: true,
         verificationLink: true,
+        verifiedAt: true,
       },
     });
 
