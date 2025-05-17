@@ -53,6 +53,8 @@ describe('UserService', () => {
       nickname: 'test',
       createdAt: new Date(),
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: new Date(),
     };
 
     it.each<[string, boolean]>([
@@ -82,14 +84,13 @@ describe('UserService', () => {
         nickname: 'test',
         createdAt: new Date(),
         role: Role.USER,
+        isVerified: false,
+        verifiedAt: new Date(),
       },
     ];
 
     it.each<[string, SearchUserDto | null]>([
-      [
-        'Should return all users with default sorting',
-        null
-      ],
+      ['Should return all users with default sorting', null],
       [
         'Should return all users searched by nickname with default sorting',
         { nickname: 'test' },
@@ -151,6 +152,9 @@ describe('UserService', () => {
       nickname: 'test',
       createdAt: new Date(),
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
     };
     jest.spyOn(repository, 'findOneByEmail').mockResolvedValue(mockUser);
 
@@ -163,7 +167,14 @@ describe('UserService', () => {
     it.each<[string, UserNoCred | null]>([
       [
         'Should find user by id',
-        { id: 1, nickname: 'test', createdAt: new Date(), role: Role.USER },
+        {
+          id: 1,
+          nickname: 'test',
+          createdAt: new Date(),
+          role: Role.USER,
+          isVerified: false,
+          verifiedAt: new Date(),
+        },
       ],
       ['Should throw NotFoundException because user not found', null],
     ])('%s', async (_, mockUser) => {
@@ -188,6 +199,9 @@ describe('UserService', () => {
       nickname: 'test',
       createdAt: new Date(),
       role: Role.USER,
+      verificationLink: '123',
+      isVerified: false,
+      verifiedAt: new Date(),
     };
 
     jest.spyOn(repository, 'findUserProfile').mockResolvedValue(mockUser);
@@ -208,6 +222,9 @@ describe('UserService', () => {
       nickname: 'test',
       createdAt: new Date(),
       role: Role.USER,
+      verificationLink: '123',
+      isVerified: false,
+      verifiedAt: new Date(),
     };
 
     jest.spyOn(repository, 'create').mockResolvedValue(mockUser);

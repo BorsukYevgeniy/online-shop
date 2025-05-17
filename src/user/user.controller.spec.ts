@@ -9,7 +9,7 @@ import { AuthRequest } from '../types/request.type';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';
-import { UserNoCred } from './types/user.types';
+import { UserNoCred, UserNoPassword } from './types/user.types';
 
 const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
 
@@ -58,6 +58,8 @@ describe('UserController', () => {
       nickname: 'test',
       createdAt: new Date(),
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: new Date(),
     };
 
     it.each<[string, boolean]>([
@@ -89,6 +91,8 @@ describe('UserController', () => {
         nickname: 'test',
         createdAt: new Date(),
         role: Role.USER,
+        isVerified: false,
+        verifiedAt: new Date(),
       },
     ];
 
@@ -155,7 +159,14 @@ describe('UserController', () => {
     it.each<[string, UserNoCred | null]>([
       [
         'Should find user by id',
-        { id: 1, nickname: 'test', createdAt: new Date(), role: Role.USER },
+        {
+          id: 1,
+          nickname: 'test',
+          createdAt: new Date(),
+          role: Role.USER,
+          isVerified: false,
+          verifiedAt: new Date(),
+        },
       ],
       ['Should throw NotFoundException because user not found', null],
     ])('%s', async (_, mockUser) => {
@@ -178,12 +189,15 @@ describe('UserController', () => {
   });
 
   it('Should return user profile', async () => {
-    const mockUser = {
+    const mockUser: UserNoPassword = {
       id: 1,
       nickname: 'test',
       createdAt: new Date(),
       email: 'test',
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: new Date(),
+      verificationLink: '123',
     };
 
     jest.spyOn(userService, 'getMe').mockResolvedValue(mockUser);

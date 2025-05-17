@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
@@ -6,6 +5,8 @@ import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
+import { UserNoPassword } from './types/user.types';
+import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -50,13 +51,16 @@ describe('UserRepository', () => {
     const mockUsers = {
       id: 1,
       nickname: 'test',
+      email: 'email',
+      password: '123',
       createdAt: date,
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
     };
 
-    jest
-      .spyOn(prismaService.user, 'update')
-      .mockResolvedValue(mockUsers as any);
+    jest.spyOn(prismaService.user, 'update').mockResolvedValue(mockUsers);
 
     const user = await repository.assignAdmin(1);
 
@@ -106,6 +110,9 @@ describe('UserRepository', () => {
         password: 'password',
         createdAt: date,
         role: Role.USER,
+        isVerified: false,
+        verifiedAt: null,
+        verificationLink: '123',
       },
     ];
 
@@ -144,6 +151,8 @@ describe('UserRepository', () => {
           id: true,
           nickname: true,
           createdAt: true,
+          verifiedAt: true,
+          isVerified: true,
           role: true,
         },
         skip: 0,
@@ -171,6 +180,9 @@ describe('UserRepository', () => {
       password: 'test',
       createdAt: date,
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
     };
 
     jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
@@ -191,11 +203,17 @@ describe('UserRepository', () => {
       password: '1234',
     };
 
-    jest
-      .spyOn(prismaService.user, 'create')
-      .mockResolvedValue(createUserDto as User);
+    jest.spyOn(prismaService.user, 'create').mockResolvedValue({
+      id: 1,
+      role: Role.USER,
+      ...createUserDto,
+      createdAt: date,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    });
 
-    const user = await repository.create(createUserDto);
+    const user: UserNoPassword = await repository.create(createUserDto);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
       data: createUserDto,
@@ -204,11 +222,22 @@ describe('UserRepository', () => {
         email: true,
         nickname: true,
         createdAt: true,
+        isVerified: true,
+        verifiedAt: true,
+        verificationLink: true,
         role: true,
       },
     });
 
-    expect(user).toEqual(createUserDto);
+    expect(user).toEqual({
+      id: 1,
+      role: Role.USER,
+      ...createUserDto,
+      createdAt: date,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    });
   });
 
   it('Should delete user by id', async () => {
@@ -219,6 +248,9 @@ describe('UserRepository', () => {
       password: '1234',
       role: Role.USER,
       createdAt: date,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
     };
 
     jest.spyOn(prismaService.user, 'delete').mockResolvedValue(mockUser);

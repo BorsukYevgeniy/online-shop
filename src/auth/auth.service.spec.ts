@@ -3,13 +3,10 @@ import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
+import { MailService } from '../mail/mail.service';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -31,6 +28,8 @@ describe('AuthService', () => {
           provide: UserService,
           useValue: { getByEmail: jest.fn(), create: jest.fn() },
         },
+        { provide: ConfigService, useValue: { get: jest.fn() } },
+        { provide: MailService, useValue: { sendVerificationMail: jest.fn() } },
         {
           provide: TokenService,
           useValue: {
@@ -70,6 +69,9 @@ describe('AuthService', () => {
       password: hashedPassword,
       createdAt: new Date(),
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
     };
     it.each<[string, boolean]>([
       ['Should register user', true],
@@ -114,6 +116,9 @@ describe('AuthService', () => {
       password: hashedPassword,
       createdAt: new Date(),
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
     };
     const mockTokens = {
       accessToken: 'accessToken',
@@ -141,10 +146,11 @@ describe('AuthService', () => {
         expect(tokens).toEqual(mockTokens);
         expect(userService.getByEmail).toHaveBeenCalledWith(dto.email);
         expect(compare).toHaveBeenCalledWith(dto.password, hashedPassword);
-        expect(tokenService.generateTokens).toHaveBeenCalledWith(
-          mockUser.id,
-          mockUser.role,
-        );
+        expect(tokenService.generateTokens).toHaveBeenCalledWith({
+          id: mockUser.id,
+          role: mockUser.role,
+          isVerified: mockUser.isVerified,
+        });
       } else if (!isUserFounded) {
         jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
 
@@ -188,7 +194,7 @@ describe('AuthService', () => {
 
     jest
       .spyOn(tokenService, 'verifyRefreshToken')
-      .mockResolvedValue({ id: 1, role: Role.USER });
+      .mockResolvedValue({ id: 1, role: Role.USER, isVerified: false });
 
     jest
       .spyOn(tokenService, 'getUserTokens')

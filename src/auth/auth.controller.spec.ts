@@ -55,6 +55,9 @@ describe('AuthController', () => {
       password: hashedPassword,
       createdAt: new Date(),
       role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123'
     };
     it.each<[string, boolean]>([
       ['Should register user', true],

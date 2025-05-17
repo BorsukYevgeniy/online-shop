@@ -61,7 +61,11 @@ describe('TokenService', () => {
       expiresAt: new Date(),
     });
 
-    const result = await service.generateTokens(userId, Role.ADMIN);
+    const result = await service.generateTokens({
+      id: userId,
+      role: Role.ADMIN,
+      isVerified: false,
+    });
 
     expect(repository.create).toHaveBeenCalledWith(
       userId,
