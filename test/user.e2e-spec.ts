@@ -8,7 +8,6 @@ import { UserModule } from '../src/user/user.module';
 import * as request from 'supertest';
 import { hash } from 'bcryptjs';
 import { ValidationPipe } from '@nestjs/common';
-import { SearchUserDto } from 'src/user/dto/search-user.dto';
 
 describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
@@ -19,7 +18,7 @@ describe('UserController (e2e)', () => {
       imports: [
         UserModule,
         AuthModule,
-        ConfigModule.forRoot({ envFilePath: '.env.test' }),
+        ConfigModule.forRoot({ envFilePath: '.env.test' , isGlobal: true}),
       ],
     }).compile();
     app = moduleFixture.createNestApplication();
@@ -101,12 +100,16 @@ describe('UserController (e2e)', () => {
           id: adminId,
           nickname: 'admin',
           role: 'ADMIN',
+          isVerified: false,
+          verifiedAt: null,
         },
         {
           createdAt: expect.any(String),
           id: userId,
           nickname: 'user',
           role: 'USER',
+          isVerified: false,
+          verifiedAt: null,
         },
       ],
     });
@@ -124,6 +127,9 @@ describe('UserController (e2e)', () => {
       createdAt: expect.any(String),
       nickname: 'user',
       role: 'USER',
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: expect.any(String),
     });
   });
 
@@ -201,12 +207,16 @@ describe('UserController (e2e)', () => {
               id: expect.any(Number),
               nickname: 'admin',
               role: 'ADMIN',
+              isVerified: false,
+              verifiedAt: null,
             },
             {
               createdAt: expect.any(String),
               id: expect.any(Number),
               nickname: 'user',
               role: 'USER',
+              isVerified: false,
+              verifiedAt: null,
             },
           ],
         });
@@ -224,6 +234,8 @@ describe('UserController (e2e)', () => {
               nickname: 'user',
               id: expect.any(Number),
               role: 'USER',
+              isVerified: false,
+              verifiedAt: null,
             },
           ],
         });
@@ -249,6 +261,8 @@ describe('UserController (e2e)', () => {
               nickname: 'user',
               id: expect.any(Number),
               role: 'USER',
+              isVerified: false,
+              verifiedAt: null,
             },
       );
     });
@@ -295,6 +309,8 @@ describe('UserController (e2e)', () => {
           nickname: 'user',
           role: 'ADMIN',
           createdAt: expect.any(String),
+          isVerified: false,
+          verifiedAt: null,
         });
       }
     });

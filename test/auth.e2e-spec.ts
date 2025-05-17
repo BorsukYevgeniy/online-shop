@@ -16,7 +16,10 @@ describe('AuthController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, ConfigModule.forRoot({ envFilePath: '.env.test' })],
+      imports: [
+        AuthModule,
+        ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -37,12 +40,20 @@ describe('AuthController (e2e)', () => {
       [
         'POST /auth/register - 201 CREATED - Should register a new user',
         201,
-        { email: 'user@gmail.com', nickname: 'user', password: 'password' },
+        {
+          email: process.env.TEST_EMAIL,
+          nickname: 'user',
+          password: 'password',
+        },
       ],
       [
         'POST /auth/register - 400 BAD REQUEST - Should return 400 http code because user already exists',
         400,
-        { email: 'user@gmail.com', nickname: 'user', password: 'password' },
+        {
+          email: process.env.TEST_EMAIL,
+          nickname: 'user',
+          password: 'password',
+        },
       ],
       [
         'POST /auth/register - 400 BAD REQUEST - Should return 400 http code because email not valid',
@@ -73,10 +84,13 @@ describe('AuthController (e2e)', () => {
       if (statusCode === 201) {
         expect(body).toEqual({
           id: expect.any(Number),
-          email: 'user@gmail.com',
+          email: process.env.TEST_EMAIL,
           nickname: 'user',
           role: Role.USER,
           createdAt: expect.any(String),
+          isVerified: false,
+          verifiedAt: null,
+          verificationLink: expect.any(String),
         });
       }
     });
@@ -88,7 +102,7 @@ describe('AuthController (e2e)', () => {
       [
         'POST /auth/login - 200 OK - Should login a user',
         200,
-        { email: 'user@gmail.com', password: 'password' },
+        { email: process.env.TEST_EMAIL, password: 'password' },
       ],
       [
         'POST /auth/login - 404 NOT FOUND - Should return 404 HTTP code because user not found',
@@ -143,5 +157,37 @@ describe('AuthController (e2e)', () => {
       .post('/auth/logout-all')
       .set('Cookie', [`accessToken=${accessToken}`])
       .expect(200);
+  });
+
+  describe('POST /auth/verify - Should verify user', () => {
+    it.each<[string, 200 | 400 | 404]>([
+      ['POST /auth/verify - 200 OK - Should verify user', 200],
+      [
+        'POST /auth/verify - 400 BAD REQUEST - Should return 400 HTTP code because user alredy verified',
+        400,
+      ],
+      [
+        'POST /auth/verify - 404 NOT FOUND - Should return 400 HTTP code because user not found',
+        404,
+      ],
+    ])('%s', async (_, statusCode) => {
+      const { verificationLink } = await prisma.user.findUnique({
+        where: { email: process.env.TEST_EMAIL },
+      });
+
+      if (statusCode === 200) {
+        await request(app.getHttpServer())
+          .post(`/auth/verify/${verificationLink}`)
+          .expect(200);
+      } else if (statusCode === 404) {
+        await request(app.getHttpServer())
+          .post(`/auth/verify/${verificationLink + 1}`)
+          .expect(404);
+      } else {
+        await request(app.getHttpServer())
+          .post(`/auth/verify/${verificationLink}`)
+          .expect(400);
+      }
+    });
   });
 });

@@ -8,10 +8,9 @@ import { AuthModule } from '../src/auth/auth.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { ProductModule } from '../src/product/product.module';
 import { hash } from 'bcryptjs';
-import { UpdateProductDto } from 'src/product/dto/update-product.dto';
-import { SearchProductDto } from 'src/product/dto/search-product.dto';
-import { CreateProductDto } from 'src/product/dto/create-product.dto';
-import { devNull } from 'node:os';
+import { UpdateProductDto } from '../src/product/dto/update-product.dto';
+import { SearchProductDto } from '../src/product/dto/search-product.dto';
+import { CreateProductDto } from '../src/product/dto/create-product.dto';
 
 describe('ProductController (e2e)', () => {
   let app: NestExpressApplication;
@@ -22,7 +21,7 @@ describe('ProductController (e2e)', () => {
       imports: [
         ProductModule,
         AuthModule,
-        ConfigModule.forRoot({ envFilePath: '.env.test' }),
+        ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
       ],
     }).compile();
 
@@ -38,19 +37,22 @@ describe('ProductController (e2e)', () => {
   let accessToken: string;
   let category1Id: number, category2Id: number;
   let userId: number;
+
   beforeAll(async () => {
     const user = await prisma.user.create({
       data: {
-        email: 'user@gmail.com',
+        email: process.env.TEST_EMAIL,
         password: await hash('password', 10),
         nickname: 'user',
+        isVerified: true,
+        verifiedAt: new Date()
       },
       select: { id: true },
     });
 
     const { headers } = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'user@gmail.com', password: 'password' });
+      .send({ email: process.env.TEST_EMAIL, password: 'password' });
 
     const [category1, category2] = await Promise.all([
       prisma.category.create({

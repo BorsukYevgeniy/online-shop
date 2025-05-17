@@ -21,7 +21,7 @@ describe('CategoryController (e2e)', () => {
       imports: [
         AuthModule,
         CategoryModule,
-        ConfigModule.forRoot({ envFilePath: '.env.test' }),
+        ConfigModule.forRoot({ envFilePath: '.env.test' , isGlobal: true}),
       ],
     }).compile();
 
@@ -39,7 +39,7 @@ describe('CategoryController (e2e)', () => {
   beforeAll(async () => {
     await prisma.user.create({
       data: {
-        email: 'user@gmail.com',
+        email: process.env.TEST_EMAIL,
         password: await hash('password', 10),
         nickname: 'user',
         role: 'ADMIN',
@@ -48,7 +48,7 @@ describe('CategoryController (e2e)', () => {
 
     const { headers } = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'user@gmail.com', password: 'password' })
+      .send({ email: process.env.TEST_EMAIL, password: 'password' })
       .expect(200);
 
     accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
