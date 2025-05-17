@@ -7,6 +7,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
+import { verify } from 'crypto';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -26,7 +27,12 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: UserService,
-          useValue: { getByEmail: jest.fn(), create: jest.fn() },
+          useValue: {
+            getByEmail: jest.fn(),
+            create: jest.fn(),
+            verify: jest.fn(),
+            getByVerificationLink: jest.fn(),
+          },
         },
         { provide: ConfigService, useValue: { get: jest.fn() } },
         { provide: MailService, useValue: { sendVerificationMail: jest.fn() } },
@@ -207,5 +213,60 @@ describe('AuthService', () => {
     const tokens = await service.refreshToken(refreshToken);
 
     expect(tokens).toEqual(mockTokens);
+  });
+
+  describe('Should verify user', () => {
+    const date = new Date()
+
+    const mockUser = {
+      id: 1,
+      createdAt: date,
+      email: 'email',
+      isVerified: false,
+      nickname: 'nick',
+      password: '123',
+      role: Role.USER,
+      verificationLink: '123',
+      verifiedAt: null,
+    };
+    it.each<[string, string, boolean, boolean]>([
+      ['Should verify user', '123', false, true],
+      ['Should throw NotFoundException', '123', false, false],
+      ['Should throw BadRequestException', '123', true, false],
+    ])('%s', async (_, link, isVerified, isUserFounded) => {
+      if (!isVerified && isUserFounded) {
+        jest
+          .spyOn(userService, 'getByVerificationLink')
+          .mockResolvedValue(mockUser);
+
+        jest.spyOn(userService, 'verify').mockResolvedValue({
+          ...mockUser,
+          isVerified: true,
+          verifiedAt: date
+        });
+
+        const user = await service.verifyUser(link);
+
+        expect(user).toEqual({
+          ...mockUser,
+          isVerified: true,
+          verifiedAt: date
+        });
+      } else if (!isVerified && !isUserFounded) {
+        jest
+          .spyOn(userService, 'getByVerificationLink')
+          .mockResolvedValue(null);
+
+        await expect(service.verifyUser(link)).rejects.toThrow(NotFoundException);
+      } else {
+        jest.spyOn(userService, 'getByVerificationLink').mockResolvedValue({
+          ...mockUser,
+          isVerified: true,
+          verifiedAt: date,
+        });
+
+        await expect(service.verifyUser(link)).rejects.toThrow(BadRequestException);
+      }
+    });
   });
 });

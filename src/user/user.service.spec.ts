@@ -28,8 +28,10 @@ describe('UserService', () => {
             findUserProfile: jest.fn(),
             findOneByEmail: jest.fn(),
             findUserRoles: jest.fn(),
+            findOneByVerificationLink: jest.fn(),
             create: jest.fn(),
             delete: jest.fn(),
+            verify: jest.fn(),
           },
         },
       ],
@@ -192,6 +194,25 @@ describe('UserService', () => {
     });
   });
 
+  it('Should find user by verification link', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'emai',
+      password: 'password',
+      nickname: 'test',
+      createdAt: new Date(),
+      role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    };
+    jest.spyOn(repository, 'findOneByVerificationLink').mockResolvedValue(mockUser);
+
+    const user = await service.getByVerificationLink('123');
+
+    expect(user).toEqual(mockUser)
+  });
+
   it('Should find user profile', async () => {
     const mockUser = {
       id: 1,
@@ -252,5 +273,24 @@ describe('UserService', () => {
         expect(service.delete).rejects.toThrow(NotFoundException);
       }
     });
+  });
+
+  it('Should verify user', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'email',
+      nickname: 'test',
+      password: 'password',
+      createdAt: new Date(),
+      role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+    };
+
+    jest.spyOn(repository, 'verify').mockResolvedValue(mockUser);
+
+    const user = await service.verify('123');
+
+    expect(user).toEqual(mockUser);
   });
 });

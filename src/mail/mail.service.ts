@@ -17,7 +17,7 @@ export class MailService {
     this.API_URL = this.configService.get<string>('API_URL');
   }
 
-  async sendVerificationMail(to: string, link: string) {
+  async sendVerificationMail(to: string, link: string): Promise<void> {
     await this.mailerService.sendMail({
       to,
       from: this.SMTP_USER,

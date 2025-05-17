@@ -196,6 +196,28 @@ describe('UserRepository', () => {
     expect(user).toEqual(mockUser);
   });
 
+
+  it('Should find user by verification link', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'emai',
+      password: 'password',
+      nickname: 'test',
+      createdAt: new Date(),
+      role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    };
+    jest
+      .spyOn(prismaService.user, 'findUnique')
+      .mockResolvedValue(mockUser);
+
+    const user = await repository.findOneByVerificationLink('123');
+
+    expect(user).toEqual(mockUser);
+  });
+
   it('Should create a new user', async () => {
     const createUserDto: CreateUserDto = {
       email: 'email',
@@ -260,5 +282,27 @@ describe('UserRepository', () => {
     expect(prismaService.user.delete).toHaveBeenCalledWith({
       where: { id: 1 },
     });
+  });
+
+  it('Should verify user', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'email',
+      nickname: 'test',
+      password: 'password',
+      createdAt: date,
+      role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    };
+
+    jest.spyOn(prismaService.user, 'update').mockResolvedValue(mockUser);
+
+    const user = await repository.verify('123')
+
+    expect(user).toEqual(mockUser)
+
+
   });
 });
