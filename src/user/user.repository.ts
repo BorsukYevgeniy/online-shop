@@ -162,7 +162,7 @@ export class UserRepository {
 
   async create(createDto: CreateUserDto): Promise<UserNoPassword> {
     const user = await this.prisma.user.create({
-      data: createDto,
+      data: { ...createDto, cart: { create: {} } },
       select: {
         id: true,
         email: true,

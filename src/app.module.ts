@@ -13,6 +13,7 @@ import { join as joinPath } from 'path';
 import { CategoryModule } from './category/category.module';
 
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
     TokenModule,
     ScheduleModule.forRoot(),
     CategoryModule,
+    CartModule,
   ],
 })
 export class AppModule implements NestModule {

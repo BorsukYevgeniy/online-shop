@@ -18,6 +18,7 @@ model Product {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   categories Category[]
+  carts      Cart[]
 }
 
 model User {
@@ -30,11 +31,13 @@ model User {
   tokens   Token[]
   products Product[]
 
-  role     Roles     @default(USER)
+  role Roles @default(USER)
 
   isVerified       Boolean   @default(false)
   verificationLink String    @unique @default(uuid(4))
   verifiedAt       DateTime?
+
+  cart Cart?
 }
 
 model Token {
@@ -42,14 +45,23 @@ model Token {
   token     String
   expiresAt DateTime
 
-  userId    Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Category {
   id          Int    @id @default(autoincrement())
   name        String @unique
   description String
+
+  products Product[]
+}
+
+model Cart {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   products Product[]
 }
