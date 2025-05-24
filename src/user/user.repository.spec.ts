@@ -238,7 +238,7 @@ describe('UserRepository', () => {
     const user: UserNoPassword = await repository.create(createUserDto);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
-      data: createUserDto,
+      data: { ...createUserDto, cart: { create: {} } },
       select: {
         id: true,
         email: true,
