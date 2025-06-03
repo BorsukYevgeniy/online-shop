@@ -35,8 +35,8 @@ export class CategoryController {
   @Get()
   async getAll(
     @Query() pagination: PaginationDto,
-    @Query() sortDto?: SortCategoryDto,
-    @Query() searchDto?: SearchCategoryDto,
+    @Query() sortDto: SortCategoryDto,
+    @Query() searchDto: SearchCategoryDto,
   ): Promise<PaginatedCategory> {
     return await this.categoryService.getAll(pagination, sortDto, searchDto);
   }

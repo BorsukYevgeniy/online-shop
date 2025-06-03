@@ -53,7 +53,7 @@ export class ProductService {
   async getAll(
     paginationDto: PaginationDto,
     sortDto: SortProductDto,
-    searchDto?: SearchProductDto,
+    searchDto: SearchProductDto,
   ): Promise<PaginatedProduct> {
     const { pageSize, page }: PaginationDto = paginationDto;
 

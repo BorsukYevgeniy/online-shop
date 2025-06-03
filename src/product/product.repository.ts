@@ -39,7 +39,7 @@ export class ProductRepository {
     skip: number,
     take: number,
     sortDto: SortProductDto,
-    searchDto?: SearchProductDto,
+    searchDto: SearchProductDto,
   ): Promise<Product[]> {
     return await this.prisma.product.findMany({
       where: {

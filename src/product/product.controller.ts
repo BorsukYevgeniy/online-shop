@@ -32,8 +32,8 @@ export class ProductController {
   @Get()
   async getAll(
     @Query() paginationDto: PaginationDto,
-    @Query() sortDto?: SortProductDto,
-    @Query(ValidateProductDtoPipe) searchDto?: SearchProductDto,
+    @Query() sortDto: SortProductDto,
+    @Query(ValidateProductDtoPipe) searchDto: SearchProductDto,
   ): Promise<PaginatedProduct> {
     return await this.productService.getAll(paginationDto, sortDto, searchDto);
   }

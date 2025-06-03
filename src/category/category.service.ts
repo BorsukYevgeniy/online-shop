@@ -22,8 +22,8 @@ export class CategoryService {
 
   async getAll(
     paginationDto: PaginationDto,
-    sortDto?: SortCategoryDto,
-    searchDto?: SearchCategoryDto,
+    sortDto: SortCategoryDto,
+    searchDto: SearchCategoryDto,
   ): Promise<PaginatedCategory> {
     const { page, pageSize }: PaginationDto = paginationDto;
     const skip: number = (page - 1) * pageSize;

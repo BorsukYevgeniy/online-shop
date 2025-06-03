@@ -21,8 +21,8 @@ export class CategoryRepository {
   async findAll(
     skip: number,
     take: number,
-    sortDto?: SortCategoryDto,
-    searchDto?: SearchCategoryDto,
+    sortDto: SortCategoryDto,
+    searchDto: SearchCategoryDto,
   ): Promise<Category[]> {
     return await this.prisma.category.findMany({
       where: {
