@@ -161,41 +161,6 @@ export class ProductService {
     }
   }
 
-  async getCategoryProducts(
-    categoryId: number,
-    paginationDto: PaginationDto,
-    sortProductDto: SortProductDto,
-  ): Promise<PaginatedProduct> {
-    const { pageSize, page }: PaginationDto = paginationDto;
-    const skip: number = (page - 1) * pageSize;
-
-    const [products, total] = await Promise.all([
-      this.productRepository.findCategoryProducts(
-        categoryId,
-        skip,
-        pageSize,
-        sortProductDto,
-      ),
-      this.productRepository.countCategoryProducts(categoryId),
-    ]);
-
-    const totalPages: number = Math.ceil(total / pageSize);
-
-    this.logger.log(
-      `Products fetched successfully for category ${categoryId}, total: ${total}`,
-    );
-
-    return {
-      products,
-      total,
-      pageSize,
-      page,
-      totalPages,
-      prevPage: page > 1 ? page - 1 : null,
-      nextPage: page < totalPages ? page + 1 : null,
-    };
-  }
-
   async getUserProducts(
     userId: number,
     paginationDto: PaginationDto,

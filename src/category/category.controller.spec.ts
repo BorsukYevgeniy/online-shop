@@ -112,51 +112,6 @@ describe('CategoryController', () => {
     });
   });
 
-  it('Should return category products', async () => {
-    const mockProducts = {
-      products: [
-        {
-          id: 1,
-          title: 'test',
-          description: 'test',
-          price: 1,
-          userId: 1,
-          images: ['1'],
-          categories: [1, 2],
-        },
-      ],
-      total: 1,
-      page: 1,
-      pageSize: 1,
-      nextPage: null,
-      prevPage: null,
-      totalPages: 1,
-    };
-
-    jest
-      .spyOn(productService, 'getCategoryProducts')
-      .mockResolvedValue(mockProducts);
-
-    const products = await controller.getCategoryProducts(
-      1,
-      {
-        page: 1,
-        pageSize: 1,
-      },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(productService.getCategoryProducts).toHaveBeenCalledWith(
-      1,
-      {
-        page: 1,
-        pageSize: 1,
-      },
-      { sortBy: 'id', order: Order.DESC },
-    );
-    expect(products).toEqual(mockProducts);
-  });
-
   describe('Should create category', () => {
     it.each<[string, CreateCategoryDto, boolean]>([
       [

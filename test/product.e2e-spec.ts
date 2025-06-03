@@ -88,6 +88,11 @@ describe('ProductController (e2e)', () => {
         { title: 'Prod' },
       ],
       [
+        'GET /products - 200 OK - Should get category products',
+        200,
+        { categoryIds: [1] },
+      ],
+      [
         'GET /products - 200 OK - Should search the product by title and min price',
         200,
         { title: 'Prod', minPrice: 50 },

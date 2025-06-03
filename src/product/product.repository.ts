@@ -56,20 +56,6 @@ export class ProductRepository {
     });
   }
 
-  async findCategoryProducts(
-    categoryId: number,
-    skip: number,
-    take: number,
-    sortDto: SortProductDto,
-  ): Promise<Product[]> {
-    return await this.prisma.product.findMany({
-      where: { categories: { some: { id: categoryId } } },
-      orderBy: { [sortDto.sortBy]: sortDto.order },
-      skip,
-      take,
-    });
-  }
-
   async findUserProducts(
     userId: number,
     skip: number,

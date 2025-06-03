@@ -155,22 +155,6 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  it('GET /categories/:categoryId/products - 200 OK - Should get a category products', async () => {
-    const { body: category } = await request(app.getHttpServer())
-      .get(`/categories/${categoryId}/products`)
-      .expect(200);
-
-    expect(category).toEqual({
-      total: 0,
-      page: 1,
-      pageSize: 10,
-      totalPages: 0,
-      prevPage: null,
-      nextPage: null,
-      products: [],
-    });
-  });
-
   describe('PATCH /categories/:categoryId - Should update fields in category', () => {
     it.each<[string, 200 | 404 | 400, UpdateCategoryDto | null]>([
       [

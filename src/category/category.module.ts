@@ -4,10 +4,9 @@ import { CategoryController } from './category.controller';
 import { CategoryRepository } from './category.repository';
 import { PrismaModule } from '../prisma/prisma.module';
 import { TokenModule } from '../token/token.module';
-import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [PrismaModule, TokenModule, ProductModule],
+  imports: [PrismaModule, TokenModule],
   controllers: [CategoryController],
   providers: [CategoryService, CategoryRepository],
 })

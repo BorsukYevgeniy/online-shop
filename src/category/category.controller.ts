@@ -29,7 +29,6 @@ import { SortCategoryDto } from './dto/sort-category.dto';
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,
-    private readonly productService: ProductService,
   ) {}
 
   @Get()
@@ -45,19 +44,6 @@ export class CategoryController {
   @Get(':categoryId')
   async getById(@Param('categoryId') id: number): Promise<Category> {
     return await this.categoryService.getById(id);
-  }
-
-  @Get(':categoryId/products')
-  async getCategoryProducts(
-    @Param('categoryId') categoryId: number,
-    @Query() pagination: PaginationDto,
-    @Query() sortDto: SortProductDto,
-  ): Promise<PaginatedProduct> {
-    return await this.productService.getCategoryProducts(
-      categoryId,
-      pagination,
-      sortDto,
-    );
   }
 
   @Post()

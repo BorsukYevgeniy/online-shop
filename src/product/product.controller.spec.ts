@@ -73,6 +73,10 @@ describe('ProductController', () => {
         { title: 'Test' },
       ],
       [
+        'Should find category products with default sorting',
+        { categoryIds: [1] },
+      ],
+      [
         'Should filter products by title and and category ids with default sorting',
         { title: 'Test', categoryIds: [1] },
       ],
@@ -93,7 +97,6 @@ describe('ProductController', () => {
         { title: 'Test', minPrice: 20, maxPrice: 20, categoryIds: [1] },
       ],
     ])('%s', async (_, searchDto) => {
-      
       jest.spyOn(service, 'getAll').mockResolvedValue({
         total: 1,
         totalPages: 1,

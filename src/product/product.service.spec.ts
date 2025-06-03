@@ -63,49 +63,6 @@ describe('ProductService', () => {
     expect(service).toBeDefined();
   });
 
-  it('Should return category products with default sorting', async () => {
-    const mockProducts = [
-      {
-        id: 1,
-        title: 'title',
-        price: 50,
-        userId: 1,
-        description: 'description',
-        images: ['1', '2'],
-        categories: [{ id: 1, name: 'test', description: 'test' }],
-      },
-    ];
-
-    jest.spyOn(repository, 'countCategoryProducts').mockResolvedValue(1);
-    jest
-      .spyOn(repository, 'findCategoryProducts')
-      .mockResolvedValue(mockProducts);
-
-    const products = await service.getCategoryProducts(
-      1,
-      {
-        page: 1,
-        pageSize: 1,
-      },
-      { sortBy: 'id', order: Order.DESC },
-    );
-
-    expect(repository.countCategoryProducts).toHaveBeenCalledWith(1);
-    expect(repository.findCategoryProducts).toHaveBeenCalledWith(1, 0, 1, {
-      sortBy: 'id',
-      order: Order.DESC,
-    });
-    expect(products).toEqual({
-      products: mockProducts,
-      total: 1,
-      pageSize: 1,
-      page: 1,
-      totalPages: 1,
-      prevPage: null,
-      nextPage: null,
-    });
-  });
-
   it('Should return user products with default sorting', async () => {
     const mockProducts = [
       {
@@ -164,6 +121,10 @@ describe('ProductService', () => {
       [
         'Should return all products finded by title with default sorting',
         { title: 'Test' },
+      ],
+      [
+        'Should find category products with default sorting',
+        { categoryIds: [1] },
       ],
       [
         'Should filter products by title and and category ids with default sorting',
