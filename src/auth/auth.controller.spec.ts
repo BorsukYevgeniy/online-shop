@@ -48,27 +48,22 @@ describe('AuthController', () => {
       nickname: 'test',
       password: '12345',
     };
-    const hashedPassword = 'hashedPassword';
-    const mockUser = {
-      id: 1,
-      ...dto,
-      password: hashedPassword,
-      createdAt: new Date(),
-      role: Role.USER,
-      isVerified: false,
-      verifiedAt: null,
-      verificationLink: '123'
+
+    const mockTokens = {
+      accessToken: '123',
+      refreshToken: '123',
     };
+
     it.each<[string, boolean]>([
       ['Should register user', true],
       ['Should throw an error if user already exists', false],
     ])('%s', async (_, isSuccess) => {
       if (isSuccess) {
-        jest.spyOn(service, 'register').mockResolvedValue(mockUser);
+        jest.spyOn(service, 'register').mockResolvedValue(mockTokens);
 
-        const user = await service.register(dto);
+        const tokens = await service.register(dto);
 
-        expect(user).toEqual(mockUser);
+        expect(tokens).toEqual(mockTokens);
         expect(service.register).toHaveBeenCalledWith(dto);
       } else {
         jest

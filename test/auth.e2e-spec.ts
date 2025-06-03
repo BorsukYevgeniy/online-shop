@@ -6,7 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import { CreateUserDto } from '../src/user/dto/create-user.dto';
-import { Role } from '../src/enum/role.enum';
 import { ValidationPipe } from '@nestjs/common';
 import { LoginUserDto } from 'src/auth/dto/login-user.dto';
 
@@ -76,22 +75,16 @@ describe('AuthController (e2e)', () => {
         { email: 'user', nickname: 'us', password: 'user' },
       ],
     ])('%s', async (_, statusCode, CreateUserDto) => {
-      const { body } = await request(app.getHttpServer())
+      const { headers } = await request(app.getHttpServer())
         .post('/auth/registration')
         .send(CreateUserDto)
         .expect(statusCode);
 
       if (statusCode === 201) {
-        expect(body).toEqual({
-          id: expect.any(Number),
-          email: process.env.TEST_EMAIL,
-          nickname: 'user',
-          role: Role.USER,
-          createdAt: expect.any(String),
-          isVerified: false,
-          verifiedAt: null,
-          verificationLink: expect.any(String),
-        });
+        expect(headers['set-cookie']).toEqual([
+          expect.any(String),
+          expect.any(String),
+        ]);
       }
     });
   });

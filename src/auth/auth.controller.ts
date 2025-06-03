@@ -23,8 +23,24 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
-  async registration(@Body() dto: CreateUserDto): Promise<UserNoPassword> {
-    return await this.authService.register(dto);
+  async registration(
+    @Res() res: Response,
+    @Body() dto: CreateUserDto,
+  ): Promise<void> {
+    const { accessToken, refreshToken }: Tokens =
+      await this.authService.register(dto);
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    res.send('Registered succesfully');
   }
 
   @Post('login')

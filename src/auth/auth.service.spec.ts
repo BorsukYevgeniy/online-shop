@@ -79,6 +79,11 @@ describe('AuthService', () => {
       verifiedAt: null,
       verificationLink: '123',
     };
+    const mockTokens = {
+      accessToken: '123',
+      refreshToken: '123',
+    };
+
     it.each<[string, boolean]>([
       ['Should register user', true],
       ['Should throw an error if user already exists', false],
@@ -87,11 +92,19 @@ describe('AuthService', () => {
         jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
         hash.mockResolvedValue(hashedPassword);
         jest.spyOn(userService, 'create').mockResolvedValue(mockUser);
+        jest
+          .spyOn(tokenService, 'generateTokens')
+          .mockResolvedValue(mockTokens);
 
-        const user = await service.register(dto);
+        const tokens = await service.register(dto);
 
-        expect(user).toEqual(mockUser);
+        expect(tokens).toEqual(mockTokens);
 
+        expect(tokenService.generateTokens).toHaveBeenCalledWith({
+          id: mockUser.id,
+          role: mockUser.role as Role,
+          isVerified: mockUser.isVerified,
+        });
         expect(userService.getByEmail).toHaveBeenCalledWith(dto.email);
         expect(userService.create).toHaveBeenCalledWith({
           ...dto,
@@ -216,7 +229,7 @@ describe('AuthService', () => {
   });
 
   describe('Should verify user', () => {
-    const date = new Date()
+    const date = new Date();
 
     const mockUser = {
       id: 1,
@@ -242,7 +255,7 @@ describe('AuthService', () => {
         jest.spyOn(userService, 'verify').mockResolvedValue({
           ...mockUser,
           isVerified: true,
-          verifiedAt: date
+          verifiedAt: date,
         });
 
         const user = await service.verifyUser(link);
@@ -250,14 +263,16 @@ describe('AuthService', () => {
         expect(user).toEqual({
           ...mockUser,
           isVerified: true,
-          verifiedAt: date
+          verifiedAt: date,
         });
       } else if (!isVerified && !isUserFounded) {
         jest
           .spyOn(userService, 'getByVerificationLink')
           .mockResolvedValue(null);
 
-        await expect(service.verifyUser(link)).rejects.toThrow(NotFoundException);
+        await expect(service.verifyUser(link)).rejects.toThrow(
+          NotFoundException,
+        );
       } else {
         jest.spyOn(userService, 'getByVerificationLink').mockResolvedValue({
           ...mockUser,
@@ -265,7 +280,9 @@ describe('AuthService', () => {
           verifiedAt: date,
         });
 
-        await expect(service.verifyUser(link)).rejects.toThrow(BadRequestException);
+        await expect(service.verifyUser(link)).rejects.toThrow(
+          BadRequestException,
+        );
       }
     });
   });

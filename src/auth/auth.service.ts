@@ -31,7 +31,7 @@ export class AuthService {
     this.API_URL = this.configService.get<string>('API_URL');
   }
 
-  async register(dto: CreateUserDto): Promise<UserNoPassword> {
+  async register(dto: CreateUserDto): Promise<Tokens> {
     const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (candidate) {
@@ -51,7 +51,12 @@ export class AuthService {
     );
 
     this.logger.log(`New user registered: ${user.email}`);
-    return user;
+
+    return await this.tokenService.generateTokens({
+      id: user.id,
+      isVerified: user.isVerified,
+      role: user.role as Role,
+    });
   }
 
   async login(dto: LoginUserDto): Promise<Tokens> {
