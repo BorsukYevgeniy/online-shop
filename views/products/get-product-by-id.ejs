@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %> | Product</title>
+  <link rel="stylesheet" href="/css/products/get-product-by-id.css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main class="product-container">
+    <h1><%= title %></h1>
+
+    <% if (images && images.length > 0) { %>
+      <div class="product-images">
+        <% images.forEach(image => { %>
+          <img src="/<%= image %>" alt="Фото продукту" />
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p>Немає фотографій</p>
+    <% } %>
+
+    <div class="product-info">
+      <p><strong>Ціна:</strong> <%= price %> ₴</p>
+      <p><strong>Опис:</strong> <%= description %></p>
+
+      <% if (categories && categories.length > 0) { %>
+        <div class="product-categories">
+          <strong>Категорії:</strong>
+          <ul>
+            <% categories.forEach((c) => { %>
+              <li><a href="/categories/<%= c.id %>"><%= c.name %></a></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+      <div class="product-actions">
+        <% if (authorId === userId) { %>
+          <a href="/products/update/<%= id %>" class="btn btn-update">Редагувати</a>
+
+          <form action="/products/delete/<%= id %>?_method=DELETE" method="post" class="delete-form">
+            <button type="submit" class="btn btn-delete">Видалити</button>
+          </form>
+        <% } %>
+
+        <form action="/cart/products/<%= id %>" method="post">
+          <button type="submit" id="add-to-cart" class="btn btn-add">Додати в кошик</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

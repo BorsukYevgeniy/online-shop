@@ -206,11 +206,13 @@ describe('UserService', () => {
       verifiedAt: null,
       verificationLink: '123',
     };
-    jest.spyOn(repository, 'findOneByVerificationLink').mockResolvedValue(mockUser);
+    jest
+      .spyOn(repository, 'findOneByVerificationLink')
+      .mockResolvedValue(mockUser);
 
     const user = await service.getByVerificationLink('123');
 
-    expect(user).toEqual(mockUser)
+    expect(user).toEqual(mockUser);
   });
 
   it('Should find user profile', async () => {

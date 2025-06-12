@@ -7,8 +7,6 @@ import { AuthModule } from '../src/auth/auth.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import * as request from 'supertest';
-import { APP_GUARD } from '@nestjs/core';
-import { brotliDecompressSync } from 'zlib';
 
 describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
@@ -33,7 +31,7 @@ describe('UserController (e2e)', () => {
   let accessToken: string;
   let userId: number, productId: number;
   beforeAll(async () => {
-    await request(app.getHttpServer()).post('/auth/registration').send({
+    await request(app.getHttpServer()).post('/api/auth/register').send({
       email: process.env.TEST_EMAIL,
       password: '123456',
       nickname: 'USER123',
@@ -50,7 +48,7 @@ describe('UserController (e2e)', () => {
     });
 
     const { headers } = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/api/auth/login')
       .send({ email: process.env.TEST_EMAIL, password: '123456' });
 
     accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
@@ -63,9 +61,9 @@ describe('UserController (e2e)', () => {
   });
 
   let cartId: number;
-  it('GET /cart - 200 OK - Should return my cart', async () => {
+  it('GET /api/cart - 200 OK - Should return my cart', async () => {
     const { body } = await request(app.getHttpServer())
-      .get('/cart')
+      .get('/api/cart')
       .set('Cookie', [`accessToken=${accessToken}`])
       .expect(200);
 
@@ -78,20 +76,20 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('POST /cart/product/:productId - Should add product to cart', () => {
+  describe('POST /api/cart/product/:productId - Should add product to cart', () => {
     it.each([
       [
-        'POST /cart/product/:productId - 200 OK - Should add product to cart',
+        'POST /api/cart/product/:productId - 200 OK - Should add product to cart',
         200,
       ],
       [
-        'POST /cart/product/:productId - 400 BAD REQUEST - Return 400 HTTP code because product not found',
+        'POST /api/cart/product/:productId - 400 BAD REQUEST - Return 400 HTTP code because product not found',
         400,
       ],
     ])('%s', async (_, statusCode) => {
       const { body } = await request(app.getHttpServer())
         .post(
-          `/cart/products/${statusCode === 200 ? productId : productId + 1}`,
+          `/api/cart/products/${statusCode === 200 ? productId : productId + 1}`,
         )
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(statusCode);
@@ -115,16 +113,16 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('GET /cart/:cartId - Should return cart by id', () => {
+  describe('GET /api/cart/:cartId - Should return cart by id', () => {
     it.each<[string, 200 | 404]>([
-      ['GET /cart/:cartId - 200 OK - Should return my cart', 200],
+      ['GET /api/cart/:cartId - 200 OK - Should return my cart', 200],
       [
-        'GET /cart/:cartId - 404 NOT FOUND - Should return 404 HTTP code beacuse cart not founf',
+        'GET /api/cart/:cartId - 404 NOT FOUND - Should return 404 HTTP code beacuse cart not founf',
         404,
       ],
     ])('%s', async (_, statusCode) => {
       const { body } = await request(app.getHttpServer())
-        .get(`/cart/${statusCode === 200 ? cartId : cartId + 1}`)
+        .get(`/api/cart/${statusCode === 200 ? cartId : cartId + 1}`)
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(statusCode);
 
@@ -147,9 +145,9 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('DELETE /cart/product/:productId - 200 OK - Should remove product from cart', async () => {
+  it('DELETE /api/cart/products/:productId - 200 OK - Should remove product from cart', async () => {
     const { body } = await request(app.getHttpServer())
-      .delete(`/cart/products/${productId}`)
+      .delete(`/api/cart/products/${productId}`)
       .set('Cookie', [`accessToken=${accessToken}`])
       .expect(200);
 
@@ -160,9 +158,9 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('DELETE /cart/product - 200 OK - Should clear a cart', async () => {
+  it('DELETE /api/cart/products - 200 OK - Should clear a cart', async () => {
     const { body } = await request(app.getHttpServer())
-      .delete('/cart/products/')
+      .delete('/api/cart/products')
       .set('Cookie', [`accessToken=${accessToken}`])
       .expect(200);
 

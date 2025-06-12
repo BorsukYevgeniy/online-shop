@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= name %> | Category</title>
+  <link rel="stylesheet" href="/css/categories/get-category-by-id.css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main class="category-container">
+    <h1><%= name %></h1>
+
+    <div class="category-info">
+      <p><strong>Description:</strong> <%= description %></p>
+    </div>
+
+    <br />
+
+    <div class="category-actions">
+      <a href="/products?categoryIds=<%= id %>" class="btn get-all-products">Get all category products</a>
+
+      <% if (role === "ADMIN") { %>
+        <a href="/categories/update/<%= id %>" class="btn btn-update">Update category</a>
+
+        <form action="/categories/delete/<%= id %>?_method=DELETE" method="post" class="delete-form">
+          <button type="submit" class="btn" id="btn-delete">Delete</button>
+        </form>
+      <% } %>
+    </div>
+  </main>
+
+</body>
+</html>

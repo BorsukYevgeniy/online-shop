@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Products</title>
+  <link rel="stylesheet" href="/css/products/search-product.css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main>
+    <section class="search-section">
+      <form action="/products/search" method="get" id="search-form">
+        <h1>Search product by:</h1>
+
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" class="input" required />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <input type="text" id="description" name="description" class="input" />
+        </div>
+
+        <div class="form-group">
+          <label for="minPrice">Minimal price:</label>
+          <input type="number" name="minPrice" id="minPrice" class="input" step="0.01" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label for="maxPrice">Maximal price:</label>
+          <input type="number" name="maxPrice" id="maxPrice" class="input" step="0.01" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label for="categories">Categories:</label>
+          <select name="categoryIds" id="categories" class="input" multiple>
+            <% categories.forEach(c => { %>
+              <option value="<%= c.id %>"><%= c.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        
+        <button type="submit" id="submit-btn">Search</button>
+      </form>
+    </section>
+
+    <section class="results">
+      <% if (products && products.length) { %>
+        <h2>Results:</h2>
+
+        <% products.forEach(p => { %>
+          <div class="product">
+            <% if (p.images && p.images.length) { %>
+              <div class="product-images">
+                <% p.images.forEach(i => { %>
+                  <img src="/<%= i %>" alt="Product photo" />
+                <% }) %>
+              </div>
+            <% } %>
+
+            <div><strong>Title:</strong> 
+              <a href="/products/<%= p.id %>"><%= p.title %></a>
+            </div>
+            <div><strong>Price:</strong> <%= p.price %>₴</div>
+            <div><strong>Description:</strong> <%= p.description %></div>
+          </div>
+        <% }) %>
+      <% } else if (products) { %>
+        <p>No products found for your query.</p>
+      <% } %>
+    </section>
+
+    <%- include('../partials/sort-product.ejs') %>
+    <%- include('../partials/pagination.ejs') %>
+  </main>
+
+  <script src="/js/clear-empty-query.js"></script>
+</body>
+</html>

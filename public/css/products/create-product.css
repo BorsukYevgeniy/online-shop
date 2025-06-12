@@ -1,0 +1,85 @@
+h1 {
+  text-align: center;
+}
+
+.create-form {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px 30px;
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.create-form label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.create-form input[type='text'],
+.create-form input[type='number'],
+.create-form input[type='file'],
+.create-form textarea,
+.create-form select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.create-form select[multiple] {
+  height: 120px;
+  font-size: 15px;
+}
+
+.create-form button {
+  margin-top: 25px;
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-form button:hover {
+  background-color: #218838;
+}
+.create-form {
+  text-align: center;
+}
+
+.create-form label {
+  font-weight: bold;
+}
+
+.create-form input {
+  padding: 8px;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+.create-form button {
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+.create-form button:hover {
+  background-color: #0056b3;
+}

@@ -18,6 +18,10 @@ export class CategoryRepository {
     });
   }
 
+  async findAllCategories() {
+    return await this.prisma.category.findMany();
+  }
+
   async findAll(
     skip: number,
     take: number,

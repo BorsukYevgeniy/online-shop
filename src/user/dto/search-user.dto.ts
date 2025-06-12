@@ -3,9 +3,7 @@ import {
   IsString,
   MaxLength,
   MinLength,
-  Matches,
-  IsDateString,
-  IsDate
+  IsDate,
 } from 'class-validator';
 import { ToDate, Trim } from '../../decorators';
 

@@ -4,8 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
-  private readonly logger: Logger = new Logger(MailService.name)
-
+  private readonly logger: Logger = new Logger(MailService.name);
 
   private readonly SMTP_USER: string;
   private readonly API_URL: string;
@@ -30,7 +29,7 @@ export class MailService {
       </div>
       `,
     });
-  
-    this.logger.log(`Email with link: ${link} sended succesfully`)
+
+    this.logger.log(`Email with link: ${link} sended succesfully`);
   }
 }

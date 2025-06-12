@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Information about <%= nickname %></title>
+  <link rel="stylesheet" href="/css/users/user-account.css">
+</head>
+<body>
+
+  <%- include('../partials/header') %>
+
+  <!-- Information about user -->
+  <br />
+  <h1>My account:</h1>
+
+  <main>
+
+    <div>Nickname: <%= nickname %></div>
+    <div>Email: <%= email %></div>
+    <div>Created at: <%= new Date(createdAt).toLocaleDateString() %></div>
+    <div>Role: <%= role %></div>
+
+    <div>Is user verified: <%= isVerified ? 'yes' : 'no' %></div>
+
+    <% if (isVerified) { %>
+      <div>Verified at: <%= new Date(verifiedAt).toLocaleDateString() %></div>
+    <% } %>
+  </main>
+
+  <!-- Account management -->
+  <div id="account-managment">
+    <form action="/auth/logout" method="post">
+      <button type="submit" class="user-btn">Logout</button>
+    </form>
+
+    <form action="/auth/logout-all" method="post">
+      <button type="submit" class="user-btn">Logout from all devices</button>
+    </form>
+
+    <form action="/users/me?_method=DELETE" method="post">
+      <button type="submit" class="user-btn">Delete account</button>
+    </form>
+  </div>
+
+  <!-- Product management -->
+  <div id="product-managment">
+    <a href="/products/create">Create product</a>
+    <br>
+    <a href="/users/<%= id %>/products">My products</a>
+    <br>
+    <a href="/cart">Cart</a>
+  </div>
+
+  <!-- Admin management -->
+  <% if (role === 'ADMIN') { %>
+    <div id="admin">
+      <a href="/users">All users</a>
+      <br>
+      <a href="/categories/create">Create category</a>
+      <br>
+
+      <form id="cartIdInputForm">
+        <label for="cartIdInput">Get cart by id:</label>
+        <input type="text" id="cartIdInput" style="width: 100px;" required />
+        <button type="submit">Search</button>
+      </form>
+
+      <script src="/js/go-to-cart.js"></script>
+    </div>
+  <% } %>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+h1 {
+  text-align: center;
+}
+
+.update-form {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px 30px;
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.update-form label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.update-form input[type="text"],
+.update-form input[type="number"],
+.update-form input[type="file"],
+.update-form textarea,
+.update-form select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.update-form select[multiple] {
+  height: 120px;
+  font-size: 15px;
+}
+
+.update-form button {
+  margin-top: 25px;
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-form button:hover {
+  background-color: #218838;
+}
+.update-form {
+  text-align: center;
+}
+
+
+.update-form label {
+  font-weight: bold;
+}
+
+.update-form input {
+  padding: 8px;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+
+
+.update-form button {
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+.update-form button:hover {
+  background-color: #0056b3;
+}

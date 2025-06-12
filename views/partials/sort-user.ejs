@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="/css/partials/sort.css" />
+
+<form method="get" id="sortForm">
+
+  <label for="sortBy" style="font-weight: bold;">Sort by:</label>
+  <select name="sortBy" id="sortBy">
+    <option value="id" <%= sortBy === 'id' ? 'selected' : '' %>>ID</option>
+    <option value="nickname" <%= sortBy === 'nickname' ? 'selected' : '' %>>Nickname</option>
+    <option value="createdAt" <%= sortBy === 'createdAt' ? 'selected' : '' %>>Date of creation</option>
+    <option value="role" <%= sortBy === 'role' ? 'selected' : '' %>>Role</option>
+    <option value="isVerified" <%= sortBy === 'isVerified' ? 'selected' : '' %>>Is user verified</option>
+  </select>
+
+  <label for="order" style="font-weight: bold;">Order:</label>
+  <select name="order" id="order">
+    <option value="asc" <%= order === 'asc' ? 'selected' : '' %>>Ascending</option>
+    <option value="desc" <%= order === 'desc' ? 'selected' : '' %>>Descending</option>
+  </select>
+
+  <input type="hidden" name="pageSize" value="<%= pageSize %>" />
+  <input type="hidden" name="page" value="<%= currentPage %>" />
+
+  <button type="submit">Sort</button>
+
+  <script src="/js/save-query.js"></script>
+</form>

@@ -196,7 +196,6 @@ describe('UserRepository', () => {
     expect(user).toEqual(mockUser);
   });
 
-
   it('Should find user by verification link', async () => {
     const mockUser = {
       id: 1,
@@ -209,9 +208,7 @@ describe('UserRepository', () => {
       verifiedAt: null,
       verificationLink: '123',
     };
-    jest
-      .spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValue(mockUser);
+    jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
 
     const user = await repository.findOneByVerificationLink('123');
 
@@ -299,10 +296,8 @@ describe('UserRepository', () => {
 
     jest.spyOn(prismaService.user, 'update').mockResolvedValue(mockUser);
 
-    const user = await repository.verify('123')
+    const user = await repository.verify('123');
 
-    expect(user).toEqual(mockUser)
-
-
+    expect(user).toEqual(mockUser);
   });
 });

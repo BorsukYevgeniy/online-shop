@@ -6,5 +6,8 @@ export class SortUserDto extends SortDto {
   @IsOptional()
   @IsString()
   @IsEnum(['id', 'role', 'nickname', 'createdAt'])
-  readonly sortBy?: keyof Omit<User, 'password' | 'email'> = 'id';
+  readonly sortBy?: keyof Omit<
+    User,
+    'password' | 'verificationLink' | 'email'
+  > = 'id';
 }

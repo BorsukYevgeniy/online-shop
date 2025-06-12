@@ -18,7 +18,7 @@ describe('UserController (e2e)', () => {
       imports: [
         UserModule,
         AuthModule,
-        ConfigModule.forRoot({ envFilePath: '.env.test' , isGlobal: true}),
+        ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
       ],
     }).compile();
     app = moduleFixture.createNestApplication();
@@ -56,12 +56,12 @@ describe('UserController (e2e)', () => {
     const [adminRes, userRes] = await Promise.all([
       //Login as admin
       request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({ email: 'admin@gmail.com', password: 'password' }),
 
       //Login as user
       request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({ email: 'user@gmail.com', password: 'password' }),
     ]);
 
@@ -81,9 +81,9 @@ describe('UserController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /users - 200 OK - Should return users with default sorting', async () => {
+  it('GET /api/users - 200 OK - Should return users with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
-      .get('/users')
+      .get('/api/users')
       .set('Cookie', [`accessToken=${adminAccessToken}`])
       .expect(200);
 
@@ -115,9 +115,9 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/me - 200 OK - Should return me', async () => {
+  it('GET /api/users/me - 200 OK - Should return me', async () => {
     const { body: users } = await request(app.getHttpServer())
-      .get('/users/me')
+      .get('/api/users/me')
       .set('Cookie', [`accessToken=${userAccessToken}`])
       .expect(200);
 
@@ -133,7 +133,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('GET /users - Should return all users and search him', () => {
+  describe('GET /api/users - Should return all users and search him', () => {
     it.each<
       [
         string,
@@ -141,24 +141,24 @@ describe('UserController (e2e)', () => {
         { nickname?: string; minDate?: string; maxDate?: string } | null,
       ]
     >([
-      ['GET /users - 200 OK - Should return all users', 200, null],
+      ['GET /api/users - 200 OK - Should return all users', 200, null],
       [
-        'GET /users - 200 OK - Should search user by nickname',
+        'GET /api/users - 200 OK - Should search user by nickname',
         200,
         { nickname: 'use' },
       ],
       [
-        'GET /users - 200 OK - Should search user by nickname and min date',
+        'GET /api/users - 200 OK - Should search user by nickname and min date',
         200,
         { nickname: 'use', minDate: '2024-01-01' },
       ],
       [
-        'GET /users - 200 OK - Should search user by nickname and max date',
+        'GET /api/users - 200 OK - Should search user by nickname and max date',
         200,
         { nickname: 'use', maxDate: '2100-01-01' },
       ],
       [
-        'GET /users - 200 OK - Should search user by nickname and date range',
+        'GET /api/users - 200 OK - Should search user by nickname and date range',
         200,
         {
           nickname: 'use',
@@ -167,28 +167,28 @@ describe('UserController (e2e)', () => {
         },
       ],
       [
-        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because nickname not valid',
+        'GET /api/users - 400 BAD REQUEST - Should return 400 HTTP code because nickname not valid',
         400,
         { nickname: 'us' },
       ],
       [
-        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because minDate not valid',
+        'GET /api/users - 400 BAD REQUEST - Should return 400 HTTP code because minDate not valid',
         400,
         { nickname: 'us', minDate: '123' },
       ],
       [
-        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because maxDate not valid',
+        'GET /api/users - 400 BAD REQUEST - Should return 400 HTTP code because maxDate not valid',
         400,
         { nickname: 'us', maxDate: '123' },
       ],
       [
-        'GET /users - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        'GET /api/users - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
         400,
         { nickname: 'us', maxDate: '123', minDate: '123' },
       ],
     ])('%s', async (_, statusCode, dto) => {
       const { body: users } = await request(app.getHttpServer())
-        .get('/users')
+        .get('/api/users')
         .query(dto)
         .set('Cookie', [`accessToken=${userAccessToken}`])
         .expect(statusCode);
@@ -243,13 +243,13 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('GET /users/:userId - Should return user id', () => {
+  describe('GET /api/users/:userId - Should return user id', () => {
     it.each<[string, 200 | 404]>([
-      ['GET /users/:userId - 200 OK - Should return user searched by id', 200],
-      ['GET /users/:userId - 404 NOT FOUND - Should return 404 HTTP code', 404],
+      ['GET /api/users/:userId - 200 OK - Should return user searched by id', 200],
+      ['GET /api/users/:userId - 404 NOT FOUND - Should return 404 HTTP code', 404],
     ])('%s', async (_, statusCode) => {
       const { body } = await request(app.getHttpServer())
-        .get(`/users/${statusCode === 404 ? userId - 2 : userId}`)
+        .get(`/api/users/${statusCode === 404 ? userId - 2 : userId}`)
         .set('Cookie', [`accessToken=${userAccessToken}`])
         .expect(statusCode);
 
@@ -268,13 +268,13 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('GET /users/:userId/products - 200 OK - Should return produts of user', async () => {
-    const { body: users } = await request(app.getHttpServer())
-      .get(`/users/${userId}/products`)
-      .set('Cookie', [`accessToken=${userAccessToken}`])
+  it('GET /api/users/:userId/products - 200 OK - Should return produts of user', async () => {
+    const { body: products } = await request(app.getHttpServer())
+      .get(`/api/users/${adminId}/products`)
+      .set('Cookie', [`accessToken=${adminAccessToken}`])
       .expect(200);
 
-    expect(users).toEqual({
+    expect(products).toEqual({
       total: 0,
       totalPages: 0,
       page: 1,
@@ -285,20 +285,20 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('PATCH /users/assing-admin/:userId - Should assign user to admin', () => {
+  describe('PATCH /api/users/assing-admin/:userId - Should assign user to admin', () => {
     it.each<[string, 200 | 404]>([
       [
-        'PATCH /users/assing-admin/:userId - 200 OK - Should assign user to admin',
+        'PATCH /api/users/assing-admin/:userId - 200 OK - Should assign user to admin',
         200,
       ],
       [
-        'PATCH /users/assing-admin/:userId - 404 NOT FOUND - Should return 404 HTTP code',
+        'PATCH /api/users/assing-admin/:userId - 404 NOT FOUND - Should return 404 HTTP code',
         404,
       ],
     ])('%s', async (_, statusCode) => {
       const { body } = await request(app.getHttpServer())
         .patch(
-          `/users/assing-admin/${statusCode === 404 ? userId - 2 : userId}`,
+          `/api/users/assing-admin/${statusCode === 404 ? userId - 2 : userId}`,
         )
         .set('Cookie', [`accessToken=${adminAccessToken}`])
         .expect(statusCode);
@@ -316,28 +316,31 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  it('DELETE /users/me - 204 NO CONTENT - Should delete user by himself', async () => {
+  it('DELETE /api/users/me - 204 NO CONTENT - Should delete user by himself', async () => {
     await request(app.getHttpServer())
-      .delete('/users/me')
+      .delete('/api/users/me')
       .set('Cookie', [`accessToken=${userAccessToken}`])
       .expect(204);
   });
 
-  describe('DELETE /users/:userId - Should delete user by id', () => {
+  describe('DELETE /api/users/:userId - Should delete user by id', () => {
     it.each<[string, 204 | 404]>([
       [
-        'DELETE /users/:userId - 204 NO CONTENT - Should delete user by id',
+        'DELETE /api/users/:userId - 204 NO CONTENT - Should delete user by id',
         204,
       ],
       [
-        'DELETE /users/:userId - 404 NOT FOUND - Should return 404 HTTP code',
+        'DELETE /api/users/:userId - 404 NOT FOUND - Should return 404 HTTP code',
         404,
       ],
     ])('%s', async (_, statusCode) => {
+      
       await request(app.getHttpServer())
-        .delete(`/users/${statusCode === 404 ? adminId - 2 : adminId}`)
+        .delete(`/api/users/${statusCode === 404 ? adminId - 2 : adminId}`)
         .set('Cookie', [`accessToken=${adminAccessToken}`])
         .expect(statusCode);
-    });
+    
+    
+      });
   });
 });

@@ -67,7 +67,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const { password: hashedPassword, role } = candidate;
+    const { password: hashedPassword } = candidate;
 
     const isPasswordValid: boolean = await compare(
       dto.password,

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All categories</title>
+    <link rel="stylesheet" href="/css/categories/get-all-categories.css" />
+  </head>
+  <body>
+
+    <%- include('../partials/header.ejs') %>
+
+    <div class="results">
+      <% if (categories && categories.length) { %>
+
+        <h1>All categories:</h1>
+
+        <% categories.forEach(c => { %>
+          <div class="category">
+            <div>
+              <strong>Name:</strong>
+              <a href="/categories/<%= c.id %>"><%= c.name %></a>
+            </div>
+            <div>
+              <strong>Description:</strong> <%= c.description %>
+            </div>
+
+            <% if (role === "ADMIN") { %>
+              <div class="category-actions">
+                <a href="/categories/update/<%= c.id %>" class="btn btn-update">Update</a>
+
+                <form action="/categories/delete/<%= c.id %>?_method=DELETE" method="post" class="delete-form">
+                  <button type="submit" class="btn" id="btn-delete">Delete</button>
+                </form>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+
+      <% } %>
+    </div>
+
+    <%- include('../partials/sort-category.ejs') %>
+    <%- include('../partials/pagination.ejs') %>
+
+  </body>
+</html>

@@ -1,0 +1,119 @@
+.user-container {
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  max-width: 700px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.user-info p {
+  margin: 8px 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1{ 
+  text-align: center;
+}
+
+.user-actions {
+  justify-content: center;
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+
+.btn-update {
+  background-color: rgb(255, 196, 0);
+  color: white;
+}
+
+#btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-form {
+  margin: 0;
+}
+
+#btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+#btn-delete:hover {
+  background-color: #c53228;
+  transition: background-color 0.3s ease;
+}
+
+.btn-update {
+  background-color: rgb(255, 196, 0);
+  color: white;
+}
+.btn-update:hover {
+  background-color: rgb(224, 173, 3);
+  transition: background-color 0.3s ease;
+}
+
+.btn-create{
+  background-color: #007bff;
+  color: white;
+}
+.btn-create:hover {
+  background-color: #0363c9;
+  transition: background-color 0.3s ease;
+}
+
+.get-all{
+  background-color: #00ff00;
+  color: white;
+}
+
+.get-all:hover {
+  background-color: #02c702;
+  transition: background-color 0.3s ease;
+}
+
+.search {
+  background-color: #ff7b00;
+  color: white;
+}
+
+.search:hover {
+  background-color: #e26d00;
+  transition: background-color 0.3s ease;
+}
+
+.get-all-products{
+  background-color: rgb(1, 219, 219);
+  color: white
+}
+
+.get-all-products:hover {
+  background-color: rgb(1, 190, 190);
+  transition: background-color 0.3s ease;
+}
+
+#btn-assign-admin {
+  background-color: rgb(223, 223, 1);
+  color: white
+}
+
+#btn-assign-admin:hover {
+  background-color: rgb(199, 199, 1);
+  transition: background-color 0.3s ease;
+}

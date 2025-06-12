@@ -45,13 +45,13 @@ describe('ProductController (e2e)', () => {
         password: await hash('password', 10),
         nickname: 'user',
         isVerified: true,
-        verifiedAt: new Date()
+        verifiedAt: new Date(),
       },
       select: { id: true },
     });
 
     const { headers } = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/api/auth/login')
       .send({ email: process.env.TEST_EMAIL, password: 'password' });
 
     const [category1, category2] = await Promise.all([
@@ -75,45 +75,41 @@ describe('ProductController (e2e)', () => {
     await app.close();
   });
 
-  describe('GET /products - 200 OK - Should return all products and search him', () => {
+  describe('GET /api/products - 200 OK - Should return all products and search him', () => {
     it.each<[string, 200 | 400, SearchProductDto | null]>([
+      ['GET /api/products - 200 OK - Should return all products', 200, null],
       [
-        'GET /products - 200 OK - Should return all products',
-        200,
-        null,
-      ],
-      [
-        'GET /products - 200 OK - Should search the product by title',
+        'GET /api/products - 200 OK - Should search the product by title',
         200,
         { title: 'Prod' },
       ],
       [
-        'GET /products - 200 OK - Should get category products',
+        'GET /api/products - 200 OK - Should get category products',
         200,
         { categoryIds: [1] },
       ],
       [
-        'GET /products - 200 OK - Should search the product by title and min price',
+        'GET /api/products - 200 OK - Should search the product by title and min price',
         200,
         { title: 'Prod', minPrice: 50 },
       ],
       [
-        'GET /products - 200 OK - Should search the product by title and max price',
+        'GET /api/products - 200 OK - Should search the product by title and max price',
         200,
         { title: 'Prod', maxPrice: 150 },
       ],
       [
-        'GET /products - 200 OK - Should search the product by title and price range',
+        'GET /api/products - 200 OK - Should search the product by title and price range',
         200,
         { title: 'Prod', minPrice: 50, maxPrice: 150 },
       ],
       [
-        'GET /products - 200 OK - Should search the product by title and categories',
+        'GET /api/products - 200 OK - Should search the product by title and categories',
         200,
         { title: 'Prod', categoryIds: [category1Id] },
       ],
       [
-        'GET /products - 200 OK - Should search the product by title ,categories and price range',
+        'GET /api/products - 200 OK - Should search the product by title ,categories and price range',
         200,
         {
           title: 'Prod',
@@ -123,28 +119,28 @@ describe('ProductController (e2e)', () => {
         },
       ],
       [
-        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
+        'GET /api/products - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
         400,
         { title: '' },
       ],
       [
-        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because minPrice not valid',
+        'GET /api/products - 400 BAD REQUEST - Should return 400 HTTP code because minPrice not valid',
         400,
         { title: 'Title', minPrice: -1 },
       ],
       [
-        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because maxPrice not valid',
+        'GET /api/products - 400 BAD REQUEST - Should return 400 HTTP code because maxPrice not valid',
         400,
         { title: 'Title', maxPrice: -1 },
       ],
       [
-        'GET /products - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        'GET /api/products - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
         400,
         { title: 'T', minPrice: -1, maxPrice: -10, categoryIds: [category1Id] },
       ],
     ])('%s', async (_, statusCode, dto) => {
       const { body } = await request(app.getHttpServer())
-        .get('/products')
+        .get('/api/products')
         .query(dto)
         .expect(statusCode);
 
@@ -211,7 +207,7 @@ describe('ProductController (e2e)', () => {
       ],
     ])('%s', async (_, statusCode, dto, file) => {
       const requestBuilder = request(app.getHttpServer())
-        .post('/products')
+        .post('/api/products')
         .set('Cookie', [`accessToken=${accessToken}`]);
 
       if (dto) {
@@ -249,19 +245,19 @@ describe('ProductController (e2e)', () => {
     });
   });
 
-  describe('GET /products/:productId - Should find the product by id', () => {
+  describe('GET /api/products/:productId - Should find the product by id', () => {
     it.each<[string, 200 | 404]>([
       [
-        'GET /products/:productId - 200 OK - Should return the product by id',
+        'GET /api/products/:productId - 200 OK - Should return the product by id',
         200,
       ],
       [
-        'GET /products/:productId - 404 NOT FOUND - Should return 404 HTTP code because product not found',
+        'GET /api/products/:productId - 404 NOT FOUND - Should return 404 HTTP code because product not found',
         404,
       ],
     ])('%s', async (_, status) => {
       const { body: product } = await request(app.getHttpServer())
-        .get(`/products/${status === 404 ? productId - 1 : productId}`)
+        .get(`/api/products/${status === 404 ? productId - 1 : productId}`)
         .expect(status);
 
       if (status === 200) {
@@ -280,66 +276,66 @@ describe('ProductController (e2e)', () => {
     });
   });
 
-  describe('PATCH /products/:productId - Should update product', () => {
+  describe('PATCH /api/products/:productId - Should update product', () => {
     it.each<[string, 200 | 400 | 404, UpdateProductDto | null, Buffer | null]>([
       [
-        'PATCH /products/:productId - 200 OK - Should update title in product',
+        'PATCH /api/products/:productId - 200 OK - Should update title in product',
         200,
         { title: 'New Title' },
         null,
       ],
       [
-        'PATCH /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        'PATCH /api/products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
         404,
         null,
         null,
       ],
       [
-        'PATCH /products/:productId - 200 OK - Should update description in product',
+        'PATCH /api/products/:productId - 200 OK - Should update description in product',
         200,
         { description: 'New Description' },
         null,
       ],
       [
-        'PATCH /products/:productId - 200 OK - Should update price in product',
+        'PATCH /api/products/:productId - 200 OK - Should update price in product',
         200,
         { price: 125 },
         null,
       ],
       [
-        'PATCH /products/:productId - 200 OK - Should update categories in product',
+        'PATCH /api/products/:productId - 200 OK - Should update categories in product',
         200,
         { categoryIds: [category2Id] },
         null,
       ],
       [
-        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
+        'PATCH /api/products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because title not valid',
         400,
         { title: 'T' },
         null,
       ],
       [
-        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because price not valid',
+        'PATCH /api/products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because price not valid',
         400,
         { price: -1 },
         null,
       ],
       [
-        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because description not valid',
+        'PATCH /api/products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because description not valid',
         400,
         { description: 'De' },
         null,
       ],
 
       [
-        'PATCH /products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        'PATCH /api/products/:productId - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
         400,
         { title: '', price: -1, description: '' },
         null,
       ],
     ])('%s', async (_, statusCode, dto, file) => {
       const requestBuilder = request(app.getHttpServer())
-        .patch(`/products/${statusCode === 404 ? productId - 1 : productId}`)
+        .patch(`/api/products/${statusCode === 404 ? productId - 1 : productId}`)
         .set('Cookie', [`accessToken=${accessToken}`]);
 
       if (dto) {
@@ -375,19 +371,19 @@ describe('ProductController (e2e)', () => {
     });
   });
 
-  describe('DELETE /products/:productId - Should delete product', () => {
+  describe('DELETE /api/products/:productId - Should delete product', () => {
     it.each<[string, 204 | 404]>([
       [
-        'DELETE /products/:productId - 204 NO CONTENT - Should delete product',
+        'DELETE /api/products/:productId - 204 NO CONTENT - Should delete product',
         204,
       ],
       [
-        'DELETE /products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        'DELETE /api/products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
         404,
       ],
     ])('%s', async (_, statusCode) => {
       await request(app.getHttpServer())
-        .delete(`/products/${statusCode === 404 ? productId - 1 : productId}`)
+        .delete(`/api/products/${statusCode === 404 ? productId - 1 : productId}`)
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(statusCode);
     });

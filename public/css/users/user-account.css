@@ -1,0 +1,68 @@
+h1 {
+  text-align: center;
+}
+
+main,
+#account-managment,
+#product-managment,
+#admin {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+}
+
+main > div {
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #333;
+}
+
+#account-managment {
+  max-width: 600px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+}
+
+.user-btn, button[type="submit"], label {
+  padding: 10px 16px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+}
+
+.user-btn:hover {
+  background-color: #0056b3;
+}
+
+
+#product-managment a, #admin a {
+  display: inline-block;
+  padding: 10px 18px;
+  margin-bottom: 10px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.25s ease;
+}
+
+#product-managment a:hover, #admin a:hover {
+  background-color: #0056b3;
+}
+
+#cartIdInput {
+  border: none;
+}

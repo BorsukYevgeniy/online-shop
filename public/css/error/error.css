@@ -1,0 +1,12 @@
+h1 {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+h2 {
+  margin-top: 0;
+  text-align: center;
+}

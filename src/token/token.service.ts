@@ -84,8 +84,8 @@ export class TokenService {
         secret: this.accessSecret,
       });
     } catch (error) {
-      this.logger.warn('Invalid refresh token', { message: error.message });
-      throw new UnauthorizedException('Invalid refresh token');
+      this.logger.warn('Invalid access token', { message: error.message });
+      throw new UnauthorizedException('Invalid access token');
     }
   }
 

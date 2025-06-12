@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart: <%= id %></title>
+  <link rel="stylesheet" href="/css/cart/my-cart.css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main>
+    <h1>Cart: <%= id %></h1>
+
+    <% products.forEach(p => { %>
+      <div class="product">
+        <% if (p.images && p.images.length) { %>
+          <div class="product-images">
+            <% p.images.forEach(i => { %>
+              <img src="/<%= i %>" alt="Product photo" />
+            <% }) %>
+          </div>
+        <% } %>
+
+        <div><strong>Title:</strong> 
+          <a href="/products/<%= p.id %>"><%= p.title %></a>
+        </div>
+        <div><strong>Price:</strong> <%= p.price %>₴</div>
+        <div><strong>Description:</strong> <%= p.description %></div>
+      </div>
+    <% }) %>
+
+  </main>
+</body>
+</html>

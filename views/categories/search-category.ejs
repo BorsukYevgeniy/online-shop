@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Searching category</title>
+    <link rel="stylesheet" href="/css/categories/search-category.css" />
+  </head>
+  <body>
+
+    <%- include('../partials/header.ejs') %>
+
+    <br />
+    <h1>Search category by:</h1>
+    <form action="/categories/search" method="get" class="search-form">
+      <label for="name">Title:</label>
+      <input type="text" id="name" name="name" class="input" required />
+      <br /><br />
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="results">
+      <% if (categories && categories.length) { %>
+        <h1>Results:</h1>
+        <% categories.forEach(c => { %>
+          <div class="category">
+            <div><strong>Name:</strong> 
+              <a href="/categories/<%= c.id %>"><%= c.name %></a>
+            </div>
+            <div><strong>Description:</strong> <%= c.description %></div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <%- include('../partials/sort-category.ejs') %>
+    <%- include('../partials/pagination.ejs') %>
+
+  </body>
+</html>

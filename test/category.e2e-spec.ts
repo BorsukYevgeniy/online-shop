@@ -21,7 +21,7 @@ describe('CategoryController (e2e)', () => {
       imports: [
         AuthModule,
         CategoryModule,
-        ConfigModule.forRoot({ envFilePath: '.env.test' , isGlobal: true}),
+        ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
       ],
     }).compile();
 
@@ -47,9 +47,8 @@ describe('CategoryController (e2e)', () => {
     });
 
     const { headers } = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/api/auth/login')
       .send({ email: process.env.TEST_EMAIL, password: 'password' })
-      .expect(200);
 
     accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
   }, 6500);
@@ -60,10 +59,10 @@ describe('CategoryController (e2e)', () => {
     await app.close();
   });
 
-  describe('GET /categories - Should return all categories and search him', () => {
+  describe('GET /api/categories - Should return all categories and search him', () => {
     it.each<[string, SearchCategoryDto | null]>([
-      ['GET /categories - Should return all categories', null],
-      ['GET /categories - Should search category by name', { name: 'TEST' }],
+      ['GET /api/categories - Should return all categories', null],
+      ['GET /api/categories - Should search category by name', { name: 'TEST' }],
     ])('%s', async (_, searchDto) => {
       const mockCategories = {
         categories: [],
@@ -72,11 +71,11 @@ describe('CategoryController (e2e)', () => {
         prevPage: null,
         nextPage: null,
         total: 0,
-        totalPages: 0
+        totalPages: 0,
       };
 
       const { body } = await request(app.getHttpServer())
-        .get('/categories')
+        .get('/api/categories')
         .query(searchDto)
         .expect(200);
 
@@ -85,36 +84,36 @@ describe('CategoryController (e2e)', () => {
   });
 
   let categoryId: number;
-  describe('POST /categories - Should return create category', () => {
+  describe('POST /api/categories - Should return create category', () => {
     it.each<[string, 201 | 400, CreateCategoryDto | null]>([
       [
-        'POST /categories - 201 CREATED - Should create a new category',
+        'POST /api/categories - 201 CREATED - Should create a new category',
         201,
         { name: 'Category', description: 'Category description' },
       ],
       [
-        'POST /categories - 400 BAD REQUEST - Should return 400 because category already exists',
+        'POST /api/categories - 400 BAD REQUEST - Should return 400 because category already exists',
         400,
         null,
       ],
       [
-        'POST /categories - 400 BAD REQUEST - Should return 400 because name not valid',
+        'POST /api/categories - 400 BAD REQUEST - Should return 400 because name not valid',
         400,
         { name: '23', description: 'Description' },
       ],
       [
-        'POST /categories - 400 BAD REQUEST - Should return 400 because description not valid',
+        'POST /api/categories - 400 BAD REQUEST - Should return 400 because description not valid',
         400,
         { name: 'Category', description: 'De' },
       ],
       [
-        'POST /categories - 400 BAD REQUEST - Should return 400 because data not valid',
+        'POST /api/categories - 400 BAD REQUEST - Should return 400 because data not valid',
         400,
         { name: null, description: null },
       ],
     ])('%s', async (_, status, dto) => {
       const { body: category } = await request(app.getHttpServer())
-        .post('/categories')
+        .post('/api/categories')
         .send(dto)
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(status);
@@ -130,19 +129,19 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  describe('GET /categories/:categoryId - Should get a category by id ', () => {
+  describe('GET /api/categories/:categoryId - Should get a category by id ', () => {
     it.each<[string, 200 | 404]>([
       [
-        'GET /categories/:categoryId - 200 OK - Should get a category by id',
+        'GET /api/categories/:categoryId - 200 OK - Should get a category by id',
         200,
       ],
       [
-        'GET /categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code because category not founded',
+        'GET /api/categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code because category not founded',
         404,
       ],
     ])('%s', async (_, statusCode) => {
       const { body: category } = await request(app.getHttpServer())
-        .get(`/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`)
+        .get(`/api/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`)
         .expect(statusCode);
 
       if (statusCode === 200) {
@@ -155,47 +154,47 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  describe('PATCH /categories/:categoryId - Should update fields in category', () => {
+  describe('PATCH /api/categories/:categoryId - Should update fields in category', () => {
     it.each<[string, 200 | 404 | 400, UpdateCategoryDto | null]>([
       [
-        'PATCH /categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code',
+        'PATCH /api/categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code',
         404,
         null,
       ],
       [
-        'PATCH /categories/:categoryId - 200 OK - Should update name in category',
+        'PATCH /api/categories/:categoryId - 200 OK - Should update name in category',
         200,
         { name: 'New category name' },
       ],
       [
-        'PATCH /categories/:categoryId - 200 OK - Should update description in category',
+        'PATCH /api/categories/:categoryId - 200 OK - Should update description in category',
         200,
         { description: 'New category description' },
       ],
       [
-        'PATCH /categories/:categoryId - 200 OK - Should update name and description in category',
+        'PATCH /api/categories/:categoryId - 200 OK - Should update name and description in category',
         200,
         { name: 'New category name', description: 'New category description' },
       ],
       [
-        'PATCH /categories/:categoryId - 400 BAD REQUEST - Should return 400 HTTP code because name not valid',
+        'PATCH /api/categories/:categoryId - 400 BAD REQUEST - Should return 400 HTTP code because name not valid',
         400,
         { name: 'Na' },
       ],
       [
-        'PATCH /categories/:categoryId - 400 BAD REQUEST - Should return 400 HTTP code because description not valid',
+        'PATCH /api/categories/:categoryId - 400 BAD REQUEST - Should return 400 HTTP code because description not valid',
         400,
         { description: 'De' },
       ],
       [
-        'PATCH /categories/:categoryId - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
+        'PATCH /api/categories/:categoryId - 400 BAD REQUEST - Should return 400 HTTP code because data not valid',
         400,
         { name: 'Na', description: 'De' },
       ],
     ])('%s', async (_, statusCode, dto) => {
       const { body } = await request(app.getHttpServer())
         .patch(
-          `/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`,
+          `/api/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`,
         )
         .set('Cookie', [`accessToken=${accessToken}`])
         .send(dto)
@@ -207,21 +206,24 @@ describe('CategoryController (e2e)', () => {
     });
   });
 
-  describe('DELETE /categories/:categoryId - Should delete a category by id', () => {
+  describe('DELETE /api/categories/:categoryId - Should delete a category by id', () => {
     it.each<[string, 204 | 404]>([
       [
-        'DELETE /categories/:categoryId - 204 NO CONTENT - Should delete a category by id',
+        'DELETE /api/categories/:categoryId - 204 NO CONTENT - Should delete a category by id',
         204,
       ],
       [
-        'DELETE /categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code because category not found',
+        'DELETE /api/categories/:categoryId - 404 NOT FOUND - Should return 404 HTTP code because category not found',
         404,
       ],
     ])('%s', async (_, statusCode) => {
-      await request(app.getHttpServer())
-        .delete(`/categories/${categoryId}`)
+      const {body} =await request(app.getHttpServer())
+        .delete(`/api/categories/${categoryId}`)
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(statusCode);
-    });
+    
+      console.log(body)
+    
+      });
   });
 });

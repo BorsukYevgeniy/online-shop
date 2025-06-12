@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Creating category</title>
+    <link rel="stylesheet" href="/css/categories/create-category.css" />
+  </head>
+  <body>
+    <%- include('../partials/header.ejs') %>
+
+    <form action="/categories/create" method="post" class="create-form">
+      <h1>Create category:</h1>
+      <br />
+      <label for="name">Name:</label>
+      <input type="text" name="name" required />
+
+      <label for="description">Description:</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="4"
+        required
+      ></textarea>
+
+      <button type="submit">Create</button>
+    </form>
+  </body>
+</html>

@@ -8,10 +8,12 @@ import {
   MinLength,
 } from 'class-validator';
 import { ToNumber, Trim, ToNumberArray } from '../../decorators';
+import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
   @IsOptional()
   @IsString()
+  @Transform(({ value }) => (value?.trim() === '' ? undefined : value))
   @Trim()
   @MinLength(3)
   @MaxLength(100)
@@ -22,6 +24,7 @@ export class UpdateProductDto {
   @Trim()
   @MinLength(10)
   @MaxLength(500)
+  @Transform(({ value }) => (value?.trim() === '' ? undefined : value))
   readonly description?: string;
 
   @IsOptional()

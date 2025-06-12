@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Updating category | <%= name %></title>
+    <link rel="stylesheet" href="/css/categories/update-category.css" />
+  </head>
+  <body>
+    <%- include('../partials/header.ejs') %>
+
+    <form action="/categories/update/<%= id %>?_method=PATCH" method="post" class="update-form">
+      <h1>Updating category:</h1>
+      <br />
+
+      <label for="name">Name of category:</label>
+      <input type="text" id="name" name="name" value="<%= name %>" />
+
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" rows="3"><%= description %></textarea>
+
+      <button type="submit">Update category</button>
+    </form>
+
+  </body>
+</html>

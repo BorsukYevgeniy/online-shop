@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Updating product: <%= product.title %></title>
+  <link rel="stylesheet" href="/css/products/update-product.css" type="text/css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main>
+    <form 
+      action="/products/update/<%= product.id %>?_method=PATCH" 
+      method="post" 
+      enctype="multipart/form-data" 
+      class="update-form">
+
+      <h1>Update Product</h1>
+
+      <label for="title">Title of product:</label>
+      <input 
+        type="text" 
+        id="title" 
+        name="title" 
+        value="<%= product.title %>" 
+      />
+
+      <label for="price">Price:</label>
+      <input 
+        type="number" 
+        id="price" 
+        name="price" 
+        value="<%= product.price %>" 
+        step="0.01" 
+      />
+
+      <label for="description">Description:</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        rows="4" 
+        ><%= product.description %></textarea>
+
+      <label for="category">Category:</label>
+      <select id="category" name="categoryIds" multiple>
+        <% categories.forEach(category => { %>
+          <option 
+            value="<%= category.id %>" 
+            <%= product.categories.some(c => c.id === category.id) ? 'selected' : '' %>>
+            <%= category.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <label for="images">Upload new photos:</label>
+      <input 
+        type="file" 
+        name="images" 
+        id="images" 
+        multiple 
+      />
+
+      <button type="submit" class="btn-submit">Update Product</button>
+    </form>
+  </main>
+
+</body>
+</html>

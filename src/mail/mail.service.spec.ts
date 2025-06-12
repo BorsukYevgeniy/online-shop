@@ -36,6 +36,8 @@ describe('UserCleaningService', () => {
   it('Should send email', async () => {
     jest.spyOn(mailerService, 'sendMail').mockResolvedValue({});
 
-    await expect(service.sendVerificationMail('test@gmail.com', '/verify/123')).resolves.toBe(undefined)
+    await expect(
+      service.sendVerificationMail('test@gmail.com', '/verify/123'),
+    ).resolves.toBe(undefined);
   });
 });

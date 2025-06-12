@@ -120,21 +120,17 @@ export class ProductService {
     await this.validateProductOwnership(userId, productId);
 
     try {
-      let imagesNames: string[] = [];
-
-      if (images && images.length > 0) {
-        imagesNames = await this.fileService.createImages(images);
-      }
+      const imagesNames = await this.fileService.createImages(images);
 
       const product = await this.productRepository.update(
         productId,
         updateProductDto,
         imagesNames,
       );
-
       this.logger.log(
         `Product ${product.id} updated successfully by user ${userId}`,
       );
+
       return product;
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {

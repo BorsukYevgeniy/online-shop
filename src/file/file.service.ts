@@ -16,9 +16,10 @@ export class FileService {
   private readonly logger: Logger = new Logger(FileService.name);
 
   async createImages(images: Express.Multer.File[]): Promise<string[]> {
+    if (!images || images.length < 1) return undefined;
     try {
       const fileNames: string[] = [];
-      const filePath: string = resolvePath(__dirname, '..', '..', 'static');
+      const filePath: string = resolvePath(__dirname, '..', '..', 'images');
 
       try {
         await fsPromises.access(filePath);

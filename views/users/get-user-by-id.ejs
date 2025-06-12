@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= nickname %> | User</title>
+  <link rel="stylesheet" href="/css/users/get-user-by-id.css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main class="user-container">
+    <h1><%= nickname %></h1>
+
+    <div class="user-info">
+      <p><strong>Created at:</strong> <%= new Date(createdAt).toLocaleDateString() %></p>
+      <p><strong>Role:</strong> <%= role %></p>
+      
+      <% if (isVerified) { %>
+        <p><strong>Is user verified:</strong> yes</p>
+        <p><strong>Verified at:</strong> <%= new Date(verifiedAt).toLocaleDateString() %></p>
+      <% } else { %>
+        <p><strong>Is user verified:</strong> no</p>
+      <% } %>
+    </div>
+
+    <br />
+
+    <div class="user-actions">
+      <a href="/users/<%= id %>/products" class="btn get-all-products">Get all user products</a>
+
+      <% if (guestRole === "ADMIN") { %>
+        <form action="/users/delete/<%= id %>?_method=DELETE" method="post" class="delete-form">
+          <button type="submit" class="btn" id="btn-delete">Delete</button>
+        </form>
+
+        <form action="/users/assing-admin/<%= id %>?_method=PATCH" method="post" class="assign-admin-form">
+          <button type="submit" class="btn" id="btn-assign-admin">Assign admin</button>
+        </form>
+      <% } %>
+    </div>
+  </main>
+
+</body>
+</html>

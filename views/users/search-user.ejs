@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User searching</title>
+  <link rel="stylesheet" href="/css/users/search-user.css">
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <!-- Search form -->
+  <form action="/users/search" method="get" id="search-form">
+    <h1>Search user by:</h1>
+    <br>
+
+    <label for="nickname">Nickname:</label>
+    <input type="text" id="nickname" name="nickname" class="input" required>
+    <br><br>
+
+    <label for="minDate">Minimal date of creating account:</label>
+    <input type="date" name="minDate" id="minDate" class="input">
+    <br><br>
+
+    <label for="maxDate">Maximal date of creating account:</label>
+    <input type="date" name="maxDate" id="maxDate" class="input">
+    <br><br>
+
+    <button type="submit">Search</button>
+  </form>
+
+  <!-- Search results -->
+  <div class="results">
+    <% if (users && users.length) { %>
+      <h1>Results:</h1>
+
+      <% users.forEach(u => { %>
+        <div class="user">
+          <div><strong>Nickname:</strong> 
+            <a href="/users/<%= u.id %>"><%= u.nickname %></a>
+          </div>
+          <div><strong>Created at:</strong> <%= new Date(u.createdAt).toLocaleDateString() %></div>
+          <div><strong>Role:</strong> <%= u.role %></div>
+
+          <div><strong>Is user verified:</strong> <%= u.isVerified ? 'yes' : 'no' %></div>
+
+          <% if (u.isVerified) { %>
+            <div><strong>Verified at:</strong> <%= new Date(u.verifiedAt).toLocaleDateString() %></div>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <!-- Sort and Pagination -->
+  <%- include('../partials/sort-user.ejs') %>
+  <%- include('../partials/pagination.ejs') %>
+
+  <script src="/js/clear-empty-query.js"></script>
+
+</body>
+</html>
