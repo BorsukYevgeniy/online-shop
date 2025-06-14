@@ -245,8 +245,14 @@ describe('UserController (e2e)', () => {
 
   describe('GET /api/users/:userId - Should return user id', () => {
     it.each<[string, 200 | 404]>([
-      ['GET /api/users/:userId - 200 OK - Should return user searched by id', 200],
-      ['GET /api/users/:userId - 404 NOT FOUND - Should return 404 HTTP code', 404],
+      [
+        'GET /api/users/:userId - 200 OK - Should return user searched by id',
+        200,
+      ],
+      [
+        'GET /api/users/:userId - 404 NOT FOUND - Should return 404 HTTP code',
+        404,
+      ],
     ])('%s', async (_, statusCode) => {
       const { body } = await request(app.getHttpServer())
         .get(`/api/users/${statusCode === 404 ? userId - 2 : userId}`)
@@ -334,13 +340,10 @@ describe('UserController (e2e)', () => {
         404,
       ],
     ])('%s', async (_, statusCode) => {
-      
       await request(app.getHttpServer())
         .delete(`/api/users/${statusCode === 404 ? adminId - 2 : adminId}`)
         .set('Cookie', [`accessToken=${adminAccessToken}`])
         .expect(statusCode);
-    
-    
-      });
+    });
   });
 });

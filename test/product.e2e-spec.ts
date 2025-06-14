@@ -335,7 +335,9 @@ describe('ProductController (e2e)', () => {
       ],
     ])('%s', async (_, statusCode, dto, file) => {
       const requestBuilder = request(app.getHttpServer())
-        .patch(`/api/products/${statusCode === 404 ? productId - 1 : productId}`)
+        .patch(
+          `/api/products/${statusCode === 404 ? productId - 1 : productId}`,
+        )
         .set('Cookie', [`accessToken=${accessToken}`]);
 
       if (dto) {
@@ -383,7 +385,9 @@ describe('ProductController (e2e)', () => {
       ],
     ])('%s', async (_, statusCode) => {
       await request(app.getHttpServer())
-        .delete(`/api/products/${statusCode === 404 ? productId - 1 : productId}`)
+        .delete(
+          `/api/products/${statusCode === 404 ? productId - 1 : productId}`,
+        )
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(statusCode);
     });

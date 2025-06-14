@@ -48,7 +48,7 @@ describe('CategoryController (e2e)', () => {
 
     const { headers } = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: process.env.TEST_EMAIL, password: 'password' })
+      .send({ email: process.env.TEST_EMAIL, password: 'password' });
 
     accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
   }, 6500);
@@ -62,7 +62,10 @@ describe('CategoryController (e2e)', () => {
   describe('GET /api/categories - Should return all categories and search him', () => {
     it.each<[string, SearchCategoryDto | null]>([
       ['GET /api/categories - Should return all categories', null],
-      ['GET /api/categories - Should search category by name', { name: 'TEST' }],
+      [
+        'GET /api/categories - Should search category by name',
+        { name: 'TEST' },
+      ],
     ])('%s', async (_, searchDto) => {
       const mockCategories = {
         categories: [],
@@ -141,7 +144,9 @@ describe('CategoryController (e2e)', () => {
       ],
     ])('%s', async (_, statusCode) => {
       const { body: category } = await request(app.getHttpServer())
-        .get(`/api/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`)
+        .get(
+          `/api/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`,
+        )
         .expect(statusCode);
 
       if (statusCode === 200) {
@@ -217,13 +222,10 @@ describe('CategoryController (e2e)', () => {
         404,
       ],
     ])('%s', async (_, statusCode) => {
-      const {body} =await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(`/api/categories/${categoryId}`)
         .set('Cookie', [`accessToken=${accessToken}`])
         .expect(statusCode);
-    
-      console.log(body)
-    
-      });
+    });
   });
 });

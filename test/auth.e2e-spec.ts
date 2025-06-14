@@ -25,10 +25,9 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     prisma = app.get<PrismaService>(PrismaService);
 
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.setViewEngine('ejs');
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-
+    app.setBaseViewsDir(join(__dirname, '..', 'views'));
+    app.setViewEngine('ejs');
+    app.useStaticAssets(join(__dirname, '..', 'public'));
 
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
