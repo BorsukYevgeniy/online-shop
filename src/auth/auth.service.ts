@@ -96,8 +96,7 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string): Promise<Tokens> {
-    const { id, isVerified, role } =
-      await this.tokenService.verifyRefreshToken(refreshToken);
+    const { id } = await this.tokenService.verifyRefreshToken(refreshToken);
 
     const userTokens: Token[] | null =
       await this.tokenService.getUserTokens(id);
@@ -111,13 +110,9 @@ export class AuthService {
       throw new BadRequestException('Invalid refresh token');
     }
 
-    const tokens = await this.tokenService.generateTokens({
-      id,
-      role,
-      isVerified,
-    });
+    const tokens = await this.tokenService.updateTokens(refreshToken);
 
-    this.logger.log(`Refresh token successful for user ID: ${id}`);
+    this.logger.log(`Token refreshed successful for user ID: ${id}`);
     return tokens;
   }
 

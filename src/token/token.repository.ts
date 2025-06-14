@@ -23,6 +23,13 @@ export class TokenRepository {
     });
   }
 
+  async update(refreshToken: string, newRefreshToken: string): Promise<Token> {
+    return await this.prismaService.token.update({
+      where: { token: refreshToken },
+      data: { token: newRefreshToken },
+    });
+  }
+
   async deleteUserToken(refreshToken: string): Promise<DeletingCount> {
     return await this.prismaService.token.deleteMany({
       where: { token: refreshToken },

@@ -41,21 +41,9 @@ export class TokenService {
 
   async generateTokens(tokenPayload: TokenPayload): Promise<Tokens> {
     try {
-      const accessToken: string = await this.jwtService.signAsync(
-        tokenPayload,
-        {
-          expiresIn: this.accessTokenExpirationTime,
-          secret: this.accessSecret,
-        },
-      );
-
-      const refreshToken: string = await this.jwtService.signAsync(
-        tokenPayload,
-        {
-          expiresIn: this.refreshTokenExpirationTime,
-          secret: this.refreshSecret,
-        },
-      );
+      const accessToken: string = await this.generateAccessToken(tokenPayload);
+      const refreshToken: string =
+        await this.generateRefreshToken(tokenPayload);
 
       await this.saveToken(tokenPayload.id, refreshToken);
 
@@ -118,5 +106,46 @@ export class TokenService {
       this.logger.error('Error saving token', { message: error.message });
       throw new InternalServerErrorException('Failed to save token');
     }
+  }
+
+  private async generateAccessToken(payload: TokenPayload) {
+    this.logger.log(`Generating access token for user ${payload.id}`);
+
+    return await this.jwtService.signAsync(payload, {
+      expiresIn: this.accessTokenExpirationTime,
+      secret: this.accessSecret,
+    });
+  }
+
+  private async generateRefreshToken(payload: TokenPayload) {
+    this.logger.log(`Generating refresh token for user ${payload.id}`);
+
+    return await this.jwtService.signAsync(payload, {
+      expiresIn: this.refreshTokenExpirationTime,
+      secret: this.refreshSecret,
+    });
+  }
+
+  async updateTokens(refreshToken: string): Promise<Tokens> {
+    const { id, isVerified, role } =
+      await this.verifyRefreshToken(refreshToken);
+
+    const newRefreshToken = await this.generateRefreshToken({
+      id,
+      role,
+      isVerified,
+    });
+
+    const newAccessToken = await this.generateAccessToken({
+      id,
+      role,
+      isVerified,
+    });
+
+    await this.tokenRepositry.update(refreshToken, newRefreshToken);
+
+    this.logger.log(`Refresh token for user ${id} updated succesfully`);
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 }

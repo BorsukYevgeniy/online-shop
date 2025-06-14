@@ -43,7 +43,7 @@ export class AppModule implements NestModule {
       .apply(TokenSsrMiddleware)
       .exclude(
         '/',
-        'api/',
+        '/api/*path',
         '/:image',
         'auth/register',
         'auth/login',
@@ -52,6 +52,6 @@ export class AppModule implements NestModule {
         '/categories/search',
       )
       .forRoutes('');
-    consumer.apply(IsAuthorizedMiddleware).exclude('api/').forRoutes('');
+    consumer.apply(IsAuthorizedMiddleware).exclude('/api/*path').forRoutes('');
   }
 }
