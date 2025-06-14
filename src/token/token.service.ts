@@ -142,7 +142,11 @@ export class TokenService {
       isVerified,
     });
 
-    await this.tokenRepositry.update(refreshToken, newRefreshToken);
+    await this.tokenRepositry.update(
+      refreshToken,
+      newRefreshToken,
+      new Date(Date.now() + 24 * 60 * 60 * 1000),
+    );
 
     this.logger.log(`Refresh token for user ${id} updated succesfully`);
 

@@ -23,10 +23,14 @@ export class TokenRepository {
     });
   }
 
-  async update(refreshToken: string, newRefreshToken: string): Promise<Token> {
+  async update(
+    refreshToken: string,
+    newRefreshToken: string,
+    newExpirationTime: Date,
+  ): Promise<Token> {
     return await this.prismaService.token.update({
       where: { token: refreshToken },
-      data: { token: newRefreshToken },
+      data: { token: newRefreshToken, expiresAt: newExpirationTime },
     });
   }
 
