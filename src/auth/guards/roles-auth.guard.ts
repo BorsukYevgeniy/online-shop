@@ -11,6 +11,8 @@ import { TokenService } from '../../token/token.service';
 import { AuthRequest } from '../../types/request.type';
 import { Role } from '../../enum/role.enum';
 
+import { TokenErrorMessages as TokenErrMsg } from '../../token/enum/token-error-messages.enum';
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   private readonly logger: Logger = new Logger(RolesGuard.name);
@@ -35,7 +37,7 @@ export class RolesGuard implements CanActivate {
 
       if (!accessToken) {
         this.logger.warn('Access token is missing in cookies');
-        throw new UnauthorizedException('Access token is missing in cookies');
+        throw new UnauthorizedException(TokenErrMsg.AccessTokenIsMissing);
       }
 
       const payload = await this.tokenService.verifyAccessToken(accessToken);
@@ -56,7 +58,7 @@ export class RolesGuard implements CanActivate {
       return false;
     } catch (e: unknown) {
       this.logger.error('Invalid access token', e);
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException(TokenErrMsg.InvalidAccessToken);
     }
   }
 }

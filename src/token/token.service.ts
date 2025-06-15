@@ -11,7 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import { Token } from '@prisma/client';
 import { TokenPayload, Tokens } from './interface/token.interfaces';
 import { DeletingCount } from '../types/deleting-count.type';
-import { Role } from '../enum/role.enum';
+
+import { TokenErrorMessages as TokenErrMsg } from './enum/token-error-messages.enum';
 
 @Injectable()
 export class TokenService {
@@ -51,7 +52,7 @@ export class TokenService {
       return { accessToken, refreshToken };
     } catch (error) {
       this.logger.error('Error generating tokens', { message: error.message });
-      throw new UnauthorizedException('Error generating tokens');
+      throw new UnauthorizedException(TokenErrMsg.ErrorGeneratingToken);
     }
   }
 
@@ -62,7 +63,7 @@ export class TokenService {
       });
     } catch (error) {
       this.logger.warn('Invalid refresh token', { message: error.message });
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException(TokenErrMsg.RefreshTokenIsMissing);
     }
   }
 
@@ -73,7 +74,7 @@ export class TokenService {
       });
     } catch (error) {
       this.logger.warn('Invalid access token', { message: error.message });
-      throw new UnauthorizedException('Invalid access token');
+      throw new UnauthorizedException(TokenErrMsg.InvalidAccessToken);
     }
   }
 
@@ -104,7 +105,7 @@ export class TokenService {
       return await this.tokenRepositry.create(userId, refreshToken, expiredAt);
     } catch (error) {
       this.logger.error('Error saving token', { message: error.message });
-      throw new InternalServerErrorException('Failed to save token');
+      throw new InternalServerErrorException(TokenErrMsg.FailTokenSave);
     }
   }
 

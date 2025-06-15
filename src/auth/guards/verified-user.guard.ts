@@ -8,6 +8,8 @@ import {
 import { TokenService } from '../../token/token.service';
 import { AuthRequest } from '../../types/request.type';
 
+import { TokenErrorMessages as TokenErrMsg } from '../../token/enum/token-error-messages.enum';
+
 @Injectable()
 export class VerifiedUserGuard implements CanActivate {
   private readonly logger: Logger = new Logger(VerifiedUserGuard.name);
@@ -20,7 +22,7 @@ export class VerifiedUserGuard implements CanActivate {
 
     if (!accessToken) {
       this.logger.warn('Access token is missing in cookies');
-      throw new UnauthorizedException('Access token is missing in cookies');
+      throw new UnauthorizedException(TokenErrMsg.AccessTokenIsMissing);
     }
 
     try {
@@ -39,7 +41,7 @@ export class VerifiedUserGuard implements CanActivate {
       return false;
     } catch (e: unknown) {
       this.logger.error('Invalid access token', e);
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException(TokenErrMsg.InvalidAccessToken);
     }
   }
 }
