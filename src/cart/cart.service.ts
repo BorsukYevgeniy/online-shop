@@ -8,6 +8,9 @@ import { CartRepository } from './cart.repository';
 import { CartProduct } from './types/cart.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
+import { CartErrorMessages as CartErrMsg } from './enum/cart-error-messages.enum';
+import { ProductErrorMessages as ProductErrMsg } from '../product/enum/product-error-messages.enum';
+
 @Injectable()
 export class CartService {
   private readonly logger: Logger = new Logger(CartService.name);
@@ -19,7 +22,7 @@ export class CartService {
 
     if (!cart) {
       this.logger.warn(`Cart ${cartId} not founded`);
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(CartErrMsg.CartNotFound);
     }
 
     this.logger.log(`Cart ${cartId} fecthed succesfully`);
@@ -41,7 +44,7 @@ export class CartService {
       return cart;
     } catch (e: unknown) {
       if (e instanceof PrismaClientKnownRequestError) {
-        throw new BadRequestException('Product not found');
+        throw new BadRequestException(ProductErrMsg.ProductNotFound);
       }
     }
   }

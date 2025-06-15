@@ -17,6 +17,8 @@ import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 import { SortUserDto } from './dto/sort-user.dto';
 
+import { UserErrorMessages as UserErrMsg } from './constants/user-error-messages.constants';
+
 @Injectable()
 export class UserService {
   private readonly logger: Logger = new Logger(UserService.name);
@@ -56,7 +58,7 @@ export class UserService {
 
     if (!user) {
       this.logger.warn(`User ${userId} doesnt exist`);
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(UserErrMsg.UserNotFound);
     }
 
     this.logger.log(`User ${userId} fetched successfully`);
@@ -68,7 +70,7 @@ export class UserService {
 
     if (!user) {
       this.logger.warn(`User ${userId} doesnt exist`);
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(UserErrMsg.UserNotFound);
     }
 
     this.logger.log(`User ${userId} fetched successfully`);
@@ -113,7 +115,9 @@ export class UserService {
         this.logger.warn(
           `User with ${e.meta.target} ${createUserDto[e.meta.target as string]} already exists`,
         );
-        throw new BadRequestException('User with this email already exists');
+        throw new BadRequestException(
+          UserErrMsg.UserAlreadyExists(e.meta.target as string),
+        );
       }
     }
   }
@@ -126,7 +130,7 @@ export class UserService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         this.logger.warn(`User ${userId} doesnt exist`);
-        throw new NotFoundException('User not found');
+        throw new NotFoundException(UserErrMsg.UserNotFound);
       }
     }
   }
@@ -136,7 +140,7 @@ export class UserService {
 
     if (!candidate) {
       this.logger.warn(`User ${userId} doesnt exist`);
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(UserErrMsg.UserNotFound);
     }
 
     const user = await this.userRepository.assignAdmin(userId);

@@ -17,6 +17,10 @@ import { Role } from '../enum/role.enum';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
 
+import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
+import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
+import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages';
+
 @Injectable()
 export class AuthService {
   private readonly logger: Logger = new Logger(AuthService.name);
@@ -36,7 +40,7 @@ export class AuthService {
 
     if (candidate) {
       this.logger.warn(`User already exists: ${dto.email}`);
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException(UserErrMsg.UserAlreadyExists('email'));
     }
 
     const hashedPassword: string = await hash(dto.password, 3);
@@ -64,7 +68,7 @@ export class AuthService {
 
     if (!candidate) {
       this.logger.warn(`User not found: ${dto.email}`);
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(UserErrMsg.UserNotFound);
     }
 
     const { password: hashedPassword } = candidate;
@@ -76,7 +80,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       this.logger.warn(`Invalid password for user: ${dto.email}`);
-      throw new BadRequestException('Email or password are incorrect');
+      throw new BadRequestException(AuthErrMsg.InvalidCredentials);
     }
 
     this.logger.log(`User logged in: ${dto.email}`);
@@ -107,7 +111,7 @@ export class AuthService {
 
     if (!validToken) {
       this.logger.warn(`Invalid refresh token for user ID: ${id}`);
-      throw new BadRequestException('Invalid refresh token');
+      throw new BadRequestException(TokenErrMsg.InvalidRefreshToken);
     }
 
     const tokens = await this.tokenService.updateTokens(refreshToken);
@@ -124,12 +128,12 @@ export class AuthService {
       this.logger.warn(
         `User not found with verification link: ${verificationLink}`,
       );
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(UserErrMsg.UserNotFound);
     }
 
     if (user.isVerified) {
       this.logger.warn(`User already verified: ${user.email}`);
-      throw new BadRequestException('User already verified');
+      throw new BadRequestException(AuthErrMsg.UserAlreadyVerified);
     }
 
     return await this.userService.verify(verificationLink);

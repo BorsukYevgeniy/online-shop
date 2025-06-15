@@ -14,6 +14,8 @@ import { PaginatedCategory } from './type/category.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
+import { CategoryErrroMessages as CategoryErrMsg } from './enum/category-error-messages.enum';
+
 @Injectable()
 export class CategoryService {
   private readonly logger: Logger = new Logger(CategoryService.name);
@@ -57,7 +59,7 @@ export class CategoryService {
 
     if (!category) {
       this.logger.warn(`Category ${categoryId} doesnt exist`);
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException(CategoryErrMsg.CategoryNotFound);
     }
 
     this.logger.log(`Category ${categoryId} fetched successfully`);
@@ -78,7 +80,7 @@ export class CategoryService {
         this.logger.warn(
           'Category already exists, name: ' + createCategoryDto.name,
         );
-        throw new BadRequestException('Category already exists');
+        throw new BadRequestException(CategoryErrMsg.CategoryAlreadyExists);
       }
     }
   }
@@ -98,7 +100,7 @@ export class CategoryService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         this.logger.warn(`Category ${categoryId} doesnt exist`);
-        throw new NotFoundException('Category not found');
+        throw new NotFoundException(CategoryErrMsg.CategoryNotFound);
       }
     }
   }
@@ -112,7 +114,7 @@ export class CategoryService {
       if (e instanceof PrismaClientKnownRequestError) {
         this.logger.warn(`Category ${categoryId} doesnt exist`);
 
-        throw new NotFoundException('Category not found');
+        throw new NotFoundException(CategoryErrMsg.CategoryNotFound);
       }
     }
   }

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -14,6 +13,8 @@ import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+
+import { ProductErrorMessages as ProductErrMsg } from './enum/product-error-messages.enum';
 
 @Injectable()
 export class ProductService {
@@ -35,7 +36,7 @@ export class ProductService {
       this.logger.warn(
         `User ${userId} tried to access a product ${productId} that does not exist`,
       );
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException(ProductErrMsg.ProductNotFound);
     }
 
     if (product.userId !== userId) {
@@ -85,7 +86,7 @@ export class ProductService {
 
     if (!product) {
       this.logger.warn(`Product ${productId} doesnt exist`);
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException(ProductErrMsg.ProductNotFound);
     }
 
     this.logger.log(`Product ${productId} fetched successfully`);
@@ -136,7 +137,7 @@ export class ProductService {
       if (e instanceof PrismaClientKnownRequestError) {
         this.logger.warn(`Product ${productId} doesnt exist`);
 
-        throw new NotFoundException('Product not found');
+        throw new NotFoundException(ProductErrMsg.ProductNotFound);
       }
     }
   }
@@ -152,7 +153,7 @@ export class ProductService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         this.logger.warn(`Product ${productId} doesnt exist`);
-        throw new NotFoundException('Product not found');
+        throw new NotFoundException(ProductErrMsg.ProductNotFound);
       }
     }
   }

@@ -10,6 +10,7 @@ import {
   extname as fileExtname,
 } from 'path';
 import { v4 as uuidV4 } from 'uuid';
+import { FileErrorMessages as FileErrMsg } from './enum/file-error-messages.enum';
 
 @Injectable()
 export class FileService {
@@ -48,7 +49,7 @@ export class FileService {
     } catch (e: unknown) {
       this.logger.error('Error writing files to disk', e);
 
-      throw new InternalServerErrorException('Error writing files to disk');
+      throw new InternalServerErrorException(FileErrMsg.ErrorWritingOnDisk);
     }
   }
 }
