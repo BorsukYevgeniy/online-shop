@@ -14,7 +14,7 @@ import { PaginatedCategory } from './type/category.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-import { CategoryErrroMessages as CategoryErrMsg } from './enum/category-error-messages.enum';
+import { CategoryErrorMessages as CategoryErrMsg } from './enum/category-error-messages.enum';
 
 @Injectable()
 export class CategoryService {

@@ -19,7 +19,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
-import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages';
+import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages.enum';
 
 @Injectable()
 export class AuthService {
