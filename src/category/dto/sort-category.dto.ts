@@ -1,13 +1,13 @@
 import { Category } from '@prisma/client';
 import { SortDto } from '../../dto/sort.dto';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { CategoryErrorMessages as CategoryErrMsg } from '../enum/category-error-messages.enum';
+import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 
 export class SortCategoryDto extends SortDto {
   @IsOptional()
   @IsString()
   @IsEnum(['name', 'id', 'description'], {
-    message: CategoryErrMsg.InvalidSortFields,
+    message: CategoryDtoErrMsg.InvalidSortFields,
   })
   readonly sortBy?: keyof Category = 'id';
 }

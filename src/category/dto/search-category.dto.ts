@@ -1,10 +1,10 @@
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { CategoryErrorMessages as CategoryErrMsg } from '../enum/category-error-messages.enum';
+import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 
 export class SearchCategoryDto {
   @IsOptional()
   @IsString()
-  @MinLength(3, { message: CategoryErrMsg.InvalidName })
-  @MaxLength(50, { message: CategoryErrMsg.InvalidName })
+  @MinLength(3, { message: CategoryDtoErrMsg.InvalidName })
+  @MaxLength(50, { message: CategoryDtoErrMsg.InvalidName })
   name?: string;
 }

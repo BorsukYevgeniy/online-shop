@@ -1,16 +1,16 @@
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { CategoryErrorMessages as CategoryErrMsg } from '../enum/category-error-messages.enum';
+import { CategoryDtoErrorMessages as CategortDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 
 export class UpdateCategoryDto {
   @IsOptional()
   @IsString()
-  @MinLength(3, { message: CategoryErrMsg.InvalidName })
-  @MaxLength(50, { message: CategoryErrMsg.InvalidName })
+  @MinLength(3, { message: CategortDtoErrMsg.InvalidName })
+  @MaxLength(50, { message: CategortDtoErrMsg.InvalidName })
   name?: string;
 
   @IsOptional()
   @IsString()
-  @MinLength(10, { message: CategoryErrMsg.InvalidDescription })
-  @MaxLength(150, { message: CategoryErrMsg.InvalidDescription })
+  @MinLength(10, { message: CategortDtoErrMsg.InvalidDescription })
+  @MaxLength(150, { message: CategortDtoErrMsg.InvalidDescription })
   description?: string;
 }

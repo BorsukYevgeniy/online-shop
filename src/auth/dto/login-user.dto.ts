@@ -6,18 +6,19 @@ import {
   MinLength,
 } from 'class-validator';
 import { Trim } from '../../decorators/';
-import { AuthErrorMessages as AuthErrMsg } from '../enum/auth-error-messages.enum';
+
+import { AuthDtoErrorMessages as AuthDtoErrMsg } from '../enum/auth-dto-error-messages.enum';
 
 export class LoginUserDto {
   @IsNotEmpty()
   @Trim()
-  @IsEmail({}, { message: AuthErrMsg.InvalidEmail })
+  @IsEmail({}, { message: AuthDtoErrMsg.InvalidEmail })
   email: string;
 
   @IsNotEmpty()
   @IsString()
   @Trim()
-  @MinLength(6, { message: AuthErrMsg.InvalidPassword })
-  @MaxLength(20, { message: AuthErrMsg.InvalidPassword })
+  @MinLength(6, { message: AuthDtoErrMsg.InvalidPassword })
+  @MaxLength(20, { message: AuthDtoErrMsg.InvalidPassword })
   password: string;
 }

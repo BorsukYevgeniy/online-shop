@@ -1,16 +1,16 @@
 import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
-import { CategoryErrorMessages as CategoryErrMsg } from '../enum/category-error-messages.enum';
+import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 
 export class CreateCategoryDto {
   @IsNotEmpty()
   @IsString()
-  @MinLength(3, { message: CategoryErrMsg.InvalidName })
-  @MaxLength(50, { message: CategoryErrMsg.InvalidName })
+  @MinLength(3, { message: CategoryDtoErrMsg.InvalidName })
+  @MaxLength(50, { message: CategoryDtoErrMsg.InvalidName })
   name: string;
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(10, { message: CategoryErrMsg.InvalidDescription })
-  @MaxLength(150, { message: CategoryErrMsg.InvalidDescription })
+  @MinLength(10, { message: CategoryDtoErrMsg.InvalidDescription })
+  @MaxLength(150, { message: CategoryDtoErrMsg.InvalidDescription })
   description: string;
 }

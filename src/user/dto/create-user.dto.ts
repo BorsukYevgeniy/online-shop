@@ -7,26 +7,26 @@ import {
 } from 'class-validator';
 import { Trim } from '../../decorators';
 
-import { AuthErrorMessages as AuthErrMsg } from '../../auth/enum/auth-error-messages.enum';
-import { UserErrorMessages as UserErrMsg } from '../../user/constants/user-error-messages.constants';
+import { AuthDtoErrorMessages as AuthDtoErrMsg } from 'src/auth/enum/auth-dto-error-messages.enum';
+import { UserDtoErrorMessages as UserDtoErrMsg } from '../../user/constants/user-dto-error-messages.enum';
 
 export class CreateUserDto {
   @IsNotEmpty()
   @Trim()
-  @IsEmail({}, { message: AuthErrMsg.InvalidEmail })
+  @IsEmail({}, { message: AuthDtoErrMsg.InvalidEmail })
   readonly email: string;
 
   @IsNotEmpty()
   @IsString()
   @Trim()
-  @MinLength(3, { message: UserErrMsg.InvalidNickname })
-  @MaxLength(15, { message: UserErrMsg.InvalidNickname })
+  @MinLength(3, { message: UserDtoErrMsg.InvalidNickname })
+  @MaxLength(15, { message: UserDtoErrMsg.InvalidNickname })
   readonly nickname: string;
 
   @IsNotEmpty()
   @IsString()
   @Trim()
-  @MinLength(6, { message: AuthErrMsg.InvalidPassword })
-  @MaxLength(20, { message: AuthErrMsg.InvalidPassword })
+  @MinLength(6, { message: AuthDtoErrMsg.InvalidPassword })
+  @MaxLength(20, { message: AuthDtoErrMsg.InvalidPassword })
   readonly password: string;
 }
