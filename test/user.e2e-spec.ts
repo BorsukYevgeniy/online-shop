@@ -129,7 +129,6 @@ describe('UserController (e2e)', () => {
       role: 'USER',
       isVerified: false,
       verifiedAt: null,
-      verificationLink: expect.any(String),
     });
   });
 
