@@ -8,9 +8,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import {
-  UserNoPassword,
+  UserNoPasswordVLink,
   UserNoCred,
   PaginatedUserNoCreds,
+  UserNoPassword
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -65,7 +66,7 @@ export class UserService {
     return user;
   }
 
-  async getMe(userId: number): Promise<UserNoPassword> {
+  async getMe(userId: number): Promise<UserNoPasswordVLink> {
     const user = await this.userRepository.findUserProfile(userId);
 
     if (!user) {

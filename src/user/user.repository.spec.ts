@@ -5,7 +5,7 @@ import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
-import { UserNoPassword } from './types/user.types';
+import { UserNoPasswordVLink } from './types/user.types';
 import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library';
 
 describe('UserRepository', () => {
@@ -232,7 +232,7 @@ describe('UserRepository', () => {
       verificationLink: '123',
     });
 
-    const user: UserNoPassword = await repository.create(createUserDto);
+    const user: UserNoPasswordVLink = await repository.create(createUserDto);
 
     expect(prismaService.user.create).toHaveBeenCalledWith({
       data: { ...createUserDto, cart: { create: {} } },

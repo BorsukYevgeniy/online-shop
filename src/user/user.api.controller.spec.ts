@@ -9,7 +9,7 @@ import { AuthRequest } from '../types/request.type';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';
-import { UserNoCred, UserNoPassword } from './types/user.types';
+import { UserNoCred, UserNoPasswordVLink } from './types/user.types';
 
 const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
 
@@ -189,7 +189,7 @@ describe('UserApiController', () => {
   });
 
   it('Should return user profile', async () => {
-    const mockUser: UserNoPassword = {
+    const mockUser: UserNoPasswordVLink = {
       id: 1,
       nickname: 'test',
       createdAt: new Date(),
@@ -197,7 +197,6 @@ describe('UserApiController', () => {
       role: Role.USER,
       isVerified: false,
       verifiedAt: new Date(),
-      verificationLink: '123',
     };
 
     jest.spyOn(userService, 'getMe').mockResolvedValue(mockUser);

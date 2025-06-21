@@ -18,7 +18,7 @@ import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { AuthRequest } from '../types/request.type';
 import {
   PaginatedUserNoCreds,
-  UserNoPassword,
+  UserNoPasswordVLink,
   UserNoCred,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
@@ -50,7 +50,7 @@ export class UserApiController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  async getMe(@Req() req: AuthRequest): Promise<UserNoPassword> {
+  async getMe(@Req() req: AuthRequest): Promise<UserNoPasswordVLink> {
     return await this.userService.getMe(req.user.id);
   }
 
