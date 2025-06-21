@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserNoPasswordVLink, UserNoCred, UserNoPassword } from './types/user.types';
+import {
+  UserNoPasswordVLink,
+  UserNoCred,
+  UserNoPassword,
+} from './types/user.types';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 import { SortUserDto } from './dto/sort-user.dto';
@@ -112,7 +116,10 @@ export class UserRepository {
     });
   }
 
-  async findById(userId: number): Promise<UserNoCred | null> {
+  async findById(
+    userId: number,
+    allowSensativeFields: boolean = false,
+  ): Promise<UserNoCred | UserNoPassword | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -122,6 +129,9 @@ export class UserRepository {
         isVerified: true,
         verifiedAt: true,
         role: true,
+
+        email: allowSensativeFields,
+        verificationLink: allowSensativeFields,
       },
     });
 

@@ -138,4 +138,14 @@ export class AuthService {
 
     return await this.userService.verify(verificationLink);
   }
+
+  async resendVerificationMail(userId: number) {
+    const { email, verificationLink }: UserNoPassword =
+      (await this.userService.getById(userId, true)) as UserNoPassword;
+
+    return await this.mailService.sendVerificationMail(
+      email,
+      this.API_URL + `/auth/verify/${verificationLink}`,
+    );
+  }
 }

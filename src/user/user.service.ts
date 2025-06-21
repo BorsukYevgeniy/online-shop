@@ -11,7 +11,7 @@ import {
   UserNoPasswordVLink,
   UserNoCred,
   PaginatedUserNoCreds,
-  UserNoPassword
+  UserNoPassword,
 } from './types/user.types';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -54,8 +54,16 @@ export class UserService {
     };
   }
 
-  async getById(userId: number): Promise<UserNoCred> {
-    const user: UserNoCred | null = await this.userRepository.findById(userId);
+  async getById(
+    userId: number,
+    allowSensativeFields: boolean = false,
+  ): Promise<
+    UserNoPassword | UserNoCred 
+  > {
+    const user: UserNoCred | UserNoPassword | null = await this.userRepository.findById(
+      userId,
+      allowSensativeFields,
+    );
 
     if (!user) {
       this.logger.warn(`User ${userId} doesnt exist`);

@@ -114,4 +114,11 @@ export class AuthApiController {
 
     return { message: 'User verified succesfully' };
   }
+
+  @Post('resend-email')
+  @UseGuards(AuthGuard)
+  @HttpCode(204)
+  async resendEmail(@Req() req: AuthRequest) {
+    return await this.authService.resendVerificationMail(req.user.id);
+  }
 }
