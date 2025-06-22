@@ -49,10 +49,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    await this.mailService.sendVerificationMail(
-      user.email,
-      this.API_URL + `/auth/verify/${user.verificationLink}`,
-    );
+    await this.sendVerificationMail(user.email, user.verificationLink);
 
     this.logger.log(`New user registered: ${user.email}`);
 
@@ -139,9 +136,14 @@ export class AuthService {
     return await this.userService.verify(verificationLink);
   }
 
-  async resendVerificationMail(userId: number):Promise<void> {
-    const { email, verificationLink }: UserNoPassword = await this.userService.getFullUserById(userId)
+  async resendVerificationMail(userId: number): Promise<void> {
+    const { email, verificationLink }: UserNoPassword =
+      await this.userService.getFullUserById(userId);
 
+    return await this.sendVerificationMail(email, verificationLink);
+  }
+
+  private async sendVerificationMail(email: string, verificationLink: string) {
     return await this.mailService.sendVerificationMail(
       email,
       this.API_URL + `/auth/verify/${verificationLink}`,
