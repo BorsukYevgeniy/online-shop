@@ -116,11 +116,30 @@ export class UserRepository {
     });
   }
 
+
+  async findFullUserById(userId: number):Promise<UserNoPassword>{
+  return await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      nickname: true,
+      createdAt: true,
+      isVerified: true,
+      verifiedAt: true,
+      role: true,
+
+      email: true,
+      verificationLink: true,
+    },
+  });
+
+  }
+
+
   async findById(
     userId: number,
-    allowSensativeFields: boolean = false,
-  ): Promise<UserNoCred | UserNoPassword | null> {
-    const user = await this.prisma.user.findUnique({
+  ): Promise<UserNoCred | null> {
+    return await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -129,13 +148,9 @@ export class UserRepository {
         isVerified: true,
         verifiedAt: true,
         role: true,
-
-        email: allowSensativeFields,
-        verificationLink: allowSensativeFields,
       },
     });
 
-    return user;
   }
 
   async findUserProfile(userId: number): Promise<UserNoPasswordVLink | null> {

@@ -54,15 +54,26 @@ export class UserService {
     };
   }
 
+
+  async getFullUserById(userId: number){
+    const user = await this.userRepository.findFullUserById(userId);
+
+    if (!user) {
+      this.logger.warn(`User ${userId} doesnt exist`);
+      throw new NotFoundException(UserErrMsg.UserNotFound);
+    }
+
+    this.logger.log(`User ${userId} fetched successfully`);
+    return user;
+  }
+
   async getById(
     userId: number,
-    allowSensativeFields: boolean = false,
   ): Promise<
-    UserNoPassword | UserNoCred 
+    UserNoCred 
   > {
-    const user: UserNoCred | UserNoPassword | null = await this.userRepository.findById(
+    const user: UserNoCred | null = await this.userRepository.findById(
       userId,
-      allowSensativeFields,
     );
 
     if (!user) {

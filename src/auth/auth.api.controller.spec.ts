@@ -23,6 +23,7 @@ describe('AuthApiController', () => {
             logout: jest.fn(),
             logoutAll: jest.fn(),
             refreshToken: jest.fn(),
+            resendVerificationMail: jest.fn(),
           },
         },
         { provide: TokenService, useValue: { verifyAccessToken: jest.fn() } },
@@ -161,7 +162,6 @@ describe('AuthApiController', () => {
     expect(service.logout).toHaveBeenCalledWith(req.cookies.refreshToken);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
-    expect(res.send).toHaveBeenCalledWith({ message: 'Logouted succesfully' });
   });
 
   it('Should logout all users', async () => {
@@ -185,9 +185,6 @@ describe('AuthApiController', () => {
     expect(service.logoutAll).toHaveBeenCalledWith(req.user.id);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
-    expect(res.send).toHaveBeenCalledWith({
-      message: 'Logouted in all devices',
-    });
   });
 
   it('Should refresh tokens', async () => {
@@ -226,5 +223,13 @@ describe('AuthApiController', () => {
     );
 
     expect(res.send).toHaveBeenCalledWith({ message: 'Token refreshed' });
+  });
+
+  it('Should resend mail', async () => {
+    jest.spyOn(service, 'resendVerificationMail').mockResolvedValue(undefined);
+
+    await expect(
+      controller.resendEmail({ user : {id: 1}} as AuthRequest),
+    ).resolves.toEqual(undefined);
   });
 });

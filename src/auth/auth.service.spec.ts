@@ -7,7 +7,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
-import { verify } from 'crypto';
+import { User } from '@prisma/client';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -32,6 +32,7 @@ describe('AuthService', () => {
             create: jest.fn(),
             verify: jest.fn(),
             getByVerificationLink: jest.fn(),
+            getFullUserById: jest.fn(),
           },
         },
         { provide: ConfigService, useValue: { get: jest.fn() } },
@@ -44,6 +45,7 @@ describe('AuthService', () => {
             deleteAllUsersTokens: jest.fn(),
             verifyRefreshToken: jest.fn(),
             getUserTokens: jest.fn(),
+            updateTokens: jest.fn(),
           },
         },
       ],
@@ -221,7 +223,7 @@ describe('AuthService', () => {
         { id: 1, token: refreshToken, userId: 1, expiresAt: new Date() },
       ]);
 
-    jest.spyOn(tokenService, 'generateTokens').mockResolvedValue(mockTokens);
+    jest.spyOn(tokenService, 'updateTokens').mockResolvedValue(mockTokens);
 
     const tokens = await service.refreshToken(refreshToken);
 
@@ -285,5 +287,16 @@ describe('AuthService', () => {
         );
       }
     });
+  });
+
+  it('Should resend email', async () => {
+    const userId = 1;
+    jest
+      .spyOn(userService, 'getFullUserById')
+      .mockResolvedValue({ email: '123', verificationLink: '123' } as User);
+
+    await expect(service.resendVerificationMail(userId)).resolves.toEqual(
+      undefined,
+    );
   });
 });

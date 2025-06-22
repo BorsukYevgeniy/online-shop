@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';
-import { UserNoCred } from './types/user.types';
+import { UserNoCred, UserNoPassword } from './types/user.types';
 
 describe('UserService', () => {
   let service: UserService;
@@ -32,6 +32,7 @@ describe('UserService', () => {
             create: jest.fn(),
             delete: jest.fn(),
             verify: jest.fn(),
+            findFullUserById: jest.fn()
           },
         },
       ],
@@ -193,6 +194,57 @@ describe('UserService', () => {
       }
     });
   });
+
+  describe('Should find full user by id', () => {
+    it.each<[string, UserNoPassword | null]>([
+      [
+        'Should find full user by id',
+        {
+          id: 1,
+          nickname: 'test',
+          email:'123',
+          createdAt: new Date(),
+          role: Role.USER,
+          isVerified: false,
+          verifiedAt: new Date(),
+          verificationLink: '123'
+        },
+      ],
+      ['Should throw NotFoundException because user not found', null],
+    ])('%s', async (_, mockUser) => {
+      jest.spyOn(repository, 'findFullUserById').mockResolvedValue(mockUser);
+
+      if (mockUser) {
+        const user = await service.getFullUserById(mockUser.id);
+
+        expect(user).toEqual(mockUser);
+        expect(repository.findFullUserById).toHaveBeenCalledWith(mockUser.id);
+      } else {
+        await expect(service.getFullUserById(1)).rejects.toThrow(NotFoundException);
+        expect(repository.findFullUserById).toHaveBeenCalledWith(1);
+      }
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   it('Should find user by verification link', async () => {
     const mockUser = {

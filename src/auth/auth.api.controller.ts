@@ -62,26 +62,22 @@ export class AuthApiController {
   }
 
   @Post('logout')
-  @HttpCode(200)
+  @HttpCode(204)
   async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
     await this.authService.logout(req.cookies['refreshToken']);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-
-    res.send({ message: 'Logouted succesfully' });
   }
 
   @Post('logout-all')
-  @HttpCode(200)
+  @HttpCode(204)
   @UseGuards(AuthGuard)
   async logoutAll(@Req() req: AuthRequest, @Res() res: Response) {
     await this.authService.logoutAll(req.user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-
-    res.send({ message: 'Logouted in all devices' });
   }
 
   @Post('refresh')

@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserNoPasswordVLink } from './types/user.types';
 import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library';
+import { User } from '@prisma/client';
 
 describe('UserRepository', () => {
   const date = new Date();
@@ -169,6 +170,72 @@ describe('UserRepository', () => {
         },
       });
     });
+  });
+
+  it('Should find user by id', async () => {
+    const mockUser = {
+      id: 1,
+      nickname: 'test',
+      createdAt: date,
+      role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    };
+
+    jest
+      .spyOn(prismaService.user, 'findUnique')
+      .mockResolvedValue(mockUser as User);
+
+    const user = await repository.findById(1);
+
+    expect(prismaService.user.findUnique).toHaveBeenCalledWith({
+      where: { id: 1 },
+      select: {
+        createdAt: true,
+        id: true,
+        isVerified: true,
+        nickname: true,
+        role: true,
+        verifiedAt: true,
+      },
+    });
+
+    expect(user).toEqual(mockUser);
+  });
+
+  it('Should find full user by id', async () => {
+    const mockUser = {
+      id: 1,
+      nickname: '123',
+      email: '123',
+      password: 'test',
+      createdAt: date,
+      role: Role.USER,
+      isVerified: false,
+      verifiedAt: null,
+      verificationLink: '123',
+    };
+
+    jest
+      .spyOn(prismaService.user, 'findUnique')
+      .mockResolvedValue(mockUser as User);
+
+    const user = await repository.findById(1);
+
+    expect(prismaService.user.findUnique).toHaveBeenCalledWith({
+      where: { id: 1 },
+      select: {
+        createdAt: true,
+        id: true,
+        isVerified: true,
+        nickname: true,
+        role: true,
+        verifiedAt: true,
+      },
+    });
+
+    expect(user).toEqual(mockUser);
   });
 
   it('Should find user by email', async () => {

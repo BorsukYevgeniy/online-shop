@@ -309,7 +309,7 @@ describe('ProductService', () => {
         expect(repository.update).toHaveBeenCalledWith(
           mockProduct.id,
           dto,
-          files ? files.map((file) => file.filename) : [],
+          files ? files.map((file) => file.filename) : undefined,
         );
       } else if (!isProductFounded && !isSuccess) {
         jest.spyOn(repository, 'findById').mockResolvedValue(null);
