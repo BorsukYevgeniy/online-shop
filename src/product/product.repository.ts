@@ -100,7 +100,7 @@ export class ProductRepository {
   async update(
     productId: number,
     dto: UpdateProductDto,
-    imageNames?: string[],
+    imageNames: string[],
   ): Promise<ProductCategory | null> {
     return await this.prisma.product.update({
       where: { id: productId },

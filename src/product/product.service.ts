@@ -116,22 +116,21 @@ export class ProductService {
     userId: number,
     productId: number,
     updateProductDto: UpdateProductDto,
-    images?: Express.Multer.File[],
+    images: Express.Multer.File[],
   ): Promise<ProductCategory> {
     await this.validateProductOwnership(userId, productId);
 
     try {
       const imagesNames = await this.fileService.createImages(images);
-
       const product = await this.productRepository.update(
         productId,
         updateProductDto,
         imagesNames,
       );
+
       this.logger.log(
         `Product ${product.id} updated successfully by user ${userId}`,
       );
-
       return product;
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {

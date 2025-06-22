@@ -29,7 +29,6 @@ import { PaginatedProduct } from '../product/types/product.types';
 import { Role } from '../enum/role.enum';
 import { SortUserDto } from './dto/sort-user.dto';
 import { SortProductDto } from '../product/dto/sort-product.dto';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 @Controller('api/users')
 export class UserApiController {
