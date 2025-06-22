@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   UseFilters,
+  Param,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -72,6 +73,7 @@ export class AuthSsrController {
   }
 
   @Post('logout')
+  @UseGuards(AuthGuard)
   async handleLogout(
     @Req() req: AuthRequest,
     @Res() res: Response,
@@ -93,5 +95,18 @@ export class AuthSsrController {
     res.clearCookie('refreshToken');
 
     res.redirect('/');
+  }
+
+  @Get('verify/:link')
+  @Render('auth/verification')
+  async getVerifyPage(@Param('link') link: string) {
+    return { link };
+  }
+
+  @Post('verify/:link')
+  async verifyUser(@Res() res: Response, @Param('link') link: string) {
+    await this.authService.verifyUser(link);
+
+    res.redirect('/users/me');
   }
 }
