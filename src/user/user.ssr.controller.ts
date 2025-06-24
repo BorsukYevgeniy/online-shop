@@ -5,6 +5,7 @@ import {
   Req,
   Res,
   UseGuards,
+  UseInterceptors,
   Param,
   Query,
   Delete,
@@ -26,6 +27,7 @@ import { SearchUserDto } from './dto/search-user.dto';
 import { SortUserDto } from './dto/sort-user.dto';
 import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('users')
 @UseFilters(SsrExceptionFilter)
@@ -38,6 +40,7 @@ export class UserSsrController {
   @Get('')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
+  @UseInterceptors(CacheInterceptor)
   @Render('users/get-all-users')
   async getAllUsersPage(
     @Query() paginationDto: PaginationDto,
@@ -61,6 +64,7 @@ export class UserSsrController {
   @Get('search')
   @UseGuards(AuthGuard)
   @Render('users/search-user')
+
   async getSearchUserPage(
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortUserDto,
@@ -83,6 +87,7 @@ export class UserSsrController {
 
   @Get('me')
   @UseGuards(AuthGuard)
+  
   @Render('users/user-account')
   async getUserAccountPage(@Req() req: AuthRequest) {
     const user = await this.userService.getMe(req.user.id);
@@ -101,6 +106,7 @@ export class UserSsrController {
   @Get(':userId')
   @Render('users/get-user-by-id')
   @UseGuards(AuthGuard)
+  @UseInterceptors(CacheInterceptor)
   async getUserByIdPage(
     @Param('userId') userId: number,
     @Req() req: AuthRequest,
@@ -115,6 +121,7 @@ export class UserSsrController {
 
   @Get(':userId/products')
   @UseGuards(VerifiedUserGuard)
+  @UseInterceptors(CacheInterceptor)
   @Render('users/my-products')
   async getUserProducts(
     @Req() req: AuthRequest,

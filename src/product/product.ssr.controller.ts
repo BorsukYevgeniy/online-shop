@@ -29,6 +29,7 @@ import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
 import { PaginationDto } from '../dto/pagination.dto';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('products')
 @UseFilters(SsrExceptionFilter)
@@ -40,6 +41,7 @@ export class ProductSsrController {
 
   @Get()
   @Render('products/get-all-products')
+  @UseInterceptors(CacheInterceptor)
   async getAllProducts(
     @Query() sortDto: SortProductDto,
     @Query() paginationDto: PaginationDto,
@@ -63,6 +65,7 @@ export class ProductSsrController {
   }
 
   @Get('search')
+  @UseInterceptors(CacheInterceptor)
   @Render('products/search-product')
   async search(
     @Query(ValidateProductDtoPipe) searchDto: SearchProductDto,
@@ -112,6 +115,7 @@ export class ProductSsrController {
 
   @Get(':productId')
   @UseGuards(AuthGuard)
+  @UseInterceptors(CacheInterceptor)
   @Render('products/get-product-by-id')
   async getProductByIdPage(
     @Req() req: AuthRequest,

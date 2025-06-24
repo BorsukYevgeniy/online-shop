@@ -18,11 +18,26 @@ import { TokenSsrMiddleware } from './middlewares/token.ssr.middleware';
 
 import { AppSsrController } from './app.ssr.controller';
 import { IsAuthorizedMiddleware } from './middlewares/is-authorized.middleware';
+import { CacheModule } from '@nestjs/cache-manager';
+import Keyv from 'keyv';
+import KeyvRedis from '@keyv/redis';
+
 @Module({
   imports: [
     PrismaModule,
-    UserModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 60 * 1000,
+      stores: [
+        new Keyv({
+          store: new KeyvRedis({ url: process.env.REDIS_URL }),
+          useKeyPrefix: false,
+          namespace: '',
+        }),
+      ],
+    }),
+    UserModule,
     ProductModule,
     AuthModule,
     FileModule,

@@ -24,21 +24,24 @@ import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { AuthRequest } from '../types/request.type';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SortProductDto } from './dto/sort-product.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('api/products')
 export class ProductApiController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   async getAll(
+    @Query(ValidateProductDtoPipe) searchDto: SearchProductDto,
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortProductDto,
-    @Query(ValidateProductDtoPipe) searchDto: SearchProductDto,
   ): Promise<PaginatedProduct> {
     return await this.productService.getAll(paginationDto, sortDto, searchDto);
   }
 
   @Get(':productId')
+  @UseInterceptors(CacheInterceptor)
   async getById(
     @Param('productId') productId: number,
   ): Promise<ProductCategory> {

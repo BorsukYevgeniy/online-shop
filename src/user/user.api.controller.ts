@@ -9,6 +9,7 @@ import {
   Query,
   Patch,
   HttpCode,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -29,6 +30,7 @@ import { PaginatedProduct } from '../product/types/product.types';
 import { Role } from '../enum/role.enum';
 import { SortUserDto } from './dto/sort-user.dto';
 import { SortProductDto } from '../product/dto/sort-product.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('api/users')
 export class UserApiController {
@@ -38,6 +40,7 @@ export class UserApiController {
   ) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @UseGuards(AuthGuard)
   async getAll(
     @Query(ValidateUserFilterPipe) searchDto: SearchUserDto,
@@ -48,18 +51,21 @@ export class UserApiController {
   }
 
   @Get('me')
+  @UseInterceptors(CacheInterceptor)
   @UseGuards(AuthGuard)
   async getMe(@Req() req: AuthRequest): Promise<UserNoPasswordVLink> {
     return await this.userService.getMe(req.user.id);
   }
 
   @Get(':userId')
+  @UseInterceptors(CacheInterceptor)
   @UseGuards(AuthGuard)
   async getById(@Param('userId') userId: number): Promise<UserNoCred | void> {
     return await this.userService.getById(userId);
   }
 
   @Get(':userId/products')
+  @UseInterceptors(CacheInterceptor)
   @UseGuards(AuthGuard)
   async getUserProducts(
     @Param('userId') userId: number,

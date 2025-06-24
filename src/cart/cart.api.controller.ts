@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   UseGuards,
+  UseInterceptors,
   Param,
   Req,
   HttpCode,
@@ -15,6 +16,7 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { Role } from '../enum/role.enum';
 import { CartProduct } from './types/cart.type';
+import {CacheInterceptor} from '@nestjs/cache-manager'
 
 @Controller('api/cart')
 @UseGuards(VerifiedUserGuard)
@@ -23,12 +25,14 @@ export class CartApiController {
 
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
+  @UseInterceptors(CacheInterceptor)
   @Get(':cartId')
   async getCart(@Param('cartId') cartId: number): Promise<CartProduct> {
     return await this.cartService.getCart(cartId);
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   async getMyCart(@Req() req: AuthRequest): Promise<CartProduct> {
     return await this.cartService.getMyCart(req.user.id);
   }

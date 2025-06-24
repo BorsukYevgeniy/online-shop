@@ -12,6 +12,7 @@ import {
   Query,
   Body,
   UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -26,6 +27,7 @@ import { Role } from '../enum/role.enum';
 import { Response } from 'express';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('categories')
 @UseFilters(SsrExceptionFilter)
@@ -35,6 +37,7 @@ export class CategorySsrController {
   @Get()
   @Render('categories/get-all-categories')
   @UseGuards(AuthGuard)
+  @UseInterceptors(CacheInterceptor)
   async getAllCategoriesPage(
     @Req() req: AuthRequest,
     @Query() paginationDto: PaginationDto,
@@ -58,6 +61,7 @@ export class CategorySsrController {
 
   @Get('search')
   @Render('categories/search-category')
+  @UseInterceptors(CacheInterceptor)
   async getSearchCategoryPage(
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortCategoryDto,
@@ -99,12 +103,11 @@ export class CategorySsrController {
   @Get(':categoryId')
   @UseGuards(AuthGuard)
   @Render('categories/get-category-by-id')
+  @UseInterceptors(CacheInterceptor)
   async getCategoryByIdPage(
     @Req() req: AuthRequest,
     @Param('categoryId') categoryId: number,
   ) {
-    console.log(categoryId);
-
     const category = await this.categoryService.getById(Number(categoryId));
 
     return { ...category, role: req.user.role };

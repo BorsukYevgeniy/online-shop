@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   HttpCode,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -21,12 +22,15 @@ import { PaginatedCategory } from './type/category.type';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { Role } from '../enum/role.enum';
 import { SortCategoryDto } from './dto/sort-category.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+
 
 @Controller('api/categories')
 export class CategoryApiController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   async getAll(
     @Query() pagination: PaginationDto,
     @Query() sortDto: SortCategoryDto,
@@ -36,6 +40,7 @@ export class CategoryApiController {
   }
 
   @Get(':categoryId')
+  @UseInterceptors(CacheInterceptor)
   async getById(@Param('categoryId') id: number): Promise<Category> {
     return await this.categoryService.getById(id);
   }
