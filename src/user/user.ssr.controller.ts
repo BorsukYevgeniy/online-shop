@@ -116,7 +116,7 @@ export class UserSsrController {
 
     if (userId === req.user.id) return res.redirect('/users/me');
 
-    return { ...user, guestRole: req.user.role };
+    return { ...user, guestRole: req.user.role, guestId: req.user.id };
   }
 
   @Get(':userId/products')

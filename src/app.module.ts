@@ -21,6 +21,7 @@ import { IsAuthorizedMiddleware } from './middlewares/is-authorized.middleware';
 import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import KeyvRedis from '@keyv/redis';
       ],
     }),
     UserModule,
+    ChatModule,
     ProductModule,
     AuthModule,
     FileModule,

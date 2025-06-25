@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat №<%= chatId %></title>
+  <link rel="stylesheet" href="/css/products/get-all-products.css">
+  <style>
+    #messages {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    .message {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .sender {
+      font-weight: bold;
+    }
+    .time {
+      font-size: 0.8em;
+      color: gray;
+    }
+    #sendForm {
+      display: flex;
+      gap: 10px;
+    }
+    #messageInput {
+      flex: 1;
+      padding: 8px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  
+  <%- include('../partials/header.ejs') %>
+
+  <main class="results">
+    <h1>Chat №<%= chatId %></h1>
+
+    <!-- Hidden values for JS -->
+    <input type="hidden" id="userId" value="<%= userId %>">
+    <input type="hidden" id="chatId" value="<%= chatId %>">
+
+    <!-- Chat Messages -->
+    <div id="messages">
+      <% messages.forEach(m => { %>
+        <div class="message">
+          <p class="sender"><%= m.userId %>:</p>
+          <p><%= m.text %></p>
+          <!-- <p class="time"><%= new Date(m.createdAt).toLocaleString('uk-UA') %></p> -->
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Send Message -->
+    <form id="sendForm">
+      <input id="messageInput" type="text" placeholder="Введіть повідомлення..." autocomplete="off" />
+      <button type="submit">Відправити</button>
+    </form>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const socket  = io('ws://localhost:3001');
+
+    const chatId = parseInt(document.getElementById('chatId').value);
+    const userId = parseInt(document.getElementById('userId').value);
+
+    // Приєднання до кімнати
+    console.log('Connecting to room')
+    socket.emit('joinChat', chatId);
+
+    // Обробка надходження нового повідомлення
+    socket.on('chatMessage', (msg) => {
+      const div = document.createElement('div');
+      div.classList.add('message');
+      div.innerHTML = `
+        <p class="sender">${msg.userId}:</p>
+        <p>${msg.text}</p>
+        `;
+        // <p class="time">${new Date(msg.createdAt).toLocaleString('uk-UA')}</p>
+      document.getElementById('messages').appendChild(div);
+    });
+
+    // Надсилання повідомлення
+    document.getElementById('sendForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+
+      console.log('send message')
+
+      socket.emit('sendMessage', {
+        chatId,
+        userId,
+        text
+      });
+
+      input.value = '';
+    });
+  </script>
+</body>
+</html>
