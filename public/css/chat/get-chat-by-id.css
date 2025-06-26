@@ -1,0 +1,75 @@
+h1 {
+  padding-top: 10px;
+  padding-bottom: 5px;
+  text-align: center;
+}
+
+
+
+#messageInput {
+  max-width: 300px;
+
+}
+
+
+.updateButton , .deleteButton{
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+
+}
+
+.updateButton {
+  margin-right: 3px;
+  background-color: rgb(255, 196, 0);
+  color: white;
+}
+
+.updateButton:hover {
+  background-color: rgb(224, 173, 3);
+  transition: background-color 0.3s ease;
+}
+
+.deleteButton {
+  background-color: #f44336;
+  color: white;
+}
+.deleteButton:hover {
+  background-color: #c53228;
+  transition: background-color 0.3s ease;
+}
+
+
+
+#messages {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+.message {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+.sender {
+  font-weight: bold;
+}
+.time {
+  font-size: 0.8em;
+  color: gray;
+}
+#sendForm {
+  display: flex;
+  gap: 10px;
+}
+#messageInput {
+  flex: 1;
+  padding: 8px;
+  font-size: 1em;
+}

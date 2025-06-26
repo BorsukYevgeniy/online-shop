@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class ChatRepository {
@@ -24,9 +25,19 @@ export class ChatRepository {
     });
   }
 
+  async deleteMessage(messageId: number) {
+    return await this.prisma.message.delete({ where: { id: messageId } });
+  }
 
-  async getMessagesByChatId(chatId:number){
-    return await this.prisma.message.findMany({where: {chatId}})
+  async updateMessage(messageId: number, updateDto: UpdateMessageDto) {
+    return await this.prisma.message.update({
+      where: { id: messageId },
+      data: { text: updateDto.text },
+    });
+  }
+
+  async getMessagesByChatId(chatId: number) {
+    return await this.prisma.message.findMany({ where: { chatId } });
   }
 
   async createChat(createDto: CreateChatDto) {

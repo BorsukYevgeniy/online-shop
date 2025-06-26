@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 
 @Injectable()
@@ -18,6 +19,15 @@ export class ChatService {
 
   async createMessage(createDto:CreateMessageDto){
     return await this.chatRepository.createMessage(createDto)
+  }
+
+  async updateMesssage(messageId: number , updateDto: UpdateMessageDto) {
+    return await this.chatRepository.updateMessage(messageId,updateDto)
+  }
+
+
+  async deleteMessage(messageId: number) {
+    return await this.chatRepository.deleteMessage(messageId)
   }
 
 }

@@ -9,23 +9,22 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
-@WebSocketGateway(+process.env.SOCKET_PORT,{ cors: true })
-export class ChatGateway implements OnGatewayConnection{
+@WebSocketGateway({ cors: true })
+export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
   constructor(private readonly chatService: ChatService) {}
-  handleConnection(client: any, ...args: any[]) {
-  }
+  handleConnection(client: any, ...args: any[]) {}
 
   @SubscribeMessage('joinChat')
-  handleJoinChat(
+  async handleJoinChat(
     @MessageBody() chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
     client.join(`chat-${chatId}`);
-    console.log(`Клієнт ${client.id} приєднався до кімнати chat-${chatId}`);
   }
 
   @SubscribeMessage('sendMessage')
@@ -33,9 +32,30 @@ export class ChatGateway implements OnGatewayConnection{
     @MessageBody() body: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const newMessage = await this.chatService.createMessage(body);
+    const message = await this.chatService.createMessage(body);
 
-    this.server.to(`chat-${body.chatId}`).emit('chatMessage', newMessage);
+    this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);
   }
 
+  @SubscribeMessage('updateMessage')
+  async handleUpdateMessage(
+    @MessageBody() body: { id: number; chatId: number } & UpdateMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const newMessage = await this.chatService.updateMesssage(body.id, {
+      text: body.text,
+    });
+
+    this.server.to(`chat-${body.chatId}`).emit('chatUpdateMessage', newMessage);
+  }
+
+  @SubscribeMessage('deleteMessage')
+  async handleDeleteMessage(
+    @MessageBody() body: { id: number; chatId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const message = await this.chatService.deleteMessage(body.id);
+
+    this.server.to(`chat-${body.chatId}`).emit('chatDeleteMessage', message);
+  }
 }
