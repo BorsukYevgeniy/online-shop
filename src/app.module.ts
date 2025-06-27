@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
@@ -9,6 +10,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { TokenModule } from './token/token.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CartModule } from './cart/cart.module';
+import { ChatModule } from './chat/chat.module';
+import { MessageModule } from './message/message.module';
 
 import { join as joinPath } from 'path';
 import { CategoryModule } from './category/category.module';
@@ -18,10 +21,10 @@ import { TokenSsrMiddleware } from './middlewares/token.ssr.middleware';
 
 import { AppSsrController } from './app.ssr.controller';
 import { IsAuthorizedMiddleware } from './middlewares/is-authorized.middleware';
+
 import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
-import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -39,6 +42,7 @@ import { ChatModule } from './chat/chat.module';
       ],
     }),
     UserModule,
+    MessageModule,
     ChatModule,
     ProductModule,
     AuthModule,

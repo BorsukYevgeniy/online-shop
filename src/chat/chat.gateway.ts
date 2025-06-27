@@ -8,15 +8,16 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { MessageService } from 'src/message/message.service';
+import { CreateMessageDto } from 'src/message/dto/create-message.dto';
+import { UpdateMessageDto } from 'src/message/dto/update-message.dto';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService, private readonly messageService: MessageService) {}
   handleConnection(client: any, ...args: any[]) {}
 
   @SubscribeMessage('joinChat')
@@ -32,7 +33,7 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() body: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) { 
-    const message = await this.chatService.createMessage(body);
+    const message = await this.messageService.createMessage(body);
 
     this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);
   }
@@ -42,7 +43,7 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() body: { id: number; chatId: number } & UpdateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const newMessage = await this.chatService.updateMesssage(body.id, {
+    const newMessage = await this.messageService.updateMesssage(body.id, {
       text: body.text,
     });
 
@@ -54,7 +55,7 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() body: { id: number; chatId: number },
     @ConnectedSocket() client: Socket,
   ) {
-    const message = await this.chatService.deleteMessage(body.id);
+    const message = await this.messageService.deleteMessage(body.id);
 
     this.server.to(`chat-${body.chatId}`).emit('chatDeleteMessage', message);
   }

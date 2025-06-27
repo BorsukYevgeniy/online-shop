@@ -5,9 +5,10 @@ import { ChatService } from './chat.service';
 import { ChatRepository } from './chat.repository';
 import { ChatSsrController } from './chat-ssr.controller';
 import { ChatGateway } from './chat.gateway';
+import { MessageModule } from 'src/message/message.module';
 
 @Module({
-  imports: [TokenModule, PrismaModule],
+  imports: [TokenModule, PrismaModule, MessageModule],
   controllers: [ChatSsrController],
   providers: [ChatService, ChatRepository, ChatGateway],
 })
