@@ -1,13 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { CreateMessageDto } from "./dto/create-message.dto";
 import { UpdateMessageDto } from "./dto/update-message.dto";
+
+import { Message } from "@prisma/client";
+import { MessageNickname } from "./types/message.type";
 
 @Injectable()
 export class MessageRepository {
   constructor(private readonly prisma: PrismaService){}
 
-  async createMessage(createDto: CreateMessageDto) {
+  async createMessage(createDto: CreateMessageDto): Promise<MessageNickname> {
       return await this.prisma.message.create({
         data: {
           text: createDto.text,
@@ -25,11 +28,11 @@ export class MessageRepository {
       });
     }
   
-    async deleteMessage(messageId: number) {
+    async deleteMessage(messageId: number): Promise<Message> {
       return await this.prisma.message.delete({ where: { id: messageId } });
     }
   
-    async updateMessage(messageId: number, updateDto: UpdateMessageDto) {
+    async updateMessage(messageId: number, updateDto: UpdateMessageDto): Promise<MessageNickname> {
       return await this.prisma.message.update({
         where: { id: messageId },
         data: { text: updateDto.text },
