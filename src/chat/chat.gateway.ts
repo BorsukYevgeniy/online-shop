@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayConnection {
   async handleSendMessage(
     @MessageBody() body: CreateMessageDto,
     @ConnectedSocket() client: Socket,
-  ) {
+  ) { 
     const message = await this.chatService.createMessage(body);
 
     this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);

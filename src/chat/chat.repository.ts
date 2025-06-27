@@ -8,10 +8,44 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getUserChats(userId: number) {
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        users: { some: { id: userId } },
+      },
+      select: {
+        id: true,
+        users: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+      },
+    });
+
+    return chats.map(chat => ({
+      id: chat.id,
+      withWhom: chat.users.find(user => user.id !== userId)?.nickname || 'Невідомо'
+    }));
+
+  }
+
   async getChatById(id: number) {
     return await this.prisma.chat.findUnique({
       where: { id },
-      include: { messages: true },
+      select: {
+        id: true,
+        messages: {
+          select: {
+            userId: true,
+            id: true,
+            text: true,
+            chatId: true,
+            user: { select: { nickname: true } },
+          },
+        },
+      },
     });
   }
 
@@ -21,6 +55,14 @@ export class ChatRepository {
         text: createDto.text,
         chatId: createDto.chatId,
         userId: createDto.userId,
+      },
+
+      select: {
+        id: true,
+        chatId: true,
+        text: true,
+        userId: true,
+        user: { select: { nickname: true } },
       },
     });
   }
@@ -33,6 +75,14 @@ export class ChatRepository {
     return await this.prisma.message.update({
       where: { id: messageId },
       data: { text: updateDto.text },
+
+      select: {
+        id: true,
+        chatId: true,
+        text: true,
+        userId: true,
+        user: { select: { nickname: true } },
+      },
     });
   }
 

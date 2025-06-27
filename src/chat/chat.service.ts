@@ -9,13 +9,18 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 export class ChatService {
   constructor(private readonly chatRepository: ChatRepository) {}
 
-  async createChat(createDto: CreateChatDto) {
-    return await this.chatRepository.createChat(createDto);
+  async getUserChats(userId:number){
+    return await this.chatRepository.getUserChats(userId)
   }
 
   async getChatById(id: number){
     return await this.chatRepository.getChatById(id)
   }
+
+  async createChat(createDto: CreateChatDto) {
+    return await this.chatRepository.createChat(createDto);
+  }
+
 
   async createMessage(createDto:CreateMessageDto){
     return await this.chatRepository.createMessage(createDto)

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My chats</title>
+  <link rel="stylesheet" href="/css/users/my-chats.css" type="text/css" />
+</head>
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <h1>My chats:</h1>
+
+  <main>
+    <% chats.forEach(c => { %>
+      <div class="chats">
+        <div><strong>Title:</strong> 
+          <a href="/chats/<%= c.id %>">Chat with <%= c.withWhom  %></a>
+        </div>
+      </div>
+    <% }) %>
+  </main>
+
+</body>
+</html>

@@ -35,6 +35,8 @@ document.querySelectorAll('.deleteButton').forEach((button) => {
     //Getting id from button element
     const messageId = button.id.split('-')[1];
 
+    console.log(button);
+
     socket.emit('deleteMessage', {
       id: parseInt(messageId),
       chatId,
@@ -64,6 +66,8 @@ document.querySelectorAll('.updateButton').forEach((button) => {
 // Rendering new messages
 socket.on('chatMessage', (msg) => {
   // Creating new messages
+
+  console.log(msg)
 
   const div = document.createElement('div');
   div.classList.add('message');

@@ -15,7 +15,7 @@ import { Response } from 'express';
 import { AuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthRequest } from 'src/types/request.type';
 
-@Controller('chat')
+@Controller('chats')
 export class ChatSsrController {
   constructor(private readonly chatService: ChatService) {}
 
@@ -23,11 +23,19 @@ export class ChatSsrController {
   async createChat(@Body() createDto: CreateChatDto, @Res() res: Response) {
     const chat = await this.chatService.createChat(createDto);
 
-    console.log(createDto)
-
-
-    res.redirect(`/chat/${chat.id}`);
+    res.redirect(`/chats/${chat.id}`);
   }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  @Render('users/my-chats')
+  async getAllChats(@Req() req: AuthRequest){
+    const chats = await this.chatService.getUserChats(req.user.id)
+    
+    return {chats}
+  }
+
+
 
   @Get(':chatId')
   @UseGuards(AuthGuard)
