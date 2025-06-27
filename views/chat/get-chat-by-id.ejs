@@ -21,7 +21,7 @@
     <div id="messages">
       <% messages.forEach(m => { %>
         <div class="message" id="message-<%= m.id %>">
-          <p class="sender"><%= m.userId %>:</p>
+          <p class="sender"><%= m.user.nickname %>:</p>
           <p class="text"><%= m.text %></p>
 
           <br>
