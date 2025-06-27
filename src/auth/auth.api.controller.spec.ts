@@ -229,7 +229,7 @@ describe('AuthApiController', () => {
     jest.spyOn(service, 'resendVerificationMail').mockResolvedValue(undefined);
 
     await expect(
-      controller.resendEmail({ user : {id: 1}} as AuthRequest),
+      controller.resendEmail({ user: { id: 1 } } as AuthRequest),
     ).resolves.toEqual(undefined);
   });
 });

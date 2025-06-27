@@ -64,7 +64,6 @@ export class UserSsrController {
   @Get('search')
   @UseGuards(AuthGuard)
   @Render('users/search-user')
-
   async getSearchUserPage(
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortUserDto,
@@ -87,7 +86,6 @@ export class UserSsrController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  
   @Render('users/user-account')
   async getUserAccountPage(@Req() req: AuthRequest) {
     const user = await this.userService.getMe(req.user.id);

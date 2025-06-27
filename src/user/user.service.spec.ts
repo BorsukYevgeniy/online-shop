@@ -32,7 +32,7 @@ describe('UserService', () => {
             create: jest.fn(),
             delete: jest.fn(),
             verify: jest.fn(),
-            findFullUserById: jest.fn()
+            findFullUserById: jest.fn(),
           },
         },
       ],
@@ -202,12 +202,12 @@ describe('UserService', () => {
         {
           id: 1,
           nickname: 'test',
-          email:'123',
+          email: '123',
           createdAt: new Date(),
           role: Role.USER,
           isVerified: false,
           verifiedAt: new Date(),
-          verificationLink: '123'
+          verificationLink: '123',
         },
       ],
       ['Should throw NotFoundException because user not found', null],
@@ -220,31 +220,13 @@ describe('UserService', () => {
         expect(user).toEqual(mockUser);
         expect(repository.findFullUserById).toHaveBeenCalledWith(mockUser.id);
       } else {
-        await expect(service.getFullUserById(1)).rejects.toThrow(NotFoundException);
+        await expect(service.getFullUserById(1)).rejects.toThrow(
+          NotFoundException,
+        );
         expect(repository.findFullUserById).toHaveBeenCalledWith(1);
       }
     });
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   it('Should find user by verification link', async () => {
     const mockUser = {

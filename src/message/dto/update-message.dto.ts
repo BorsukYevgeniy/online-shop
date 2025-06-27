@@ -1,3 +1,3 @@
 export class UpdateMessageDto {
-  text: string
+  text: string;
 }

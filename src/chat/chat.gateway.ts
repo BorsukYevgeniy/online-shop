@@ -26,9 +26,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('sendMessage')
-  async handleSendMessage(
-    @MessageBody() body: CreateMessageDto,
-  ) { 
+  async handleSendMessage(@MessageBody() body: CreateMessageDto) {
     const message = await this.messageService.createMessage(body);
 
     this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);

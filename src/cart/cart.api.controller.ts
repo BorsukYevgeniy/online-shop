@@ -16,7 +16,7 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { Role } from '../enum/role.enum';
 import { CartProduct } from './types/cart.type';
-import {CacheInterceptor} from '@nestjs/cache-manager'
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('api/cart')
 @UseGuards(VerifiedUserGuard)

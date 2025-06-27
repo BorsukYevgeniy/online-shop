@@ -24,7 +24,6 @@ import { Role } from '../enum/role.enum';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-
 @Controller('api/categories')
 export class CategoryApiController {
   constructor(private readonly categoryService: CategoryService) {}

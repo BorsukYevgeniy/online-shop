@@ -54,8 +54,7 @@ export class UserService {
     };
   }
 
-
-  async getFullUserById(userId: number){
+  async getFullUserById(userId: number) {
     const user = await this.userRepository.findFullUserById(userId);
 
     if (!user) {
@@ -67,14 +66,8 @@ export class UserService {
     return user;
   }
 
-  async getById(
-    userId: number,
-  ): Promise<
-    UserNoCred 
-  > {
-    const user: UserNoCred | null = await this.userRepository.findById(
-      userId,
-    );
+  async getById(userId: number): Promise<UserNoCred> {
+    const user: UserNoCred | null = await this.userRepository.findById(userId);
 
     if (!user) {
       this.logger.warn(`User ${userId} doesnt exist`);

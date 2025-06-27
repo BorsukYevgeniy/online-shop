@@ -16,7 +16,9 @@ import { FileErrorMessages as FileErrMsg } from './enum/file-error-messages.enum
 export class FileService {
   private readonly logger: Logger = new Logger(FileService.name);
 
-  async createImages(images: Express.Multer.File[]): Promise<string[] | undefined> {
+  async createImages(
+    images: Express.Multer.File[],
+  ): Promise<string[] | undefined> {
     if (!images || images.length < 1) return undefined;
 
     try {

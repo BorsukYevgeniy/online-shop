@@ -1,5 +1,5 @@
 export class CreateMessageDto {
-  chatId: number
-  userId: number
-  text: string
+  chatId: number;
+  userId: number;
+  text: string;
 }

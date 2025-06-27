@@ -116,29 +116,24 @@ export class UserRepository {
     });
   }
 
+  async findFullUserById(userId: number): Promise<UserNoPassword> {
+    return await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        nickname: true,
+        createdAt: true,
+        isVerified: true,
+        verifiedAt: true,
+        role: true,
 
-  async findFullUserById(userId: number):Promise<UserNoPassword>{
-  return await this.prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      nickname: true,
-      createdAt: true,
-      isVerified: true,
-      verifiedAt: true,
-      role: true,
-
-      email: true,
-      verificationLink: true,
-    },
-  });
-
+        email: true,
+        verificationLink: true,
+      },
+    });
   }
 
-
-  async findById(
-    userId: number,
-  ): Promise<UserNoCred | null> {
+  async findById(userId: number): Promise<UserNoCred | null> {
     return await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -150,7 +145,6 @@ export class UserRepository {
         role: true,
       },
     });
-
   }
 
   async findUserProfile(userId: number): Promise<UserNoPasswordVLink | null> {

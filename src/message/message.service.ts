@@ -14,7 +14,10 @@ export class MessageService {
     return await this.messageRepository.createMessage(createDto);
   }
 
-  async updateMesssage(messageId: number, updateDto: UpdateMessageDto): Promise<MessageNickname> {
+  async updateMesssage(
+    messageId: number,
+    updateDto: UpdateMessageDto,
+  ): Promise<MessageNickname> {
     return await this.messageRepository.updateMessage(messageId, updateDto);
   }
 

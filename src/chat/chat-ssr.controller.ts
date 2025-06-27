@@ -19,7 +19,7 @@ import { AuthRequest } from 'src/types/request.type';
 export class ChatSsrController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Post('')
+  @Post()
   async createChat(@Body() createDto: CreateChatDto, @Res() res: Response) {
     const chat = await this.chatService.createChat(createDto);
 
@@ -29,13 +29,11 @@ export class ChatSsrController {
   @Get()
   @UseGuards(AuthGuard)
   @Render('users/my-chats')
-  async getAllChats(@Req() req: AuthRequest){
-    const chats = await this.chatService.getUserChats(req.user.id)
-    
-    return {chats}
+  async getAllChats(@Req() req: AuthRequest) {
+    const chats = await this.chatService.getUserChats(req.user.id);
+
+    return { chats };
   }
-
-
 
   @Get(':chatId')
   @UseGuards(AuthGuard)

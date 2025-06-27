@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 
-import {Chat} from '@prisma/client';
+import { Chat } from '@prisma/client';
 import { ChatMessages, UserChat } from './types/chat.types';
 
 @Injectable()
@@ -25,11 +25,11 @@ export class ChatRepository {
       },
     });
 
-    return chats.map(chat => ({
+    return chats.map((chat) => ({
       id: chat.id,
-      withWhom: chat.users.find(user => user.id !== userId)?.nickname || 'Невідомо'
+      withWhom:
+        chat.users.find((user) => user.id !== userId)?.nickname || 'Невідомо',
     }));
-
   }
 
   async getChatById(id: number): Promise<ChatMessages> {
@@ -50,7 +50,6 @@ export class ChatRepository {
     });
   }
 
-  
   async createChat(createDto: CreateChatDto): Promise<Chat> {
     return await this.prisma.chat.create({
       data: {

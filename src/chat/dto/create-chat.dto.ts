@@ -1,4 +1,4 @@
-export class CreateChatDto{
-  sellerId: number
-  buyerId: number
+export class CreateChatDto {
+  sellerId: number;
+  buyerId: number;
 }
