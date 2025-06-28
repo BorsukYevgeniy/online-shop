@@ -59,4 +59,8 @@ export class ChatRepository {
       },
     });
   }
+
+  async deleteChat(chatId: number) {
+    return await this.prisma.chat.delete({ where: { id: chatId } });
+  }
 }

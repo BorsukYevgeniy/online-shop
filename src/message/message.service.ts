@@ -10,6 +10,10 @@ import { MessageNickname } from './types/message.type';
 export class MessageService {
   constructor(private readonly messageRepository: MessageRepository) {}
 
+  async getMessagesByChatId(chatId: number): Promise<Message[]> {
+    return await this.messageRepository.getMessagesByChatId(chatId);
+  }
+
   async createMessage(createDto: CreateMessageDto): Promise<MessageNickname> {
     return await this.messageRepository.createMessage(createDto);
   }

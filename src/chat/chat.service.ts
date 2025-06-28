@@ -19,4 +19,10 @@ export class ChatService {
   async createChat(createDto: CreateChatDto): Promise<Chat> {
     return await this.chatRepository.createChat(createDto);
   }
+
+  async deleteChat(chatId: number){
+    return await this.chatRepository.deleteChat(chatId)
+  }
+
 }
+

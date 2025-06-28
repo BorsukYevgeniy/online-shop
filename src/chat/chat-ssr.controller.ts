@@ -12,10 +12,11 @@ import {
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Response } from 'express';
-import { AuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthRequest } from 'src/types/request.type';
+import { VerifiedUserGuard } from 'src/auth/guards/verified-user.guard';
 
 @Controller('chats')
+@UseGuards(VerifiedUserGuard)
 export class ChatSsrController {
   constructor(private readonly chatService: ChatService) {}
 
@@ -27,7 +28,6 @@ export class ChatSsrController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
   @Render('users/my-chats')
   async getAllChats(@Req() req: AuthRequest) {
     const chats = await this.chatService.getUserChats(req.user.id);
@@ -36,7 +36,6 @@ export class ChatSsrController {
   }
 
   @Get(':chatId')
-  @UseGuards(AuthGuard)
   @Render('chat/get-chat-by-id')
   async getChatById(@Param('chatId') chatId: number, @Req() req: AuthRequest) {
     const chat = await this.chatService.getChatById(chatId);
