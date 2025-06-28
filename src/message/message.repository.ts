@@ -10,12 +10,20 @@ import { MessageNickname } from './types/message.type';
 export class MessageRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createMessage(createDto: CreateMessageDto): Promise<MessageNickname> {
+  async getMessageById(messageId: number) {
+    return await this.prisma.message.findUnique({ where: { id: messageId } });
+  }
+
+  async createMessage(
+    createDto: CreateMessageDto,
+    chatId: number,
+    userId: number,
+  ): Promise<MessageNickname> {
     return await this.prisma.message.create({
       data: {
         text: createDto.text,
-        chatId: createDto.chatId,
-        userId: createDto.userId,
+        chatId: chatId,
+        userId: userId,
       },
 
       select: {

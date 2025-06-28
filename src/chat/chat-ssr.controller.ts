@@ -12,8 +12,8 @@ import {
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Response } from 'express';
-import { AuthRequest } from 'src/types/request.type';
-import { VerifiedUserGuard } from 'src/auth/guards/verified-user.guard';
+import { AuthRequest } from '../types/request.type';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 @Controller('chats')
 @UseGuards(VerifiedUserGuard)

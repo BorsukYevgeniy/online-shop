@@ -9,7 +9,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { MessageService } from '../message/message.service';
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
