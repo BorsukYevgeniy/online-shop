@@ -30,11 +30,11 @@
     <div class="user-actions">
       <a href="/users/<%= id %>/products" class="btn get-all-products">Get all user products</a>
 
-      <form action="/chat" method="post">
+      <form action="/chats" method="post">
         <input type="number" value="<%= id%>" name="sellerId" hidden>
         <input type="number" value="<%= guestId%>" name="buyerId" hidden>
 
-        <button type="submit">Написати <%= nickname%></button>
+        <button type="submit" class="btn" id="send">Написати <%= nickname%></button>
       </form>
 
 

@@ -117,3 +117,13 @@ h1{
   background-color: rgb(199, 199, 1);
   transition: background-color 0.3s ease;
 }
+
+#send {
+  background-color: rgb(25, 216, 0);
+  color: white
+}
+
+#send:hover {
+  background-color: rgb(22, 185, 0);
+  transition: background-color 0.3s ease;
+}
