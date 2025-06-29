@@ -9,15 +9,18 @@ import {
   Param,
   Body,
   Render,
+  UseFilters,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Response } from 'express';
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
 
 @Controller('chats')
 @UseGuards(VerifiedUserGuard)
+@UseFilters(SsrExceptionFilter)
 export class ChatSsrController {
   constructor(private readonly chatService: ChatService) {}
 
@@ -45,20 +48,12 @@ export class ChatSsrController {
   }
 
   @Delete(':chatId')
-  async handleDeleteChat(@Param('chatId') chatId: number, @Res() res: Response) {
-    await this.chatService.deleteChat(chatId)
+  async handleDeleteChat(
+    @Param('chatId') chatId: number,
+    @Res() res: Response,
+  ) {
+    await this.chatService.deleteChat(chatId);
 
-    res.redirect('/chats')
+    res.redirect('/chats');
   }
-
-
-
-
-
-
-
-
-
-
-
 }
