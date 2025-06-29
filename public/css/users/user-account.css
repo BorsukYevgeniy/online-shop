@@ -64,6 +64,6 @@ main > div {
   background-color: #0056b3;
 }
 
-#cartIdInput {
+#cartIdInput, #chatIdInput {
   border: none;
 }

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All messages of chat №<%- chatId %></title>
+  <link rel="stylesheet" href="/css/message/get-all-messages.css">
+</head>
+<body>
+  
+  <%- include('../partials/header.ejs') %>
+
+  <main class="results">
+    <h1>All messages: </h1>
+
+    <% if (messages && messages.length > 0) { %>
+      <% messages.forEach(m => { %>
+        <article class="message">
+          <div class="message-details">
+            <p><strong>User: <a href="<%= m.userId %>"><%= m.user.nickname %></a></strong></p> 
+            <p><strong>Text: </strong> <%= m.text %></p>
+          </div>
+        </article>
+      <% }) %>
+    <% } else { %>
+      <p>No messages found.</p>
+    <% } %>
+  </main>
+
+</body>
+</html>

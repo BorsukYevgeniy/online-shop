@@ -18,7 +18,7 @@ import { Role } from '../enum/role.enum';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 
-@Controller('api/chat/:chatId/messages')
+@Controller('api/chats/:chatId/messages')
 @UseGuards(VerifiedUserGuard)
 export class ChatMessageApiController {
   constructor(private readonly messageService: MessageService) {}

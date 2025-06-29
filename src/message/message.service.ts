@@ -14,7 +14,7 @@ export class MessageService {
     return await this.messageRepository.getMessageById(messageId);
   }
 
-  async getMessagesByChatId(chatId: number): Promise<Message[]> {
+  async getMessagesByChatId(chatId: number): Promise<MessageNickname[]> {
     return await this.messageRepository.getMessagesByChatId(chatId);
   }
 

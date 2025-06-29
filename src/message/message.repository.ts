@@ -58,7 +58,16 @@ export class MessageRepository {
     });
   }
 
-  async getMessagesByChatId(chatId: number) {
-    return await this.prisma.message.findMany({ where: { chatId } });
+  async getMessagesByChatId(chatId: number): Promise<MessageNickname[]> {
+    return await this.prisma.message.findMany({
+      where: { chatId },
+      select: {
+        id: true,
+        chatId: true,
+        text: true,
+        userId: true,
+        user: { select: { nickname: true } },
+      },
+    });
   }
 }
