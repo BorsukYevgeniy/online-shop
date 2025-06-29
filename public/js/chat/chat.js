@@ -67,15 +67,13 @@ document.querySelectorAll('.updateButton').forEach((button) => {
 socket.on('chatMessage', (msg) => {
   // Creating new messages
 
-  console.log(msg)
-
   const div = document.createElement('div');
   div.classList.add('message');
   div.id = `message-${msg.id}`;
 
   const sender = document.createElement('p');
   sender.classList.add('sender');
-  sender.textContent = `${msg.userId}:`;
+  sender.textContent = `${msg.user.nickname}:`;
 
   const text = document.createElement('p');
   text.classList.add('text');
