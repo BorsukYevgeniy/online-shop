@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Delete,
   UseGuards,
   Req,
   Res,
@@ -42,4 +43,22 @@ export class ChatSsrController {
 
     return { chatId: chat.id, messages: chat.messages, userId: req.user.id };
   }
+
+  @Delete(':chatId')
+  async handleDeleteChat(@Param('chatId') chatId: number, @Res() res: Response) {
+    await this.chatService.deleteChat(chatId)
+
+    res.redirect('/chats')
+  }
+
+
+
+
+
+
+
+
+
+
+
 }

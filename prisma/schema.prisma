@@ -88,6 +88,6 @@ model Message {
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  Chat   Chat @relation(fields: [chatId], references: [id])
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId Int
 }

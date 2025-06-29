@@ -18,8 +18,17 @@
         <div><strong>Title:</strong> 
           <a href="/chats/<%= c.id %>">Chat with <%= c.withWhom  %></a>
         </div>
+    
+        <div class="chat-actions">
+          <form action="/chats/<%= c.id %>?_method=DELETE" method="post" class="delete-form">
+            <button type="submit" class="btn" id="btn-delete">Delete</button>
+          </form>
+        </div>
       </div>
     <% }) %>
+
+
+    
   </main>
 
 </body>
