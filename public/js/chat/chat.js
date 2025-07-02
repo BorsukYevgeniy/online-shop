@@ -35,10 +35,8 @@ document.querySelectorAll('.deleteButton').forEach((button) => {
     //Getting id from button element
     const messageId = button.id.split('-')[1];
 
-    console.log(button);
-
     socket.emit('deleteMessage', {
-      id: parseInt(messageId),
+      messageId: parseInt(messageId),
       chatId,
     });
   });
@@ -56,7 +54,7 @@ document.querySelectorAll('.updateButton').forEach((button) => {
     if (!newText || newText.trim() === '') return;
 
     socket.emit('updateMessage', {
-      id: parseInt(messageId),
+      messageId: parseInt(messageId),
       chatId,
       text: newText.trim(),
     });
@@ -105,7 +103,7 @@ socket.on('chatMessage', (msg) => {
       if (!newText || newText.trim() === '') return;
 
       socket.emit('updateMessage', {
-        id: parseInt(msg.id),
+        messageId: parseInt(msg.id),
         chatId,
         text: newText.trim(),
       });
@@ -115,7 +113,7 @@ socket.on('chatMessage', (msg) => {
     deleteButton.addEventListener('click', (e) => {
       e.preventDefault();
       socket.emit('deleteMessage', {
-        id: parseInt(msg.id),
+        messageId: parseInt(msg.id),
         chatId,
       });
     });
@@ -143,4 +141,12 @@ document.getElementById('sendForm').addEventListener('submit', (e) => {
   });
 
   input.value = '';
+});
+
+// Handling errors
+
+socket.on('error', (err) => {
+  const { errorCode, message } = err;
+
+  window.location.href = `/errors/${errorCode}?message=${message}`;
 });

@@ -6,20 +6,33 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-@Catch(HttpException)
-export class SsrExceptionFilter implements ExceptionFilter<HttpException> {
-  catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
+import { WsException } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 
-    const res = ctx.getResponse<Response>();
+@Catch(HttpException, WsException)
+export class SsrExceptionFilter
+  implements ExceptionFilter<HttpException | WsException>
+{
+  catch(exception: HttpException | WsException, host: ArgumentsHost) {
+    if (exception instanceof HttpException) {
+      const ctx = host.switchToHttp();
 
-    const status = exception.getStatus();
-    const message = exception.message || 'Сталася помилка';
+      const res = ctx.getResponse<Response>();
 
-    if (status === 401) {
-      return res.redirect('/login');
+      const status = exception.getStatus();
+      const message = exception.message || 'Сталася помилка';
+
+      if (status === 401) {
+        return res.redirect('/login');
+      }
+
+      res.redirect(`/errors/${status}?message=${message}`);
+    } else {
+      const ctx = host.switchToWs();
+
+      const client = ctx.getClient<Socket>();
+
+      client.emit('error', exception.getError());
     }
-
-    res.status(status).render(`errors/${status}.ejs`, { status, message });
   }
 }

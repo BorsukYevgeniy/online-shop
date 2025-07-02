@@ -26,6 +26,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
 
+import { ErrorModule } from './error/error.module';
+
 @Module({
   imports: [
     PrismaModule,
@@ -47,6 +49,7 @@ import KeyvRedis from '@keyv/redis';
     ProductModule,
     AuthModule,
     FileModule,
+    ErrorModule,
     ServeStaticModule.forRoot({
       rootPath: joinPath(__dirname, '..', 'images'),
     }),
