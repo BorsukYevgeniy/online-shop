@@ -6,16 +6,22 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MessageService } from 'src/message/message.service';
-import { CreateMessageDto } from 'src/message/dto/create-message.dto';
-import { UpdateMessageDto } from 'src/message/dto/update-message.dto';
+import { MessageService } from '../message/message.service';
+import { CreateMessageDto } from '../message/dto/create-message.dto';
+import { UpdateMessageDto } from '../message/dto/update-message.dto';
+import { TokenService } from '../token/token.service';
+
 
 @WebSocketGateway({ cors: true })
-export class ChatGateway {
+export class ChatGateway{
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly tokenService: TokenService,
+  ) {}
+
 
   @SubscribeMessage('joinChat')
   async handleJoinChat(
@@ -27,15 +33,23 @@ export class ChatGateway {
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
-    @MessageBody() body: CreateMessageDto & { userId: number; chatId: number },
+    @MessageBody() body: CreateMessageDto & {chatId: number},
+    @ConnectedSocket() client: Socket,
   ) {
+
+    const accessToken = client.handshake.headers.cookie
+      .split('; ')[0]
+      .split('=')[1];
+
+    const {id: userId} = await this.tokenService.verifyAccessToken(accessToken)
+
     const message = await this.messageService.createMessage(
       { text: body.text },
       body.chatId,
-      body.userId,
+      userId,
     );
 
-    this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);
+    this.server.to(`chat-3`).emit('chatMessage', message);
   }
 
   @SubscribeMessage('updateMessage')

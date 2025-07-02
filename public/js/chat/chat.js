@@ -139,7 +139,6 @@ document.getElementById('sendForm').addEventListener('submit', (e) => {
 
   socket.emit('sendMessage', {
     chatId,
-    userId,
     text,
   });
 
