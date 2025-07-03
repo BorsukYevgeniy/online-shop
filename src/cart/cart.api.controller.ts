@@ -23,10 +23,10 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 export class CartApiController {
   constructor(private readonly cartService: CartService) {}
 
+  @Get(':cartId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
-  @Get(':cartId')
   async getCart(@Param('cartId') cartId: number): Promise<CartProduct> {
     return await this.cartService.getCart(cartId);
   }

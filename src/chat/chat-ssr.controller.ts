@@ -10,6 +10,7 @@ import {
   Body,
   Render,
   UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -18,6 +19,7 @@ import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('chats')
 @UseGuards(VerifiedUserGuard)
@@ -37,6 +39,7 @@ export class ChatSsrController {
 
   @Get()
   @Render('users/my-chats')
+  @UseInterceptors(CacheInterceptor)
   async getAllChats(@Req() req: AuthRequest) {
     const chats = await this.chatService.getUserChats(req.user.id);
 

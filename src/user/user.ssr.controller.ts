@@ -66,6 +66,7 @@ export class UserSsrController {
   @Get('search')
   @UseGuards(AuthGuard)
   @Render('users/search-user')
+  @UseInterceptors(CacheInterceptor)
   async getSearchUserPage(
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortUserDto,
@@ -89,6 +90,7 @@ export class UserSsrController {
   @Get('me')
   @UseGuards(AuthGuard)
   @Render('users/user-account')
+  @UseInterceptors(CacheInterceptor)
   async getUserAccountPage(@Req() req: AuthRequest) {
     const user = await this.userService.getMe(req.user.id);
 
@@ -114,11 +116,19 @@ export class UserSsrController {
   ) {
     const user = await this.userService.getById(userId);
 
-    const chatBeetweenUsers = await this.chatService.findChatBetweenUsers(userId, req.user.id);
+    const chatBeetweenUsers = await this.chatService.findChatBetweenUsers(
+      userId,
+      req.user.id,
+    );
 
     if (userId === req.user.id) return res.redirect('/users/me');
 
-    return { ...user, guestRole: req.user.role, guestId: req.user.id, chatId: chatBeetweenUsers?.id };
+    return {
+      ...user,
+      guestRole: req.user.role,
+      guestId: req.user.id,
+      chatId: chatBeetweenUsers?.id,
+    };
   }
 
   @Get(':userId/products')

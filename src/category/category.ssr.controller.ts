@@ -117,6 +117,7 @@ export class CategorySsrController {
   @Render('categories/update-category')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
+  @UseInterceptors(CacheInterceptor)
   async getUpdateCategoryPage(@Param('categoryId') categoryId: number) {
     return await this.categoryService.getById(categoryId);
   }

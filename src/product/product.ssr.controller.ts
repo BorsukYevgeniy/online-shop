@@ -94,6 +94,7 @@ export class ProductSsrController {
 
   @Get('create')
   @Render('products/create-product')
+  @UseInterceptors(CacheInterceptor)
   async getCreateProductPage() {
     const categories = await this.categorySerivce.getAllCategories();
     return { categories };
@@ -137,6 +138,7 @@ export class ProductSsrController {
 
   @Get('update/:productId')
   @Render('products/update-product')
+  @UseInterceptors(CacheInterceptor)
   async getUpdateProductPage(@Param('productId') productId: number) {
     const product = await this.productService.getById(productId);
     const categories = await this.categorySerivce.getAllCategories();

@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Render, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Render,
+  UseFilters,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MessageService } from './message.service';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
@@ -6,6 +14,7 @@ import { Role } from '../enum/role.enum';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('chats/:chatId/messages')
 @UseGuards(VerifiedUserGuard)
@@ -17,6 +26,7 @@ export class ChatMessageSsrController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Render('message/get-all-messages')
+  @UseInterceptors(CacheInterceptor)
   async getMessagesByChatId(@Param('chatId') chatId: number) {
     const messages = await this.messageService.getMessagesByChatId(chatId);
 

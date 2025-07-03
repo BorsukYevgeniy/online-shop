@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthRequest } from '../types/request.type';
@@ -16,6 +17,7 @@ import { Chat } from '@prisma/client';
 import { ChatMessages, UserChat } from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('api/chats')
 @UseGuards(VerifiedUserGuard)
@@ -25,11 +27,13 @@ export class ChatApiController {
 ) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   async getMyChats(@Req() req: AuthRequest): Promise<UserChat[]> {
     return await this.chatService.getUserChats(req.user.id);
   }
 
   @Get(':chatId')
+  @UseInterceptors(CacheInterceptor)
   async getСhatById(@Param('chatId') chatId: number): Promise<ChatMessages> {
     return await this.chatService.getChatById(chatId);
   }
