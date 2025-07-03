@@ -1,10 +1,17 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
 import { ChatMessages, UserChat } from './types/chat.types';
 import { Chat } from '@prisma/client';
 
 import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum';
+import { UserErrorMessages as UserErrMsg } from 'src/user/constants/user-error-messages.constants';
+
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -40,10 +47,21 @@ export class ChatService {
   }
 
   async createChat(createDto: CreateChatDto): Promise<Chat> {
-    this.logger.log(
-      `Creating chat beetwen user ${createDto.buyerId} and user ${createDto.sellerId}.`,
-    );
-    return await this.chatRepository.createChat(createDto);
+    try {
+      const chat = await this.chatRepository.createChat(createDto);
+
+      this.logger.log(
+        `Chat created successfully between user ${createDto.buyerId} and user ${createDto.sellerId}.`,
+      );
+      return chat;
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        this.logger.warn(
+          `User with ID ${createDto.buyerId} or ${createDto.sellerId} not found.`,
+        );
+        throw new NotFoundException(UserErrMsg.UserNotFound);
+      }
+    }
   }
 
   async deleteChat(chatId: number): Promise<Chat> {

@@ -3,6 +3,7 @@ import {
   Injectable,
   ArgumentMetadata,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { SearchProductDto } from '../dto/search-product.dto';
 
@@ -10,6 +11,10 @@ import { SearchProductDto } from '../dto/search-product.dto';
 export class ValidateProductDtoPipe
   implements PipeTransform<SearchProductDto, SearchProductDto>
 {
+  private readonly logger: Logger = new Logger(ValidateProductDtoPipe.name);
+
+
+
   transform(
     value: SearchProductDto,
     metadata: ArgumentMetadata,
@@ -17,6 +22,10 @@ export class ValidateProductDtoPipe
     const { minPrice, maxPrice }: SearchProductDto = value;
 
     if (maxPrice < minPrice) {
+      this.logger.warn(
+        `Invalid price range: maxPrice (${maxPrice}) is less than minPrice (${minPrice}).`,
+      );
+
       throw new BadRequestException('Max price must be greater than min price');
     }
 

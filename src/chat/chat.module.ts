@@ -6,10 +6,11 @@ import { ChatRepository } from './chat.repository';
 import { ChatSsrController } from './chat-ssr.controller';
 import { ChatGateway } from './chat.gateway';
 import { MessageModule } from 'src/message/message.module';
+import { ChatApiController } from './chat-api.controller';
 
 @Module({
   imports: [TokenModule, PrismaModule, MessageModule],
-  controllers: [ChatSsrController],
+  controllers: [ChatSsrController, ChatApiController],
   providers: [ChatService, ChatRepository, ChatGateway],
 })
 export class ChatModule {}

@@ -17,6 +17,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
+import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat.dto';
 
 @Controller('chats')
 @UseGuards(VerifiedUserGuard)
@@ -25,7 +26,10 @@ export class ChatSsrController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post()
-  async createChat(@Body() createDto: CreateChatDto, @Res() res: Response) {
+  async createChat(
+    @Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto,
+    @Res() res: Response,
+  ) {
     const chat = await this.chatService.createChat(createDto);
 
     res.redirect(`/chats/${chat.id}`);

@@ -15,6 +15,7 @@ import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { Chat } from '@prisma/client';
 import { ChatMessages, UserChat } from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
+import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat.dto';
 
 @Controller('api/chats')
 @UseGuards(VerifiedUserGuard)
@@ -34,7 +35,7 @@ export class ChatApiController {
   }
 
   @Post()
-  async createChat(@Body() createDto: CreateChatDto): Promise<Chat> {
+  async createChat(@Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto): Promise<Chat> {
     return await this.chatService.createChat(createDto);
   }
 
