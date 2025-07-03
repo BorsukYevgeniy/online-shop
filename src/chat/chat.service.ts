@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
 import { ChatMessages, UserChat } from './types/chat.types';
@@ -9,12 +9,19 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ChatService {
+  private readonly logger: Logger = new Logger(ChatService.name);
+
   constructor(private readonly chatRepository: ChatRepository) {}
 
   async getUserChats(userId: number): Promise<UserChat[]> {
     const userChats = await this.chatRepository.getUserChats(userId);
 
-    if (!userChats) throw new NotFoundException(ChatErrMsg.UserChatsNotFound);
+    if (!userChats) {
+      this.logger.warn(`User with ID ${userId} has no chats.`);
+      throw new NotFoundException(ChatErrMsg.UserChatsNotFound);
+    }
+
+    this.logger.log(`User with ID ${userId} has ${userChats.length} chats.`);
 
     return userChats;
   }
@@ -22,20 +29,31 @@ export class ChatService {
   async getChatById(id: number): Promise<ChatMessages> {
     const chat = await this.chatRepository.getChatById(id);
 
-    if (!chat) throw new NotFoundException(ChatErrMsg.ChatNotFound);
+    if (!chat) {
+      this.logger.warn(`Chat with ID ${id} not found.`);
+      throw new NotFoundException(ChatErrMsg.ChatNotFound);
+    }
+
+    this.logger.log(`Fetched chat with ID ${id}.`);
 
     return chat;
   }
 
   async createChat(createDto: CreateChatDto): Promise<Chat> {
+    this.logger.log(
+      `Creating chat beetwen user ${createDto.buyerId} and user ${createDto.sellerId}.`,
+    );
     return await this.chatRepository.createChat(createDto);
   }
 
   async deleteChat(chatId: number): Promise<Chat> {
     try {
+      this.logger.log(`Deleting chat with ID ${chatId}.`);
+
       return await this.chatRepository.deleteChat(chatId);
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
+        this.logger.warn(`Chat with ID ${chatId} not found for deletion.`);
         throw new NotFoundException(ChatErrMsg.ChatNotFound);
       }
     }
