@@ -54,7 +54,9 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
   ) {
     const accessToken = client.handshake.headers.cookie
-      .split('; ')[0]
+      .split(';')
+      .map((cookie) => cookie.trim())
+      .find((cookie) => cookie.startsWith('accessToken='))
       .split('=')[1];
 
     const { id: userId } =
