@@ -9,6 +9,19 @@ import { ChatMessages, UserChat } from './types/chat.types';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findChatBeetweenUsers(sellerId: number, buyerId: number): Promise<Chat | null> {
+    return await this.prisma.chat.findFirst({
+      where: {
+        users: {
+          some: {
+            id: { in: [sellerId, buyerId] },
+          },
+        },
+      },
+    });
+  }
+
+
   async getUserChats(userId: number): Promise<UserChat[]> {
     const chats = await this.prisma.chat.findMany({
       where: {

@@ -30,12 +30,21 @@
     <div class="user-actions">
       <a href="/users/<%= id %>/products" class="btn get-all-products">Get all user products</a>
 
-      <form action="/chats" method="post">
-        <input type="number" value="<%= id%>" name="sellerId" hidden>
-        <input type="number" value="<%= guestId%>" name="buyerId" hidden>
 
-        <button type="submit" class="btn" id="send">Написати <%= nickname%></button>
-      </form>
+      <% if (!chatId) { %>
+        <form action="/chats" method="post">
+          <input type="number" value="<%= id%>" name="sellerId" hidden>
+          <input type="number" value="<%= guestId%>" name="buyerId" hidden>
+  
+          <button type="submit" class="btn" id="send">Create chat with <%= nickname%></button>
+        </form>
+      <% } else { %>
+        <a href="/chats/<%= chatId %>" class="btn" id="send">
+          Send message to  <%= nickname %>
+        </a>
+      <% } %>
+
+      
 
 
       <% if (guestRole === "ADMIN") { %>

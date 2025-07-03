@@ -12,5 +12,6 @@ import { ChatApiController } from './chat-api.controller';
   imports: [TokenModule, PrismaModule, MessageModule],
   controllers: [ChatSsrController, ChatApiController],
   providers: [ChatService, ChatRepository, ChatGateway],
+  exports: [ChatService]
 })
 export class ChatModule {}

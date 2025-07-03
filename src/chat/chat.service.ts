@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
@@ -19,6 +18,24 @@ export class ChatService {
   private readonly logger: Logger = new Logger(ChatService.name);
 
   constructor(private readonly chatRepository: ChatRepository) {}
+
+  async findChatBetweenUsers(sellerId:number,buyerId:number): Promise<Chat | null> {
+    const chat = await this.chatRepository.findChatBeetweenUsers(sellerId, buyerId);
+
+    if (!chat) {
+      this.logger.warn(
+        `No chat found between user ${buyerId} and user ${sellerId}.`,
+      );
+      return null;
+    }
+
+    this.logger.log(
+      `Chat found between user ${buyerId} and user ${sellerId}.`,
+    );
+    return chat;
+
+  }
+
 
   async getUserChats(userId: number): Promise<UserChat[]> {
     const userChats = await this.chatRepository.getUserChats(userId);

@@ -28,6 +28,7 @@ import { SortUserDto } from './dto/sort-user.dto';
 import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { ChatService } from 'src/chat/chat.service';
 
 @Controller('users')
 @UseFilters(SsrExceptionFilter)
@@ -35,6 +36,7 @@ export class UserSsrController {
   constructor(
     private readonly userService: UserService,
     private readonly productService: ProductService,
+    private readonly chatService: ChatService,
   ) {}
 
   @Get('')
@@ -112,9 +114,11 @@ export class UserSsrController {
   ) {
     const user = await this.userService.getById(userId);
 
+    const chatBeetweenUsers = await this.chatService.findChatBetweenUsers(userId, req.user.id);
+
     if (userId === req.user.id) return res.redirect('/users/me');
 
-    return { ...user, guestRole: req.user.role, guestId: req.user.id };
+    return { ...user, guestRole: req.user.role, guestId: req.user.id, chatId: chatBeetweenUsers?.id };
   }
 
   @Get(':userId/products')
