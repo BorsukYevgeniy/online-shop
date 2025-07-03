@@ -31,6 +31,7 @@ export class CartService {
 
   async getMyCart(userId: number): Promise<CartProduct> {
     const cart = await this.cartRepository.findMyCart(userId);
+    
     this.logger.log(`Cart fetched succesfully for user ${userId}`);
     return cart;
   }
@@ -61,6 +62,7 @@ export class CartService {
   }
 
   async clearCart(userId: number): Promise<CartProduct> {
+    this.logger.log(`Clearing cart for user ${userId}`);
     return await this.cartRepository.clearCart(userId);
   }
 }
