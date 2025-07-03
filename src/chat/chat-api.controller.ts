@@ -22,9 +22,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 @Controller('api/chats')
 @UseGuards(VerifiedUserGuard)
 export class ChatApiController {
-  constructor(
-    private readonly chatService: ChatService,
-) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @Get()
   @UseInterceptors(CacheInterceptor)
@@ -39,13 +37,14 @@ export class ChatApiController {
   }
 
   @Post()
-  async createChat(@Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto): Promise<Chat> {
+  async createChat(
+    @Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto,
+  ): Promise<Chat> {
     return await this.chatService.createChat(createDto);
   }
 
   @Delete(':chatId')
-  async deleteChat(@Param('chatId') chatId: number):Promise<Chat> {
+  async deleteChat(@Param('chatId') chatId: number): Promise<Chat> {
     return await this.chatService.deleteChat(chatId);
   }
-
 }

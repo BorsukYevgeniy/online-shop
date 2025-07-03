@@ -10,7 +10,7 @@ import { UserSsrController } from './user.ssr.controller';
 import { ChatModule } from '../chat/chat.module';
 
 @Module({
-  imports: [PrismaModule, TokenModule, ProductModule,ChatModule],
+  imports: [PrismaModule, TokenModule, ProductModule, ChatModule],
   controllers: [UserApiController, UserSsrController],
   providers: [UserService, UserRepository, UserCleaningService],
   exports: [UserService],

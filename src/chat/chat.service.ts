@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
 import { ChatMessages, UserChat } from './types/chat.types';
@@ -19,8 +15,14 @@ export class ChatService {
 
   constructor(private readonly chatRepository: ChatRepository) {}
 
-  async findChatBetweenUsers(sellerId:number,buyerId:number): Promise<Chat | null> {
-    const chat = await this.chatRepository.findChatBeetweenUsers(sellerId, buyerId);
+  async findChatBetweenUsers(
+    sellerId: number,
+    buyerId: number,
+  ): Promise<Chat | null> {
+    const chat = await this.chatRepository.findChatBeetweenUsers(
+      sellerId,
+      buyerId,
+    );
 
     if (!chat) {
       this.logger.warn(
@@ -29,13 +31,9 @@ export class ChatService {
       return null;
     }
 
-    this.logger.log(
-      `Chat found between user ${buyerId} and user ${sellerId}.`,
-    );
+    this.logger.log(`Chat found between user ${buyerId} and user ${sellerId}.`);
     return chat;
-
   }
-
 
   async getUserChats(userId: number): Promise<UserChat[]> {
     const userChats = await this.chatRepository.getUserChats(userId);

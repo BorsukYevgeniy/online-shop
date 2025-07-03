@@ -13,8 +13,6 @@ export class ValidateProductDtoPipe
 {
   private readonly logger: Logger = new Logger(ValidateProductDtoPipe.name);
 
-
-
   transform(
     value: SearchProductDto,
     metadata: ArgumentMetadata,

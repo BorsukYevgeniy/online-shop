@@ -9,7 +9,10 @@ import { ChatMessages, UserChat } from './types/chat.types';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findChatBeetweenUsers(sellerId: number, buyerId: number): Promise<Chat | null> {
+  async findChatBeetweenUsers(
+    sellerId: number,
+    buyerId: number,
+  ): Promise<Chat | null> {
     return await this.prisma.chat.findFirst({
       where: {
         users: {
@@ -20,7 +23,6 @@ export class ChatRepository {
       },
     });
   }
-
 
   async getUserChats(userId: number): Promise<UserChat[]> {
     const chats = await this.prisma.chat.findMany({
@@ -41,7 +43,8 @@ export class ChatRepository {
     return chats.map((chat) => ({
       id: chat.id,
       withWhom:
-        chat.users.find((user) => user.id !== userId)?.nickname || 'Невідомо',
+        chat.users.find((user) => user.id !== userId)?.nickname ||
+        'Unknown User',
     }));
   }
 
@@ -67,7 +70,7 @@ export class ChatRepository {
     return await this.prisma.chat.create({
       data: {
         users: {
-          connect: [{ id: +createDto.buyerId }, { id: +createDto.sellerId }],
+          connect: [{ id: createDto.buyerId }, { id: createDto.sellerId }],
         },
       },
     });
