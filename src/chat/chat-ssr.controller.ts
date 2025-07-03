@@ -17,7 +17,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
-import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat.dto';
+import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 
 @Controller('chats')
 @UseGuards(VerifiedUserGuard)

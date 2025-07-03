@@ -15,7 +15,7 @@ import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { Chat } from '@prisma/client';
 import { ChatMessages, UserChat } from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat.dto';
+import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 
 @Controller('api/chats')
 @UseGuards(VerifiedUserGuard)
