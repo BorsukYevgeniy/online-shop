@@ -9,12 +9,18 @@ import {
 import { Server, Socket } from 'socket.io';
 import { MessageService } from '../message/message.service';
 import { TokenService } from '../token/token.service';
-import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SendMessageDto } from 'src/message/dto/send-message.dto';
 import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
 import { UpdateMessageGatewayDto } from 'src/message/dto/update-message-gateway.dto';
 import { DeleteMessageGatewayDto } from 'src/message/dto/delete-message-gatewat.dto';
 import { TokenPayload } from 'src/token/interface/token.interfaces';
+
+import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+} from '@nestjs/websockets';
 
 @WebSocketGateway({ cors: true })
 @UsePipes(
@@ -32,20 +38,41 @@ import { TokenPayload } from 'src/token/interface/token.interfaces';
   }),
 )
 @UseFilters(SsrExceptionFilter)
-export class ChatGateway {
+export class ChatGateway
+  implements
+    OnGatewayInit<Server>,
+    OnGatewayConnection<Socket>,
+    OnGatewayDisconnect<Socket>
+{
   @WebSocketServer()
   server: Server;
+
+  private readonly logger: Logger = new Logger(ChatGateway.name);
 
   constructor(
     private readonly messageService: MessageService,
     private readonly tokenService: TokenService,
   ) {}
 
+  async afterInit() {
+    this.logger.debug(`WebSocket initialized on ws://localhost:${process.env.PORT}`);
+  }
+
+  async handleConnection(client: Socket) {
+    this.logger.debug(`Client ${client.id} connected`);
+  }
+
+  async handleDisconnect(client: Socket) {
+    this.logger.debug(`Client ${client.id} disconnected`);
+  }
+
   @SubscribeMessage('joinChat')
   async handleJoinChat(
     @MessageBody() chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
+    this.logger.log(`Client ${client.id} is joining to chat ${chatId}`);
+
     client.join(`chat-${chatId}`);
   }
 
@@ -61,6 +88,9 @@ export class ChatGateway {
       body.chatId,
       user.id,
     );
+
+    this.logger.log(`User ${user.id} sent a message in chat ${body.chatId}`);
+
     this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);
   }
 
@@ -71,7 +101,7 @@ export class ChatGateway {
   ) {
     const user = await this.getUserFromWs(client);
 
-    const newMessage = await this.messageService.updateMesssage(
+    const message = await this.messageService.updateMesssage(
       body.messageId,
       user.id,
       {
@@ -79,7 +109,9 @@ export class ChatGateway {
       },
     );
 
-    this.server.to(`chat-${body.chatId}`).emit('chatUpdateMessage', newMessage);
+    this.logger.log(`User ${user.id} updated a message in chat ${body.chatId}`);
+
+    this.server.to(`chat-${body.chatId}`).emit('chatUpdateMessage', message);
   }
 
   @SubscribeMessage('deleteMessage')
@@ -87,9 +119,14 @@ export class ChatGateway {
     @MessageBody() body: DeleteMessageGatewayDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const user = await this.getUserFromWs(client)
+    const user = await this.getUserFromWs(client);
 
-    const message = await this.messageService.deleteMessage(body.messageId,user.id);
+    const message = await this.messageService.deleteMessage(
+      body.messageId,
+      user.id,
+    );
+
+    this.logger.log(`User ${user.id} deleted a message in chat ${body.chatId}`);
 
     this.server.to(`chat-${body.chatId}`).emit('chatDeleteMessage', message);
   }
@@ -101,6 +138,12 @@ export class ChatGateway {
       .find((cookie) => cookie.startsWith('accessToken='))
       .split('=')[1];
 
-    return await this.tokenService.verifyAccessToken(accessToken);
+    const payload = await this.tokenService.verifyAccessToken(accessToken);
+
+    this.logger.log(
+      `Extracted access token from client ${client.id} by user ${payload.id}`,
+    );
+
+    return payload;
   }
 }
