@@ -14,6 +14,7 @@ import { SendMessageDto } from 'src/message/dto/send-message.dto';
 import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
 import { UpdateMessageGatewayDto } from 'src/message/dto/update-message-gateway.dto';
 import { DeleteMessageGatewayDto } from 'src/message/dto/delete-message-gatewat.dto';
+import { TokenPayload } from 'src/token/interface/token.interfaces';
 
 @WebSocketGateway({ cors: true })
 @UsePipes(
@@ -53,27 +54,26 @@ export class ChatGateway {
     @MessageBody() body: SendMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const accessToken = client.handshake.headers.cookie
-      .split(';')
-      .map((cookie) => cookie.trim())
-      .find((cookie) => cookie.startsWith('accessToken='))
-      .split('=')[1];
-
-    const { id: userId } =
-      await this.tokenService.verifyAccessToken(accessToken);
+    const user = await this.getUserFromWs(client);
 
     const message = await this.messageService.createMessage(
       { text: body.text },
       body.chatId,
-      userId,
+      user.id,
     );
     this.server.to(`chat-${body.chatId}`).emit('chatMessage', message);
   }
 
   @SubscribeMessage('updateMessage')
-  async handleUpdateMessage(@MessageBody() body: UpdateMessageGatewayDto) {
+  async handleUpdateMessage(
+    @MessageBody() body: UpdateMessageGatewayDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = await this.getUserFromWs(client);
+
     const newMessage = await this.messageService.updateMesssage(
       body.messageId,
+      user.id,
       {
         text: body.text,
       },
@@ -83,9 +83,24 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('deleteMessage')
-  async handleDeleteMessage(@MessageBody() body: DeleteMessageGatewayDto) {
-    const message = await this.messageService.deleteMessage(body.messageId);
+  async handleDeleteMessage(
+    @MessageBody() body: DeleteMessageGatewayDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = await this.getUserFromWs(client)
+
+    const message = await this.messageService.deleteMessage(body.messageId,user.id);
 
     this.server.to(`chat-${body.chatId}`).emit('chatDeleteMessage', message);
+  }
+
+  private async getUserFromWs(client: Socket): Promise<TokenPayload> {
+    const accessToken = client.handshake.headers.cookie
+      .split(';')
+      .map((cookie) => cookie.trim())
+      .find((cookie) => cookie.startsWith('accessToken='))
+      .split('=')[1];
+
+    return await this.tokenService.verifyAccessToken(accessToken);
   }
 }

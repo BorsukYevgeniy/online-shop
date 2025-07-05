@@ -49,17 +49,18 @@ export class ChatSsrController {
   @Get(':chatId')
   @Render('chat/get-chat-by-id')
   async getChatById(@Param('chatId') chatId: number, @Req() req: AuthRequest) {
-    const chat = await this.chatService.getChatById(chatId);
+    const chat = await this.chatService.getChatById(chatId, req.user.id);
 
     return { chatId: chat.id, messages: chat.messages, userId: req.user.id };
   }
 
   @Delete(':chatId')
   async handleDeleteChat(
+    @Req() req: AuthRequest,
     @Param('chatId') chatId: number,
     @Res() res: Response,
   ) {
-    await this.chatService.deleteChat(chatId);
+    await this.chatService.deleteChat(chatId, req.user.id);
 
     res.redirect('/chats');
   }

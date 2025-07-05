@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
 import { ChatMessages, UserChat } from './types/chat.types';
@@ -48,7 +53,9 @@ export class ChatService {
     return userChats;
   }
 
-  async getChatById(id: number): Promise<ChatMessages> {
+  async getChatById(id: number, userId: number): Promise<ChatMessages> {
+    await this.validateChatParticipants(id, userId);
+
     const chat = await this.chatRepository.getChatById(id);
 
     if (!chat) {
@@ -79,8 +86,10 @@ export class ChatService {
     }
   }
 
-  async deleteChat(chatId: number): Promise<Chat> {
+  async deleteChat(chatId: number, userId: number): Promise<Chat> {
     try {
+      await this.validateChatParticipants(chatId, userId);
+
       this.logger.log(`Deleting chat with ID ${chatId}.`);
 
       return await this.chatRepository.deleteChat(chatId);
@@ -90,5 +99,31 @@ export class ChatService {
         throw new NotFoundException(ChatErrMsg.ChatNotFound);
       }
     }
+  }
+
+  private async validateChatParticipants(
+    chatId: number,
+    userId: number,
+  ): Promise<boolean> {
+    this.logger.log(`Validating participants for chat ID ${chatId}.`);
+
+    const chat = await this.chatRepository.getUsersInChat(chatId);
+    if (!chat) {
+      this.logger.warn(`Chat with ID ${chatId} not found.`);
+      throw new NotFoundException(ChatErrMsg.ChatNotFound);
+    }
+
+    const isParticipant = chat.users.some((u) => u.id === userId);
+    if (!isParticipant) {
+      this.logger.warn(
+        `User with ID ${userId} is not a participant in chat ID ${chatId}.`,
+      );
+      throw new ForbiddenException();
+    }
+
+    this.logger.log(
+      `User with ID ${userId} is a participant in chat ID ${chatId}.`,
+    );
+    return true;
   }
 }

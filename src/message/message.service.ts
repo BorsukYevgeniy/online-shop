@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { MessageRepository } from './message.repository';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
@@ -15,7 +20,9 @@ export class MessageService {
 
   constructor(private readonly messageRepository: MessageRepository) {}
 
-  async getMessageById(messageId: number) {
+  async getMessageById(messageId: number, userId: number) {
+    await this.validateMessageOwnership(messageId, userId);
+
     const message = await this.messageRepository.getMessageById(messageId);
 
     if (!message) {
@@ -52,9 +59,11 @@ export class MessageService {
 
   async updateMesssage(
     messageId: number,
+    userId: number,
     updateDto: UpdateMessageDto,
   ): Promise<MessageNickname> {
     try {
+      await this.validateMessageOwnership(messageId, userId);
       this.logger.log(`Updating message with ID ${messageId}.`);
 
       return await this.messageRepository.updateMessage(messageId, updateDto);
@@ -66,8 +75,10 @@ export class MessageService {
     }
   }
 
-  async deleteMessage(messageId: number): Promise<Message> {
+  async deleteMessage(messageId: number, userId: number): Promise<Message> {
     try {
+      await this.validateMessageOwnership(messageId, userId);
+
       this.logger.log(`Deleting message with ID ${messageId}.`);
 
       return await this.messageRepository.deleteMessage(messageId);
@@ -80,5 +91,31 @@ export class MessageService {
         throw new NotFoundException(MessageErrMsg.MessageNotFound);
       }
     }
+  }
+
+  private async validateMessageOwnership(
+    messageId: number,
+    userId: number,
+  ): Promise<boolean> {
+    this.logger.log(
+      `Validating ownership of message ID ${messageId} for user ID ${userId}.`,
+    );
+
+    const message = await this.messageRepository.getMessageById(messageId);
+
+    if (!message) {
+      this.logger.warn(`Message with ID ${messageId} not found.`);
+      throw new NotFoundException(MessageErrMsg.MessageNotFound);
+    }
+
+    if (message.userId !== userId) {
+      this.logger.warn(
+        `User with ID ${userId} is not the owner of message ID ${messageId}.`,
+      );
+      throw new ForbiddenException();
+    }
+
+    this.logger.log(`User with ID ${userId} owns message ID ${messageId}.`);
+    return true;
   }
 }

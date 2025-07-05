@@ -32,8 +32,11 @@ export class ChatApiController {
 
   @Get(':chatId')
   @UseInterceptors(CacheInterceptor)
-  async getСhatById(@Param('chatId') chatId: number): Promise<ChatMessages> {
-    return await this.chatService.getChatById(chatId);
+  async getСhatById(
+    @Param('chatId') chatId: number,
+    @Req() req: AuthRequest,
+  ): Promise<ChatMessages> {
+    return await this.chatService.getChatById(chatId, req.user.id);
   }
 
   @Post()
@@ -44,7 +47,10 @@ export class ChatApiController {
   }
 
   @Delete(':chatId')
-  async deleteChat(@Param('chatId') chatId: number): Promise<Chat> {
-    return await this.chatService.deleteChat(chatId);
+  async deleteChat(
+    @Req() req: AuthRequest,
+    @Param('chatId') chatId: number,
+  ): Promise<Chat> {
+    return await this.chatService.deleteChat(chatId, req.user.id);
   }
 }

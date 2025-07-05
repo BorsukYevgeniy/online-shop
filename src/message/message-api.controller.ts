@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { Message } from '@prisma/client';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageNickname } from './types/message.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { AuthRequest } from 'src/types/request.type';
 
 @Controller('api/messages')
 @UseGuards(VerifiedUserGuard)
@@ -22,20 +24,31 @@ export class MessageApiController {
 
   @Get(':messageId')
   @UseInterceptors(CacheInterceptor)
-  async getMessageById(@Param('messageId') messageId: number) {
-    return await this.messageService.getMessageById(messageId);
+  async getMessageById(
+    @Param('messageId') messageId: number,
+    @Req() req: AuthRequest,
+  ): Promise<Message> {
+    return await this.messageService.getMessageById(messageId, req.user.id);
   }
 
   @Patch(':messageId')
   async updateMessage(
+    @Req() req: AuthRequest,
     @Param('messageId') messageId: number,
     @Body() updateDto: UpdateMessageDto,
   ): Promise<MessageNickname> {
-    return await this.messageService.updateMesssage(messageId, updateDto);
+    return await this.messageService.updateMesssage(
+      messageId,
+      req.user.id,
+      updateDto,
+    );
   }
 
   @Delete(':messageId')
-  async deleteMessage(@Param('messageId') messageId: number): Promise<Message> {
-    return await this.messageService.deleteMessage(messageId);
+  async deleteMessage(
+    @Req() req: AuthRequest,
+    @Param('messageId') messageId: number,
+  ): Promise<Message> {
+    return await this.messageService.deleteMessage(messageId, req.user.id);
   }
 }
