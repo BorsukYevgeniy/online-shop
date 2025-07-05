@@ -33,7 +33,7 @@ export class AuthSsrController {
   @Post('register')
   async handleRegister(@Body() dto: CreateUserDto, @Res() res: Response) {
     const { accessToken, refreshToken }: Tokens =
-      await this.authService.register(dto);
+      await this.authService.register(dto, 'ssr');
 
     res.cookie('accessToken', accessToken, {
       maxAge: 60 * 60 * 1000, // 1 hour

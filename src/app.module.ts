@@ -69,11 +69,12 @@ export class AppModule implements NestModule {
         '/',
         '/api/*path',
         '/:image',
-        'auth/register',
-        'auth/login',
+        '/auth/register',
+        '/auth/login',
         '/products/search',
         '/products',
         '/categories/search',
+        '/errors/:errorCode'
       )
       .forRoutes('');
     consumer.apply(IsAuthorizedMiddleware).exclude('/api/*path').forRoutes('');

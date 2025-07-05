@@ -24,7 +24,7 @@ import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages.enum
 @Injectable()
 export class AuthService {
   private readonly logger: Logger = new Logger(AuthService.name);
-  private readonly API_URL: string;
+  private readonly APP_URL: string;
 
   constructor(
     private readonly userService: UserService,
@@ -32,10 +32,13 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
   ) {
-    this.API_URL = this.configService.get<string>('API_URL');
+    this.APP_URL = this.configService.get<string>('APP_URL');
   }
 
-  async register(dto: CreateUserDto): Promise<Tokens> {
+  async register(
+    dto: CreateUserDto,
+    mode: 'api' | 'ssr' = 'api',
+  ): Promise<Tokens> {
     const candidate: User | null = await this.userService.getByEmail(dto.email);
 
     if (candidate) {
@@ -49,7 +52,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    await this.sendVerificationMail(user.email, user.verificationLink);
+    await this.sendVerificationMail(user.email, user.verificationLink, mode);
 
     this.logger.log(`New user registered: ${user.email}`);
 
@@ -136,17 +139,26 @@ export class AuthService {
     return await this.userService.verify(verificationLink);
   }
 
-  async resendVerificationMail(userId: number): Promise<void> {
+  async resendVerificationMail(
+    userId: number,
+    mode: 'api' | 'ssr' = 'api',
+  ): Promise<void> {
     const { email, verificationLink }: UserNoPassword =
       await this.userService.getFullUserById(userId);
 
-    return await this.sendVerificationMail(email, verificationLink);
+    return await this.sendVerificationMail(email, verificationLink, mode);
   }
 
-  private async sendVerificationMail(email: string, verificationLink: string) {
+  private async sendVerificationMail(
+    email: string,
+    verificationLink: string,
+    mode: 'api' | 'ssr' = 'api',
+  ): Promise<void> {
     return await this.mailService.sendVerificationMail(
       email,
-      this.API_URL + `/auth/verify/${verificationLink}`,
+      this.APP_URL +
+        (mode === 'api' ? '/api' : '') +
+        `/auth/verify/${verificationLink}`,
     );
   }
 }
