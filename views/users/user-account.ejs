@@ -30,6 +30,14 @@
 
   <!-- Account management -->
   <div id="account-managment">
+    <% if (!isVerified) { %>
+      <form action="/auth/resend-email" method="post">
+        <button type="submit" class="user-btn">Resend verification email</button>
+      </form>
+    <% } %>
+    
+    
+    
     <form action="/auth/logout" method="post">
       <button type="submit" class="user-btn">Logout</button>
     </form>

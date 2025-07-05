@@ -7,20 +7,20 @@ export class MailService {
   private readonly logger: Logger = new Logger(MailService.name);
 
   private readonly SMTP_USER: string;
-  private readonly API_URL: string;
+  private readonly APP_URL: string;
   constructor(
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
   ) {
     this.SMTP_USER = this.configService.get<string>('SMTP_USER');
-    this.API_URL = this.configService.get<string>('API_URL');
+    this.APP_URL = this.configService.get<string>('APP_URL');
   }
 
   async sendVerificationMail(to: string, link: string): Promise<void> {
     await this.mailerService.sendMail({
       to,
       from: this.SMTP_USER,
-      subject: 'Verification mail on ' + this.API_URL,
+      subject: 'Verification mail on ' + this.APP_URL,
       text: '',
       html: `
       <div>
