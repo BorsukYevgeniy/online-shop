@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
@@ -32,17 +32,26 @@ import { ErrorModule } from './error/error.module';
   imports: [
     PrismaModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-    CacheModule.register({
+
+    CacheModule.registerAsync({
       isGlobal: true,
-      ttl: 60 * 1000,
-      stores: [
-        new Keyv({
-          store: new KeyvRedis({ url: process.env.REDIS_URL }),
-          useKeyPrefix: false,
-          namespace: '',
-        }),
-      ],
+      useFactory: async () => {
+        const logger: Logger = new Logger('Redis');
+        const redisStore = new KeyvRedis({ url: process.env.REDIS_URL });
+
+        logger.debug('Connecting to Redis cache...');
+
+        return {
+          stores: new Keyv({
+            store: redisStore,
+            namespace: '',
+            useKeyPrefix: false,
+          }),
+          ttl: 60 * 1000,
+        };
+      },
     }),
+
     UserModule,
     MessageModule,
     ChatModule,
@@ -74,7 +83,7 @@ export class AppModule implements NestModule {
         '/products/search',
         '/products',
         '/categories/search',
-        '/errors/:errorCode'
+        '/errors/:errorCode',
       )
       .forRoutes('');
     consumer.apply(IsAuthorizedMiddleware).exclude('/api/*path').forRoutes('');
