@@ -150,24 +150,26 @@ describe('AuthController (e2e)', () => {
   });
 
   it('POST /api/auth/refresh - 200 OK - Should refresh pair of JWT token', async () => {
-    await request(app.getHttpServer())
+    const { headers } = await request(app.getHttpServer())
       .post('/api/auth/refresh')
       .set('Cookie', [`refreshToken=${refreshToken}`])
       .expect(200);
+
+    refreshToken = headers['set-cookie'][1].split('=')[1].split(';')[0];
   });
 
   it('POST /api/auth/logout - 200 OK - Should logout a user', async () => {
     await request(app.getHttpServer())
       .post('/api/auth/logout')
       .set('Cookie', [`refreshToken=${refreshToken}`])
-      .expect(200);
+      .expect(204);
   });
 
   it('POST /api/auth/logout-all - 200 OK - Should logout a user from all devices', async () => {
     await request(app.getHttpServer())
       .post('/api/auth/logout-all')
       .set('Cookie', [`accessToken=${accessToken}`])
-      .expect(200);
+      .expect(204);
   });
 
   describe('POST /api/auth/verify - Should verify user', () => {

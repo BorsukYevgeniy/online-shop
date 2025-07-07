@@ -92,6 +92,9 @@ export class AuthService {
   }
 
   async logout(token: string): Promise<Token> {
+    if (!token)
+      throw new BadRequestException(TokenErrMsg.RefreshTokenIsMissing);
+
     return await this.tokenService.deleteUserToken(token);
   }
 
