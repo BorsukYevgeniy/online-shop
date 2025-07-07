@@ -37,7 +37,7 @@ export class MessageApiController {
     @Param('messageId') messageId: number,
     @Body() updateDto: UpdateMessageDto,
   ): Promise<MessageNickname> {
-    return await this.messageService.updateMesssage(
+    return await this.messageService.updateMessage(
       messageId,
       req.user.id,
       updateDto,

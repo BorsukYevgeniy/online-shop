@@ -101,7 +101,7 @@ export class ChatGateway
   ) {
     const user = await this.getUserFromWs(client);
 
-    const message = await this.messageService.updateMesssage(
+    const message = await this.messageService.updateMessage(
       body.messageId,
       user.id,
       {

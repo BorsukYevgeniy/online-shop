@@ -57,13 +57,14 @@ export class MessageService {
     );
   }
 
-  async updateMesssage(
+  async updateMessage(
     messageId: number,
     userId: number,
     updateDto: UpdateMessageDto,
   ): Promise<MessageNickname> {
+    await this.validateMessageOwnership(messageId, userId);
+
     try {
-      await this.validateMessageOwnership(messageId, userId);
       this.logger.log(`Updating message with ID ${messageId}.`);
 
       return await this.messageRepository.updateMessage(messageId, updateDto);
@@ -72,12 +73,14 @@ export class MessageService {
         this.logger.warn(`Message with ID ${messageId} not found for update.`);
         throw new NotFoundException(MessageErrMsg.MessageNotFound);
       }
+
     }
   }
 
   async deleteMessage(messageId: number, userId: number): Promise<Message> {
+    await this.validateMessageOwnership(messageId, userId);
+    
     try {
-      await this.validateMessageOwnership(messageId, userId);
 
       this.logger.log(`Deleting message with ID ${messageId}.`);
 
@@ -97,13 +100,20 @@ export class MessageService {
     messageId: number,
     userId: number,
   ): Promise<boolean> {
+    
+    
+    
     this.logger.log(
       `Validating ownership of message ID ${messageId} for user ID ${userId}.`,
     );
 
     const message = await this.messageRepository.getMessageById(messageId);
 
+
     if (!message) {
+
+      console.log(`Message with ID ${messageId} not found.`);
+
       this.logger.warn(`Message with ID ${messageId} not found.`);
       throw new NotFoundException(MessageErrMsg.MessageNotFound);
     }
@@ -112,6 +122,9 @@ export class MessageService {
       this.logger.warn(
         `User with ID ${userId} is not the owner of message ID ${messageId}.`,
       );
+
+      console.log(`User with ID ${userId} is not the owner of message ID ${messageId}.`);
+
       throw new ForbiddenException();
     }
 

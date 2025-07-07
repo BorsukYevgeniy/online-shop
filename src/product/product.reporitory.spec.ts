@@ -5,7 +5,6 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from './product.repository';
 import { Test } from '@nestjs/testing';
 import { SearchProductDto } from './dto/search-product.dto';
-import { Product } from '@prisma/client';
 
 describe('ProductRepository', () => {
   let repository: ProductRepository;
