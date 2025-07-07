@@ -28,7 +28,7 @@ import { SortUserDto } from './dto/sort-user.dto';
 import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { ChatService } from 'src/chat/chat.service';
+import { ChatService } from '../chat/chat.service';
 
 @Controller('users')
 @UseFilters(SsrExceptionFilter)

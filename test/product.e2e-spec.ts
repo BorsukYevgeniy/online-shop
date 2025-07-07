@@ -11,6 +11,9 @@ import { hash } from 'bcryptjs';
 import { UpdateProductDto } from '../src/product/dto/update-product.dto';
 import { SearchProductDto } from '../src/product/dto/search-product.dto';
 import { CreateProductDto } from '../src/product/dto/create-product.dto';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import Keyv from 'keyv';
 
 describe('ProductController (e2e)', () => {
   let app: NestExpressApplication;
@@ -19,6 +22,16 @@ describe('ProductController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
+        CacheModule.register({
+          isGlobal: true,
+          ttl: 60 * 1000,
+          stores: [
+            new Keyv(new KeyvRedis(process.env.REDIS_URL), {
+              namespace: '',
+              useKeyPrefix: false,
+            }),
+          ],
+        }),
         ProductModule,
         AuthModule,
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),

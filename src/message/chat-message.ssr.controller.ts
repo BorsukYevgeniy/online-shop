@@ -13,8 +13,8 @@ import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { Role } from '../enum/role.enum';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 
 @Controller('chats/:chatId/messages')
 @UseGuards(VerifiedUserGuard)

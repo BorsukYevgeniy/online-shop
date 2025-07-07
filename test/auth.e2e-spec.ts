@@ -7,8 +7,11 @@ import { PrismaService } from '../src/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import { CreateUserDto } from '../src/user/dto/create-user.dto';
 import { ValidationPipe } from '@nestjs/common';
-import { LoginUserDto } from 'src/auth/dto/login-user.dto';
+import { LoginUserDto } from '../src/auth/dto/login-user.dto';
 import { join } from 'path';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import Keyv from 'keyv';
 
 describe('AuthController (e2e)', () => {
   let app: NestExpressApplication;
@@ -17,8 +20,18 @@ describe('AuthController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        AuthModule,
+        CacheModule.register({
+          isGlobal: true,
+          ttl: 60 * 1000,
+          stores: [
+            new Keyv(new KeyvRedis(process.env.REDIS_URL), {
+              namespace: '',
+              useKeyPrefix: false,
+            }),
+          ],
+        }),
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
+        AuthModule,
       ],
     }).compile();
 

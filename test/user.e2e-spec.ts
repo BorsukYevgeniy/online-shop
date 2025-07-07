@@ -8,6 +8,9 @@ import { UserModule } from '../src/user/user.module';
 import * as request from 'supertest';
 import { hash } from 'bcryptjs';
 import { ValidationPipe } from '@nestjs/common';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import Keyv from 'keyv';
 
 describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
@@ -16,6 +19,16 @@ describe('UserController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
+        CacheModule.register({
+          isGlobal: true,
+          ttl: 60 * 1000,
+          stores: [
+            new Keyv(new KeyvRedis(process.env.REDIS_URL), {
+              namespace: '',
+              useKeyPrefix: false,
+            }),
+          ],
+        }),
         UserModule,
         AuthModule,
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),

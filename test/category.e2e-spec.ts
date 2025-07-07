@@ -11,6 +11,9 @@ import { hash } from 'bcryptjs';
 import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
 import { SearchCategoryDto } from 'src/category/dto/search-category.dto';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import Keyv from 'keyv';
 
 describe('CategoryController (e2e)', () => {
   let app: NestExpressApplication;
@@ -19,6 +22,16 @@ describe('CategoryController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
+        CacheModule.register({
+          isGlobal: true,
+          ttl: 60 * 1000,
+          stores: [
+            new Keyv(new KeyvRedis(process.env.REDIS_URL), {
+              namespace: '',
+              useKeyPrefix: false,
+            }),
+          ],
+        }),
         AuthModule,
         CategoryModule,
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),

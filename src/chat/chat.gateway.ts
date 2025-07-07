@@ -10,11 +10,11 @@ import { Server, Socket } from 'socket.io';
 import { MessageService } from '../message/message.service';
 import { TokenService } from '../token/token.service';
 import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { SendMessageDto } from 'src/message/dto/send-message.dto';
-import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
-import { UpdateMessageGatewayDto } from 'src/message/dto/update-message-gateway.dto';
-import { DeleteMessageGatewayDto } from 'src/message/dto/delete-message-gatewat.dto';
-import { TokenPayload } from 'src/token/interface/token.interfaces';
+import { SendMessageDto } from '../message/dto/send-message.dto';
+import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { UpdateMessageGatewayDto } from '../message/dto/update-message-gateway.dto';
+import { DeleteMessageGatewayDto } from '../message/dto/delete-message-gatewat.dto';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 import {
   OnGatewayConnection,

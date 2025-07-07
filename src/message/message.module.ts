@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { MessageRepository } from './message.repository';
 import { MessageService } from './message.service';
 import { MessageApiController } from './message.api.controller';

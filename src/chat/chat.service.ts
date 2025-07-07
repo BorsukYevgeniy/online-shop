@@ -10,7 +10,7 @@ import { ChatMessages, UserChat } from './types/chat.types';
 import { Chat } from '@prisma/client';
 
 import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum';
-import { UserErrorMessages as UserErrMsg } from 'src/user/constants/user-error-messages.constants';
+import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 

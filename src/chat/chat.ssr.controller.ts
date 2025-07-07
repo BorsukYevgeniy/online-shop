@@ -17,7 +17,7 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { Response } from 'express';
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-import { SsrExceptionFilter } from 'src/filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 

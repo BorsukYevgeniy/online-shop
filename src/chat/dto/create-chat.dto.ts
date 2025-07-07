@@ -1,7 +1,7 @@
 import { IsNumber, IsPositive } from 'class-validator';
 
 import { ChatDtoErrorMessages as ChatDtoErrMsg } from '../enum/chat-dto-error-messages.enum';
-import { ToNumber } from 'src/decorators';
+import { ToNumber } from '../../decorators';
 
 export class CreateChatDto {
   @IsNumber(
