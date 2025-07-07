@@ -83,7 +83,7 @@ export class TokenService {
     return await this.tokenRepositry.findUserTokens(userId);
   }
 
-  async deleteUserToken(token: string): Promise<DeletingCount> {
+  async deleteUserToken(token: string): Promise<Token> {
     this.logger.log(`Deleting token`);
     return await this.tokenRepositry.deleteUserToken(token);
   }

@@ -34,8 +34,8 @@ export class TokenRepository {
     });
   }
 
-  async deleteUserToken(refreshToken: string): Promise<DeletingCount> {
-    return await this.prismaService.token.deleteMany({
+  async deleteUserToken(refreshToken: string): Promise<Token> {
+    return await this.prismaService.token.delete({
       where: { token: refreshToken },
     });
   }

@@ -68,6 +68,8 @@ export class AuthApiController {
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
+
+    res.sendStatus(204)
   }
 
   @Post('logout-all')
@@ -78,6 +80,8 @@ export class AuthApiController {
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
+
+    res.sendStatus(204);
   }
 
   @Post('refresh')
