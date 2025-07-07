@@ -10,6 +10,7 @@ import { SearchProductDto } from './dto/search-product.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
 import { ProductCategory } from './types/product.types';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('ProductApiController', () => {
   let controller: ProductApiController;
@@ -24,6 +25,7 @@ describe('ProductApiController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [ProductApiController],
       providers: [
         {
@@ -108,9 +110,9 @@ describe('ProductApiController', () => {
       });
 
       const products = await controller.getAll(
+        searchDto,
         { page: 1, pageSize: 10 },
         { sortBy: 'id', order: Order.DESC },
-        searchDto,
       );
 
       expect(products).toEqual({

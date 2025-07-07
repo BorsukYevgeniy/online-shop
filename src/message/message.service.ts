@@ -99,10 +99,7 @@ export class MessageService {
   private async validateMessageOwnership(
     messageId: number,
     userId: number,
-  ): Promise<boolean> {
-    
-    
-    
+  ): Promise<boolean> {    
     this.logger.log(
       `Validating ownership of message ID ${messageId} for user ID ${userId}.`,
     );
@@ -111,9 +108,6 @@ export class MessageService {
 
 
     if (!message) {
-
-      console.log(`Message with ID ${messageId} not found.`);
-
       this.logger.warn(`Message with ID ${messageId} not found.`);
       throw new NotFoundException(MessageErrMsg.MessageNotFound);
     }
@@ -122,8 +116,6 @@ export class MessageService {
       this.logger.warn(
         `User with ID ${userId} is not the owner of message ID ${messageId}.`,
       );
-
-      console.log(`User with ID ${userId} is not the owner of message ID ${messageId}.`);
 
       throw new ForbiddenException();
     }

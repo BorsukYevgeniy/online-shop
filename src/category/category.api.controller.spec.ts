@@ -8,6 +8,7 @@ import { ProductService } from '../product/product.service';
 import { Order } from '../enum/order.enum';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SearchCategoryDto } from './dto/search-category.dto';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('CategoryApiController', () => {
   let controller: CategoryApiController;
@@ -16,6 +17,7 @@ describe('CategoryApiController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [CategoryApiController],
       providers: [
         {

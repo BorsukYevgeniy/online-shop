@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/request.type';
 import { TokenService } from '../token/token.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('AuthApiController', () => {
   let controller: AuthApiController;
@@ -13,6 +14,7 @@ describe('AuthApiController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [AuthApiController],
       providers: [
         {

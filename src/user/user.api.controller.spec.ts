@@ -10,6 +10,7 @@ import { Role } from '../enum/role.enum';
 import { Order } from '../enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserNoCred, UserNoPasswordVLink } from './types/user.types';
+import { CacheModule } from '@nestjs/cache-manager';
 
 const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
 
@@ -20,6 +21,7 @@ describe('UserApiController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [UserApiController],
       providers: [
         {

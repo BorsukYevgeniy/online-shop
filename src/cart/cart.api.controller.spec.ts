@@ -6,6 +6,7 @@ import { CartApiController } from './cart.api.controller';
 import { Role } from '../enum/role.enum';
 import { AuthRequest } from '../types/request.type';
 import { TokenService } from '../token/token.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('CartApiController', () => {
   let controller: CartApiController;
@@ -13,6 +14,7 @@ describe('CartApiController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [CartApiController],
       providers: [
         {
