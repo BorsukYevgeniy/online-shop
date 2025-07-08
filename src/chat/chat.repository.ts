@@ -22,11 +22,7 @@ export class ChatRepository {
     });
   }
 
-  
-
-
-
-  async findChatBeetweenUsers(
+  async findChatBetweenUsers(
     sellerId: number,
     buyerId: number,
   ): Promise<Chat | null> {

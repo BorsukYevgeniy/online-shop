@@ -24,7 +24,7 @@ export class ChatService {
     sellerId: number,
     buyerId: number,
   ): Promise<Chat | null> {
-    const chat = await this.chatRepository.findChatBeetweenUsers(
+    const chat = await this.chatRepository.findChatBetweenUsers(
       sellerId,
       buyerId,
     );
@@ -45,7 +45,6 @@ export class ChatService {
 
     if (!userChats) {
       this.logger.warn(`User with ID ${userId} has no chats.`);
-      throw new NotFoundException(ChatErrMsg.UserChatsNotFound);
     }
 
     this.logger.log(`User with ID ${userId} has ${userChats.length} chats.`);
@@ -87,9 +86,8 @@ export class ChatService {
   }
 
   async deleteChat(chatId: number, userId: number): Promise<Chat> {
+    await this.validateChatParticipants(chatId, userId);
     try {
-      await this.validateChatParticipants(chatId, userId);
-
       this.logger.log(`Deleting chat with ID ${chatId}.`);
 
       return await this.chatRepository.deleteChat(chatId);

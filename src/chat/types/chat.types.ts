@@ -14,4 +14,4 @@ export type UserChat = { id: number; withWhom: string };
  *
  * @property messages - The messages in this chat
  */
-export type ChatMessages = Chat & { messages: Omit<MessageNickname, 'text'>[] };
+export type ChatMessages = Chat & { messages: MessageNickname[] };
