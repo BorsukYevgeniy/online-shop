@@ -7,7 +7,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
-import { User } from '@prisma/client';
+import { Token, User } from '@prisma/client';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -188,7 +188,7 @@ describe('AuthService', () => {
   it('Should logout a user', async () => {
     const refreshToken = 'refreshToken';
 
-    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({ count: 1 });
+    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({} as Token);
 
     await service.logout(refreshToken);
 
@@ -198,7 +198,7 @@ describe('AuthService', () => {
   it('Should logout all users', async () => {
     const userId = 1;
 
-    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({ count: 1 });
+    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue( {} as Token);
 
     await service.logoutAll(userId);
 

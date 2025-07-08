@@ -5,7 +5,7 @@ import { Token } from '@prisma/client';
 
 describe('TokenRepository', () => {
   let tokensRepository: TokenRepository;
-  let prismaService: PrismaService;
+  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,8 +16,10 @@ describe('TokenRepository', () => {
           useValue: {
             token: {
               findFirst: jest.fn(),
-              create: jest.fn(),
               findMany: jest.fn(),
+              update: jest.fn(),
+              create: jest.fn(),
+              delete: jest.fn(),
               deleteMany: jest.fn(),
             },
           },
@@ -26,7 +28,7 @@ describe('TokenRepository', () => {
     }).compile();
 
     tokensRepository = module.get<TokenRepository>(TokenRepository);
-    prismaService = module.get<PrismaService>(PrismaService);
+    prisma = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(async () => {
@@ -47,14 +49,28 @@ describe('TokenRepository', () => {
       token: refreshToken,
       expiresAt,
     };
-    jest.spyOn(prismaService.token, 'create').mockResolvedValue(token);
+    jest.spyOn(prisma.token, 'create').mockResolvedValue(token);
 
     expect(await tokensRepository.create(userId, refreshToken, expiresAt)).toBe(
       token,
     );
-    expect(prismaService.token.create).toHaveBeenCalledWith({
+    expect(prisma.token.create).toHaveBeenCalledWith({
       data: { userId, expiresAt, token: refreshToken },
     });
+  });
+
+  it('Should update token', async () => {
+    jest
+      .spyOn(prisma.token, 'update')
+      .mockResolvedValue({ token: 'newRefreshToken' } as Token);
+
+    const token = await tokensRepository.update(
+      'token',
+      'newRefreshToken',
+      new Date(),
+    );
+
+    expect(token).toEqual({ token: 'newRefreshToken' });
   });
 
   it('Should find user tokens by userId', async () => {
@@ -67,51 +83,43 @@ describe('TokenRepository', () => {
         expiresAt: new Date(),
       },
     ];
-    jest.spyOn(prismaService.token, 'findMany').mockResolvedValue(tokens);
+    jest.spyOn(prisma.token, 'findMany').mockResolvedValue(tokens);
 
     expect(await tokensRepository.findUserTokens(userId)).toBe(tokens);
-    expect(prismaService.token.findMany).toHaveBeenCalledWith({
+    expect(prisma.token.findMany).toHaveBeenCalledWith({
       where: { userId },
     });
   });
 
   it('Should delete all user tokens by user id', async () => {
     const userId = 1;
-    jest
-      .spyOn(prismaService.token, 'deleteMany')
-      .mockResolvedValue({ count: 1 });
+    jest.spyOn(prisma.token, 'deleteMany').mockResolvedValue({ count: 1 });
 
     expect(await tokensRepository.deleteAllUsersTokens(userId)).toEqual({
       count: 1,
     });
-    expect(prismaService.token.deleteMany).toHaveBeenCalledWith({
+    expect(prisma.token.deleteMany).toHaveBeenCalledWith({
       where: { userId },
     });
   });
 
   it('Should delete user tokens by token', async () => {
     const token = 'refreshToken';
-    jest
-      .spyOn(prismaService.token, 'deleteMany')
-      .mockResolvedValue({ count: 1 });
+    jest.spyOn(prisma.token, 'delete').mockResolvedValue({} as Token);
 
-    expect(await tokensRepository.deleteUserToken(token)).toEqual({
-      count: 1,
-    });
-    expect(prismaService.token.deleteMany).toHaveBeenCalledWith({
+    expect(await tokensRepository.deleteUserToken(token)).toEqual({} as Token);
+    expect(prisma.token.delete).toHaveBeenCalledWith({
       where: { token },
     });
   });
 
   it('Should delete expired tokens', async () => {
-    jest
-      .spyOn(prismaService.token, 'deleteMany')
-      .mockResolvedValue({ count: 1 });
+    jest.spyOn(prisma.token, 'deleteMany').mockResolvedValue({ count: 1 });
 
     expect(await tokensRepository.deleteExpiredTokens()).toEqual({
       count: 1,
     });
-    expect(prismaService.token.deleteMany).toHaveBeenCalledWith({
+    expect(prisma.token.deleteMany).toHaveBeenCalledWith({
       where: { expiresAt: { lt: expect.any(Date) } },
     });
   });

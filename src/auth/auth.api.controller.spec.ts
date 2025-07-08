@@ -7,6 +7,7 @@ import { AuthRequest } from '../types/request.type';
 import { TokenService } from '../token/token.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
+import { Token } from '@prisma/client';
 
 describe('AuthApiController', () => {
   let controller: AuthApiController;
@@ -154,10 +155,11 @@ describe('AuthApiController', () => {
 
     const res: Partial<Response> = {
       clearCookie: jest.fn(),
-      send: jest.fn(),
+
+      sendStatus: jest.fn(),
     } as any;
 
-    jest.spyOn(service, 'logout').mockResolvedValue({ count: 1 });
+    jest.spyOn(service, 'logout').mockResolvedValue({} as Token);
 
     await controller.logout(req, res as Response);
 
@@ -170,14 +172,13 @@ describe('AuthApiController', () => {
     const req: AuthRequest = {
       user: {
         id: 1,
-        roles: ['USER'],
       },
       cookies: { refreshToken: 'refreshToken' },
     } as any;
 
     const res: Partial<Response> = {
       clearCookie: jest.fn(),
-      send: jest.fn(),
+      sendStatus: jest.fn(),
     } as any;
 
     jest.spyOn(service, 'logoutAll').mockResolvedValue({ count: 1 });

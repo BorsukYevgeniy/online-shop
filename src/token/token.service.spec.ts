@@ -4,6 +4,7 @@ import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '../enum/role.enum';
+import { Token } from '@prisma/client';
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -19,6 +20,7 @@ describe('TokenService', () => {
           useValue: {
             findUserTokens: jest.fn(),
             create: jest.fn(),
+            update: jest.fn(),
             deleteUserToken: jest.fn(),
             deleteAllUsersTokens: jest.fn(),
           },
@@ -117,10 +119,34 @@ describe('TokenService', () => {
     expect(result).toEqual(tokens);
   });
 
+  it('Should update token', async () => {
+    const token = 'token';
+    const accessToken = 'access-token';
+    const refreshToken = 'refresh-token';
+
+    jest
+      .spyOn(jwt, 'verifyAsync')
+      .mockResolvedValueOnce({ id: 1, role: Role.USER, isVerified: true });
+
+      jest.spyOn(jwt, 'signAsync').mockResolvedValueOnce(refreshToken);
+    jest.spyOn(jwt, 'signAsync').mockResolvedValueOnce(accessToken);
+    jest
+      .spyOn(repository, 'update')
+      .mockResolvedValue({ token: '123' } as Token);
+
+    const newTokens = await service.updateTokens(token);
+    expect(repository.update).toHaveBeenCalledWith(
+      token,
+      refreshToken,
+      expect.any(Date),
+    );
+    expect(newTokens).toEqual({ accessToken, refreshToken });
+  });
+
   it('Should delete all user tokens', async () => {
     const userId = 1;
 
-    jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({ count: 1 });
+    jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({} as Token);
 
     await service.deleteAllUsersTokens(userId);
 
@@ -130,7 +156,7 @@ describe('TokenService', () => {
   it('Should delete user tokens', async () => {
     const token = 'token';
 
-    jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({ count: 1 });
+    jest.spyOn(repository, 'deleteUserToken').mockResolvedValue({} as Token);
 
     await service.deleteUserToken(token);
 
