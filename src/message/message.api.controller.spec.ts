@@ -136,10 +136,15 @@ describe('MessageApiController', () => {
     ])('%s', async (_, id, found, owned) => {
       if (found && owned) {
         // Simulate a scenario where the message is found and owned by the user
-        jest.spyOn(service, 'deleteMessage').mockResolvedValue(undefined);
+        jest.spyOn(service, 'deleteMessage').mockResolvedValue({
+          id: 1,
+          text: 'Hello',
+          chatId: 1,
+          userId: 1,
+      });
 
         const result = await controller.deleteMessage(req, id);
-        expect(result).toBeUndefined();
+        expect(result).toEqual(undefined);
       } else if (found && !owned) {
         // Simulate a scenario where the user does not own the message
 

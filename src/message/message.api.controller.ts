@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Req,
@@ -45,10 +46,11 @@ export class MessageApiController {
   }
 
   @Delete(':messageId')
+  @HttpCode(204)
   async deleteMessage(
     @Req() req: AuthRequest,
     @Param('messageId') messageId: number,
-  ): Promise<Message> {
-    return await this.messageService.deleteMessage(messageId, req.user.id);
+  ): Promise<void> {
+    await this.messageService.deleteMessage(messageId, req.user.id);
   }
 }
