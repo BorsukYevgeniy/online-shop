@@ -114,6 +114,6 @@ describe('ChatRepository', () => {
     jest.spyOn(prisma.chat, 'delete').mockResolvedValue(mockChat as any);
 
     const result = await repository.deleteChat(1);
-    expect(result).toEqual(mockChat);
+    expect(result).toEqual(undefined);
   });
 });

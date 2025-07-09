@@ -85,7 +85,7 @@ export class ChatService {
     }
   }
 
-  async deleteChat(chatId: number, userId: number): Promise<Chat> {
+  async deleteChat(chatId: number, userId: number): Promise<void> {
     await this.validateChatParticipants(chatId, userId);
     try {
       this.logger.log(`Deleting chat with ID ${chatId}.`);

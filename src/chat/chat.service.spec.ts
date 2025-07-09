@@ -120,10 +120,10 @@ describe('ChatService', () => {
         jest
           .spyOn(repository, 'getUsersInChat')
           .mockResolvedValue({ users: [{ id: 1 }, { id: 2 }] });
-        jest.spyOn(repository, 'deleteChat').mockResolvedValue({ id: 1 });
+        jest.spyOn(repository, 'deleteChat').mockResolvedValue(undefined);
 
         const result = await service.deleteChat(1, 1);
-        expect(result).toEqual({ id: 1 });
+        expect(result).toEqual(undefined);
       } else {
         jest.spyOn(repository, 'deleteChat').mockRejectedValue(
           new PrismaClientKnownRequestError('', {

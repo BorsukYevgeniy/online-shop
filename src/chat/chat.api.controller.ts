@@ -8,6 +8,7 @@ import {
   Body,
   Delete,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthRequest } from '../types/request.type';
@@ -47,10 +48,11 @@ export class ChatApiController {
   }
 
   @Delete(':chatId')
+  @HttpCode(204)
   async deleteChat(
     @Req() req: AuthRequest,
     @Param('chatId') chatId: number,
-  ): Promise<Chat> {
+  ): Promise<void> {
     return await this.chatService.deleteChat(chatId, req.user.id);
   }
 }

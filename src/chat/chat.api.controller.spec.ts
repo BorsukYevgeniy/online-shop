@@ -98,13 +98,13 @@ describe('ChatApiController', () => {
       ['Should not delete chat', false],
     ])('%s', async (_, success) => {
       if (success) {
-        jest.spyOn(service, 'deleteChat').mockResolvedValue({ id: 1 });
+        jest.spyOn(service, 'deleteChat').mockResolvedValue(undefined);
 
         const result = await controller.deleteChat(
           { user: { id: 1 } } as AuthRequest,
           1,
         );
-        expect(result).toEqual({ id: 1 });
+        expect(result).toEqual(undefined);
       } else {
         jest
           .spyOn(service, 'deleteChat')

@@ -191,22 +191,22 @@ describe('ChatController (e2e)', () => {
 
 
   describe('DELETE /api/chats/:chatId - Should DELETE chat by id', () => {
-    it.each<[string, 200 | 403 | 404]>([
+    it.each<[string, 204 | 403 | 404]>([
       [
         'DELETE /api/chats/:chatId - 403 FORBIDDEN - Should return 403 HTTP code because user isnt participant of this chat',
         403,
       ],
-      ['DELETE /api/chats/:chatId - 200 OK - Should delete chat by id', 200],
+      ['DELETE /api/chats/:chatId - 200 OK - Should delete chat by id', 204],
       [
         'DELETE /api/chats/:chatId - 404 NOT FOUND - Should return 404 HTTP code because chat not found',
         404,
       ],
     ])('%s', async (_, code) => {
-      if (code === 200) {
+      if (code === 204) {
         const { body } = await request(app.getHttpServer())
           .delete(`/api/chats/${chatId}`)
           .set('Cookie', [`accessToken=${userAccessToken}`])
-          .expect(200);
+          .expect(204);
 
         expect(body).toEqual({ id: chatId });
       } else {
