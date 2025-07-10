@@ -47,7 +47,7 @@ describe('ProductController (e2e)', () => {
     await app.init();
   }, 6500);
 
-  let accessToken: string;
+  let userAccessToken: string, guestAccessToken: string;
   let category1Id: number, category2Id: number;
   let userId: number;
 
@@ -62,10 +62,24 @@ describe('ProductController (e2e)', () => {
       },
       select: { id: true },
     });
+    const guest = await prisma.user.create({
+      data: {
+        email: "test@gmail.com",
+        password: await hash('password', 10),
+        nickname: 'guest',
+        isVerified: true,
+        verifiedAt: new Date(),
+      },
+      select: { email: true },
+    })
 
-    const { headers } = await request(app.getHttpServer())
+    const { headers: userHeaders } = await request(app.getHttpServer())
       .post('/api/auth/login')
       .send({ email: process.env.TEST_EMAIL, password: 'password' });
+
+      const { headers: guestHeaders } = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: guest.email, password: 'password' });
 
     const [category1, category2] = await Promise.all([
       prisma.category.create({
@@ -78,7 +92,8 @@ describe('ProductController (e2e)', () => {
 
     category1Id = category1.id;
     category2Id = category2.id;
-    accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
+    userAccessToken = userHeaders['set-cookie'][0].split('=')[1].split(';')[0];
+    guestAccessToken = guestHeaders['set-cookie'][0].split('=')[1].split(';')[0];
     userId = user.id;
   }, 6500);
 
@@ -221,7 +236,7 @@ describe('ProductController (e2e)', () => {
     ])('%s', async (_, statusCode, dto, file) => {
       const requestBuilder = request(app.getHttpServer())
         .post('/api/products')
-        .set('Cookie', [`accessToken=${accessToken}`]);
+        .set('Cookie', [`accessToken=${userAccessToken}`]);
 
       if (dto) {
         Object.entries(dto).forEach(([key, value]) => {
@@ -261,12 +276,12 @@ describe('ProductController (e2e)', () => {
   describe('GET /api/products/:productId - Should find the product by id', () => {
     it.each<[string, 200 | 404]>([
       [
-        'GET /api/products/:productId - 200 OK - Should return the product by id',
-        200,
-      ],
-      [
         'GET /api/products/:productId - 404 NOT FOUND - Should return 404 HTTP code because product not found',
         404,
+      ],
+      [
+        'GET /api/products/:productId - 200 OK - Should return the product by id',
+        200,
       ],
     ])('%s', async (_, status) => {
       const { body: product } = await request(app.getHttpServer())
@@ -290,7 +305,7 @@ describe('ProductController (e2e)', () => {
   });
 
   describe('PATCH /api/products/:productId - Should update product', () => {
-    it.each<[string, 200 | 400 | 404, UpdateProductDto | null, Buffer | null]>([
+    it.each<[string, 200 | 400 | 403 | 404, UpdateProductDto | null, Buffer | null]>([
       [
         'PATCH /api/products/:productId - 200 OK - Should update title in product',
         200,
@@ -298,7 +313,13 @@ describe('ProductController (e2e)', () => {
         null,
       ],
       [
-        'PATCH /api/products/:productId - 404 NOT FOUND - Should return 404 HTTP code',
+        'PATCH /api/products/:productId - 403 FORBIDDEN - Should return 403 HTTP code because user isnt ownership of this product',
+        403,
+        { title: 'New Title' },
+        null,
+      ],
+      [
+        'PATCH /api/products/:productId - 404 NOT FOUND - Should return 404 HTTP code because product not found',
         404,
         null,
         null,
@@ -351,7 +372,7 @@ describe('ProductController (e2e)', () => {
         .patch(
           `/api/products/${statusCode === 404 ? productId - 1 : productId}`,
         )
-        .set('Cookie', [`accessToken=${accessToken}`]);
+        .set('Cookie', [`accessToken=${statusCode === 403 ? guestAccessToken : userAccessToken}`]);
 
       if (dto) {
         Object.entries(dto).forEach(([key, value]) => {
@@ -387,7 +408,11 @@ describe('ProductController (e2e)', () => {
   });
 
   describe('DELETE /api/products/:productId - Should delete product', () => {
-    it.each<[string, 204 | 404]>([
+    it.each<[string, 204 | 403 | 404]>([
+      [
+        'PATCH /api/products/:productId - 403 FORBIDDEN - Should return 403 HTTP code because user isnt ownership of this product',
+        403,
+      ],
       [
         'DELETE /api/products/:productId - 204 NO CONTENT - Should delete product',
         204,
@@ -401,7 +426,9 @@ describe('ProductController (e2e)', () => {
         .delete(
           `/api/products/${statusCode === 404 ? productId - 1 : productId}`,
         )
-        .set('Cookie', [`accessToken=${accessToken}`])
+        .set('Cookie', [
+          `accessToken=${statusCode === 403 ? guestAccessToken : userAccessToken}`,
+        ])
         .expect(statusCode);
     });
   });
