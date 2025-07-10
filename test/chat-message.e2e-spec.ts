@@ -57,6 +57,7 @@ describe('ChatController (e2e)', () => {
   });
 
   let userId: number, adminId: number, guestId: number;
+  let chatId: number;
   let userAccessToken: string,
     adminAccessToken: string,
     guestAccessToken: string;
@@ -92,9 +93,14 @@ describe('ChatController (e2e)', () => {
       },
     });
 
+    const chat = await prisma.chat.create({
+      data: { users: { connect: [{ id: user.id }, { id: admin.id }] } },
+    });
+
     userId = user.id;
     adminId = admin.id;
     guestId = guest.id;
+    chatId = chat.id;
 
     const { headers: userHeaders } = await request(app.getHttpServer())
       .post('/api/auth/login')
@@ -116,103 +122,67 @@ describe('ChatController (e2e)', () => {
     await prisma.chat.deleteMany({});
   });
 
-  let chatId: number;
-  describe('POST /api/chats - Should create chat', () => {
-    it.each<[string, 201 | 400 | 404]>([
-      ['POST /api/chats - 201 CREATED - Should create chat', 201],
+  it('GET /api/chats/:chatId/messages - 200 OK - Should get messages in chat', async () => {
+    const { body } = await request(app.getHttpServer())
+      .get(`/api/chats/${chatId}/messages`)
+      .set("Cookie",[`accessToken=${guestAccessToken}`]) // guestAccessToken because guest is an admin
+      .expect(200);
+
+    expect(body).toEqual([]);
+  });
+
+  describe('POST /api/chats/:chatId/messages - Should create message in chat', () => {
+    it.each<[string, 201 | 400 | 403 | 404]>([
       [
-        'POST /api/chats - 400 BAD REQUEST - Should return 400 HTTP code because cannot create chat with himself',
+        'POST /api/chats/:chatId/messages - 403 FORBIDDEN - Should return 403 HTTP code because user doesnt exist in this chat',
+        403,
+      ],
+      [
+        'POST /api/chats/:chatId/messages - 201 CREATED - Should create message in chat',
+        201,
+      ],
+      [
+        'POST /api/chats/:chatId/messages - 400 BAD REQUEST - Should return 400 HTTP code because dto not valid',
         400,
       ],
       [
-        'POST /api/chats - 404 NOT FOUND - Should return 404 HTTP code because cannot user not found',
+        'POST /api/chats/:chatId/messages - 400 BAD REQUEST - Should return 404 HTTP code because chat not found',
         404,
       ],
     ])('%s', async (_, code) => {
-      const dto: CreateChatDto = { buyerId: userId, sellerId: adminId };
-      if (code === 201) {
-        const { body } = await request(app.getHttpServer())
-          .post('/api/chats')
-          .send(dto)
-          .set('Cookie', [`accessToken=${userAccessToken}`])
-          .expect(code);
+      switch (code) {
+        case 201:
+          await request(app.getHttpServer())
+            .post(`/api/chats/${chatId}/messages`)
+            .send({ text: '123456' })
+            .set('Cookie', [`accessToken=${userAccessToken}`])
+            .expect(201);
+          break;
 
-        expect(body).toEqual({ id: expect.any(Number) });
+        case 404:
+          await request(app.getHttpServer())
+            .post(`/api/chats/${chatId - 1}/messages`)
+            .send({ text: '123456' })
+            .set('Cookie', [`accessToken=${guestAccessToken}`])
+            .expect(404);
+          break;
 
-        chatId = body.id;
-      } else {
-        await request(app.getHttpServer())
-          .post('/api/chats')
-          .send({ ...dto, sellerId: code === 404 ? adminId + 2 : userId })
-          .set('Cookie', [`accessToken=${userAccessToken}`])
-          .expect(code);
+        case 400:
+          await request(app.getHttpServer())
+            .post(`/api/chats/${chatId}/messages`)
+            .send({ text: '1' }) // не валідний dto
+            .set('Cookie', [`accessToken=${guestAccessToken}`])
+            .expect(400);
+          break;
+
+        case 403:
+          await request(app.getHttpServer())
+            .post(`/api/chats/${chatId}/messages`)
+            .send({ text: '123456' })
+            .set('Cookie', [`accessToken=${guestAccessToken}`])
+            .expect(403);
+          break;
       }
     });
   });
-
-  it('GET /api/chats - 200 OK - Should return user chats', async () => {
-    const { body } = await request(app.getHttpServer())
-      .get('/api/chats')
-      .set('Cookie', [`accessToken=${userAccessToken}`])
-      .expect(200);
-
-    expect(body).toEqual([{ id: chatId, withWhom: 'user2' }]);
-  });
-
-  describe('GET /api/chats/:chatId - Should get chat by id', () => {
-    it.each<[string, 200 | 403 | 404]>([
-      [
-        'GET /api/chats/:chatId - 403 FORBIDDEN - Should return 403 HTTP code because user isnt participant of this chat',
-        403,
-      ],
-      ['GET /api/chats/:chatId - 200 OK - Should return chat by id', 200],
-      [
-        'GET /api/chats/:chatId - 404 NOT FOUND - Should return 404 HTTP code because chat not found',
-        404,
-      ],
-    ])('%s', async (_, code) => {
-      if (code === 200) {
-        const { body } = await request(app.getHttpServer())
-          .get(`/api/chats/${chatId}`)
-          .set('Cookie', [`accessToken=${userAccessToken}`])
-          .expect(200);
-
-        expect(body).toEqual({ id: chatId, messages: [] });
-      } else {
-        await request(app.getHttpServer())
-          .get(`/api/chats/${code === 404 ? chatId + 1 : chatId}`)
-          .set('Cookie', [`accessToken=${guestAccessToken}`])
-          .expect(code);
-      }
-    });
-  });
-
-
-  describe('DELETE /api/chats/:chatId - Should DELETE chat by id', () => {
-    it.each<[string, 204 | 403 | 404]>([
-      [
-        'DELETE /api/chats/:chatId - 403 FORBIDDEN - Should return 403 HTTP code because user isnt participant of this chat',
-        403,
-      ],
-      ['DELETE /api/chats/:chatId - 200 OK - Should delete chat by id', 204],
-      [
-        'DELETE /api/chats/:chatId - 404 NOT FOUND - Should return 404 HTTP code because chat not found',
-        404,
-      ],
-    ])('%s', async (_, code) => {
-      if (code === 204) {
-        await request(app.getHttpServer())
-          .delete(`/api/chats/${chatId}`)
-          .set('Cookie', [`accessToken=${userAccessToken}`])
-          .expect(204);
-      } else {
-        await request(app.getHttpServer())
-          .delete(`/api/chats/${code === 404 ? chatId + 1 : chatId}`)
-          .set('Cookie', [`accessToken=${guestAccessToken}`])
-          .expect(code);
-      }
-    });
-  });
-
-
 });

@@ -6,10 +6,12 @@ import { ChatMessages, UserChat } from './types/chat.types';
 import { NotFoundException } from '@nestjs/common';
 import { MessageNickname } from '../message/types/message.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 
 describe('ChatService', () => {
   let repository: ChatRepository;
   let service: ChatService;
+  let validationService: ChatMemberValidationService
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -26,11 +28,18 @@ describe('ChatService', () => {
             deleteChat: jest.fn(),
           },
         },
+        {
+          provide: ChatMemberValidationService,
+          useValue: {
+            validateChatMembers: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     repository = module.get<ChatRepository>(ChatRepository);
     service = module.get<ChatService>(ChatService);
+    validationService = module.get<ChatMemberValidationService>(ChatMemberValidationService);
   });
 
   afterEach(async () => {
@@ -73,12 +82,16 @@ describe('ChatService', () => {
       jest.spyOn(repository, 'getChatById').mockResolvedValue(chat);
       if (chat) {
         jest
-          .spyOn(repository, 'getUsersInChat')
-          .mockResolvedValue({ users: [{ id: 1 }, { id: 2 }] });
+          .spyOn(validationService, 'validateChatMembers')
+          .mockResolvedValue(undefined);
 
         const result = await service.getChatById(1, 2);
         expect(result).toEqual(chat);
       } else {
+        jest
+          .spyOn(validationService, 'validateChatMembers')
+          .mockRejectedValue(new NotFoundException());
+
         await expect(service.getChatById(1, 2)).rejects.toThrow(
           NotFoundException,
         );
@@ -118,8 +131,9 @@ describe('ChatService', () => {
     ])('%s', async (_, success) => {
       if (success) {
         jest
-          .spyOn(repository, 'getUsersInChat')
-          .mockResolvedValue({ users: [{ id: 1 }, { id: 2 }] });
+          .spyOn(validationService, 'validateChatMembers')
+          .mockResolvedValue(undefined);
+          
         jest.spyOn(repository, 'deleteChat').mockResolvedValue(undefined);
 
         const result = await service.deleteChat(1, 1);

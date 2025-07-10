@@ -13,12 +13,16 @@ import { MessageNickname } from './types/message.type';
 
 import { MessageErrorMessages as MessageErrMsg } from './enum/message-error-messages.enum';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 
 @Injectable()
 export class MessageService {
   private readonly logger: Logger = new Logger(MessageService.name);
 
-  constructor(private readonly messageRepository: MessageRepository) {}
+  constructor(private readonly messageRepository: MessageRepository,
+    private readonly validationService: ChatMemberValidationService,
+  ) {}
+
 
   async getMessageById(messageId: number, userId: number) {
     await this.validateMessageOwnership(messageId, userId);
@@ -46,6 +50,8 @@ export class MessageService {
     chatId: number,
     userId: number,
   ): Promise<MessageNickname> {
+    await this.validationService.validateChatMembers(chatId, userId)
+
     this.logger.log(
       `Creating message in chat ID ${chatId} from user ID ${userId}.`,
     );

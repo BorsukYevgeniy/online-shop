@@ -13,12 +13,16 @@ import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum'
 import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 
 @Injectable()
 export class ChatService {
   private readonly logger: Logger = new Logger(ChatService.name);
 
-  constructor(private readonly chatRepository: ChatRepository) {}
+  constructor(
+    private readonly chatRepository: ChatRepository,
+    private readonly validationService: ChatMemberValidationService,
+  ) {}
 
   async findChatBetweenUsers(
     sellerId: number,
@@ -53,7 +57,7 @@ export class ChatService {
   }
 
   async getChatById(id: number, userId: number): Promise<ChatMessages> {
-    await this.validateChatParticipants(id, userId);
+    await this.validationService.validateChatMembers(id, userId);
 
     const chat = await this.chatRepository.getChatById(id);
 
@@ -86,7 +90,8 @@ export class ChatService {
   }
 
   async deleteChat(chatId: number, userId: number): Promise<void> {
-    await this.validateChatParticipants(chatId, userId);
+    await this.validationService.validateChatMembers(chatId, userId);
+
     try {
       this.logger.log(`Deleting chat with ID ${chatId}.`);
 
@@ -97,31 +102,5 @@ export class ChatService {
         throw new NotFoundException(ChatErrMsg.ChatNotFound);
       }
     }
-  }
-
-  private async validateChatParticipants(
-    chatId: number,
-    userId: number,
-  ): Promise<boolean> {
-    this.logger.log(`Validating participants for chat ID ${chatId}.`);
-
-    const chat = await this.chatRepository.getUsersInChat(chatId);
-    if (!chat) {
-      this.logger.warn(`Chat with ID ${chatId} not found.`);
-      throw new NotFoundException(ChatErrMsg.ChatNotFound);
-    }
-
-    const isParticipant = chat.users.some((u) => u.id === userId);
-    if (!isParticipant) {
-      this.logger.warn(
-        `User with ID ${userId} is not a participant in chat ID ${chatId}.`,
-      );
-      throw new ForbiddenException();
-    }
-
-    this.logger.log(
-      `User with ID ${userId} is a participant in chat ID ${chatId}.`,
-    );
-    return true;
   }
 }

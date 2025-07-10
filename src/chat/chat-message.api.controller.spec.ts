@@ -1,11 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MessageService } from './message.service';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
-
 import { AuthRequest } from '../types/request.type';
 import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import { ChatMessageApiController } from './chat-message.api.controller';
+import { ChatMessageApiController } from '../chat/chat-message.api.controller';
+import { MessageService } from '../message/message.service';
 
 const req = { user: { id: 1 } } as AuthRequest;
 

@@ -5,12 +5,20 @@ import { ChatService } from './chat.service';
 import { ChatRepository } from './chat.repository';
 import { ChatSsrController } from './chat.ssr.controller';
 import { ChatGateway } from './chat.gateway';
-import { MessageModule } from '../message/message.module';
 import { ChatApiController } from './chat.api.controller';
+import { ChatMessageModule } from '../chat-message/chat-message.module';
+import { MessageModule } from '../message/message.module';
+import { ChatMessageApiController } from './chat-message.api.controller';
+import { ChatMessageSsrController } from './chat-message.ssr.controller';
 
 @Module({
-  imports: [TokenModule, PrismaModule, MessageModule],
-  controllers: [ChatSsrController, ChatApiController],
+  imports: [TokenModule, PrismaModule, ChatMessageModule, MessageModule],
+  controllers: [
+    ChatSsrController,
+    ChatApiController,
+    ChatMessageApiController,
+    ChatMessageSsrController,
+  ],
   providers: [ChatService, ChatRepository, ChatGateway],
   exports: [ChatService],
 })

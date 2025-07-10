@@ -7,7 +7,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { MessageService } from './message.service';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 import { Role } from '../enum/role.enum';
@@ -15,6 +14,7 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { MessageService } from '../message/message.service';
 
 @Controller('chats/:chatId/messages')
 @UseGuards(VerifiedUserGuard)

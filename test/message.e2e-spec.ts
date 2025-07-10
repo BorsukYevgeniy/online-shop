@@ -13,6 +13,7 @@ import Keyv from 'keyv';
 
 import { hash } from 'bcryptjs';
 import { MessageModule } from '../src/message/message.module';
+import { ChatModule } from '../src/chat/chat.module';
 
 describe('MessageController (e2e)', () => {
   let app: NestExpressApplication;
@@ -33,7 +34,7 @@ describe('MessageController (e2e)', () => {
           ],
         }),
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
-        MessageModule,
+        ChatModule
       ],
     }).compile();
 

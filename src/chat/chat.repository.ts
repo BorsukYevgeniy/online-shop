@@ -9,19 +9,6 @@ import { ChatMessages, UserChat } from './types/chat.types';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUsersInChat(chatId: number) {
-    return await this.prisma.chat.findUnique({
-      where: { id: chatId },
-      select: {
-        users: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-  }
-
   async findChatBetweenUsers(
     sellerId: number,
     buyerId: number,

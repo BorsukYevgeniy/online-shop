@@ -2,10 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MessageRepository } from './message.repository';
 import { MessageService } from './message.service';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 
 describe('MessageService', () => {
   let service: MessageService;
   let repository: MessageRepository;
+  let validationService: ChatMemberValidationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,9 +23,16 @@ describe('MessageService', () => {
             deleteMessage: jest.fn(),
           },
         },
+        {
+          provide: ChatMemberValidationService,
+          useValue: { validateChatMembers: jest.fn() },
+        },
       ],
     }).compile();
 
+    validationService = module.get<ChatMemberValidationService>(
+      ChatMemberValidationService,
+    );
     service = module.get<MessageService>(MessageService);
     repository = module.get<MessageRepository>(MessageRepository);
   });
@@ -32,7 +41,7 @@ describe('MessageService', () => {
     expect(repository).toBeDefined();
   });
 
-  it('Should create a message', async () => {
+  describe('Should create message', () => {
     const mockMessage = {
       id: 1,
       text: 'Hello',
@@ -41,15 +50,47 @@ describe('MessageService', () => {
       user: { nickname: 'User1' },
     };
 
-    jest.spyOn(repository, 'createMessage').mockResolvedValue(mockMessage);
+    it.each<[string, boolean, boolean]>([
+      ['Should get users in chat', true, true],
+      ['Should not own user', true, false],
+      ['Should not found user', false, false],
+    ])('%s', async (_, found, own) => {
+      if (found && own) {
+        jest.spyOn(repository, 'createMessage').mockResolvedValue(mockMessage);
 
-    const result = await service.createMessage(
-      { text: mockMessage.text },
-      mockMessage.chatId,
-      mockMessage.userId,
-    );
+        const result = await service.createMessage(
+          { text: mockMessage.text },
+          mockMessage.chatId,
+          mockMessage.userId,
+        );
 
-    expect(result).toEqual(mockMessage);
+        expect(result).toEqual(mockMessage);
+      } else if (found && !own) {
+        jest
+          .spyOn(validationService, 'validateChatMembers')
+          .mockRejectedValue(new ForbiddenException());
+
+        await expect(
+          service.createMessage(
+            { text: mockMessage.text },
+            mockMessage.chatId,
+            mockMessage.userId,
+          ),
+        ).rejects.toThrow(ForbiddenException);
+      } else {
+        jest
+          .spyOn(validationService, 'validateChatMembers')
+          .mockRejectedValue(new NotFoundException());
+
+        await expect(
+          service.createMessage(
+            { text: mockMessage.text },
+            mockMessage.chatId,
+            mockMessage.userId,
+          ),
+        ).rejects.toThrow(NotFoundException);
+      }
+    });
   });
 
   describe('Should get message by id', () => {

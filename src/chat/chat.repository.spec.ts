@@ -38,14 +38,6 @@ describe('ChatRepository', () => {
     expect(repository).toBeDefined();
   });
 
-  it('Should get users in chat', async () => {
-    const mockUsers = { users: [{ id: 1 }, { id: 2 }] };
-    jest.spyOn(prisma.chat, 'findUnique').mockResolvedValue(mockUsers as any);
-
-    const result = await repository.getUsersInChat(1);
-    expect(result).toEqual(mockUsers);
-  });
-
   it('Should find chat between users', async () => {
     const mockChat = { id: 1 };
     jest.spyOn(prisma.chat, 'findFirst').mockResolvedValue(mockChat as any);
@@ -97,7 +89,7 @@ describe('ChatRepository', () => {
 
     jest.spyOn(prisma.chat, 'findUnique').mockResolvedValue(mockChat as any);
 
-    const result = await repository.getUsersInChat(1);
+    const result = await repository.getChatById(1);
     expect(result).toEqual(mockChat);
   });
 

@@ -3,16 +3,13 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { MessageRepository } from './message.repository';
 import { MessageService } from './message.service';
 import { MessageApiController } from './message.api.controller';
-import { ChatMessageApiController } from './chat-message.api.controller';
-import { ChatMessageSsrController } from './chat-message.ssr.controller';
 import { TokenModule } from '../token/token.module';
+import { ChatMessageModule } from '../chat-message/chat-message.module';
 
 @Module({
-  imports: [PrismaModule, TokenModule],
+  imports: [PrismaModule, TokenModule, ChatMessageModule],
   controllers: [
     MessageApiController,
-    ChatMessageApiController,
-    ChatMessageSsrController,
   ],
   providers: [MessageRepository, MessageService],
   exports: [MessageService],
