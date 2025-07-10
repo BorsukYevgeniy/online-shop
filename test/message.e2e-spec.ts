@@ -34,7 +34,7 @@ describe('MessageController (e2e)', () => {
           ],
         }),
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
-        ChatModule
+        MessageModule
       ],
     }).compile();
 
@@ -48,15 +48,10 @@ describe('MessageController (e2e)', () => {
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.init();
-  }, 6500);
+  });
 
   afterAll(async () => {
-    await Promise.all([
-      prisma.user.deleteMany(),
-      prisma.message.deleteMany(),
-      prisma.chat.deleteMany(),
-    ]);
-
+    await prisma.user.deleteMany(),
     await app.close();
   });
 
@@ -65,7 +60,7 @@ describe('MessageController (e2e)', () => {
   beforeAll(async () => {
     const password = await hash('123456', 3);
 
-    const [user, user2, guest] = await prisma.$transaction([
+    const [user, user2, guest] = await Promise.all([
       prisma.user.create({
         data: {
           email: 'test@gmail.com',

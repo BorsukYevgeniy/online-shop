@@ -10,6 +10,7 @@ import * as request from 'supertest';
 import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
+import { hash } from 'bcryptjs';
 
 describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
@@ -44,33 +45,38 @@ describe('UserController (e2e)', () => {
   let accessToken: string;
   let userId: number, productId: number;
   beforeAll(async () => {
-    await request(app.getHttpServer()).post('/api/auth/register').send({
-      email: process.env.TEST_EMAIL,
-      password: '123456',
-      nickname: 'USER123',
-    });
+    const password = await hash('123456', 3);
 
-    const { id } = await prisma.user.update({
-      where: { email: process.env.TEST_EMAIL },
-      data: { role: 'ADMIN', isVerified: true, verifiedAt: new Date() },
+    const { id } = await prisma.user.create({
+      data: {
+        email: 'test@gmail.com',
+        nickname: 'USER123',
+        password,
+        role: 'ADMIN',
+        isVerified: true,
+        verifiedAt: new Date(),
+        cart: { create: {} },
+      },
       select: { id: true },
     });
 
-    const { id: product_id } = await prisma.product.create({
-      data: { title: 'test', description: 'test', price: 12, userId: id },
-    });
-
-    const { headers } = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({ email: process.env.TEST_EMAIL, password: '123456' });
+    const [{ id: product_id }, { headers }] = await Promise.all([
+      prisma.product.create({
+        data: { title: 'test', description: 'test', price: 12, userId: id },
+      }),
+      request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'test@gmail.com', password: '123456' }),
+    ]);
 
     accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
     userId = id;
     productId = product_id;
-  }, 6500);
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany();
+    await app.close()
   });
 
   let cartId: number;

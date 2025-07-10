@@ -14,7 +14,6 @@ import { ChatModule } from '../src/chat/chat.module';
 
 import { hash } from 'bcryptjs';
 import { CreateChatDto } from '../src/chat/dto/create-chat.dto';
-import { JwtModule } from '@nestjs/jwt';
 
 describe('ChatController (e2e)', () => {
   let app: NestExpressApplication;
@@ -49,71 +48,73 @@ describe('ChatController (e2e)', () => {
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.init();
-  }, 6500);
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany();
     await app.close();
   });
 
-  let userId: number, adminId: number, guestId: number;
-  let userAccessToken: string,
-    adminAccessToken: string,
-    guestAccessToken: string;
+  let userId: number, adminId: number;
+  let userAccessToken: string, guestAccessToken: string;
   beforeAll(async () => {
     const password = await hash('123456', 3);
 
-    const user = await prisma.user.create({
-      data: {
-        email: 'test@gmail.com',
-        password,
-        nickname: 'user1',
-        isVerified: true,
-      },
-    });
-
-    const admin = await prisma.user.create({
-      data: {
-        email: 'test2@gmail.com',
-        password,
-        nickname: 'user2',
-        isVerified: true,
-        role: 'ADMIN',
-      },
-    });
-
-    const guest = await prisma.user.create({
-      data: {
-        email: 'test3@gmail.com',
-        password,
-        nickname: 'user3',
-        isVerified: true,
-        role: 'ADMIN',
-      },
-    });
+    const [user, admin, guest] = await Promise.all([
+      prisma.user.create({
+        data: {
+          email: 'test@gmail.com',
+          password,
+          nickname: 'user1',
+          isVerified: true,
+        },
+        select: { id: true, email: true },
+      }),
+      prisma.user.create({
+        data: {
+          email: 'test2@gmail.com',
+          password,
+          nickname: 'user2',
+          isVerified: true,
+          role: 'ADMIN',
+        },
+        select: { id: true },
+      }),
+      prisma.user.create({
+        data: {
+          email: 'test3@gmail.com',
+          password,
+          nickname: 'user3',
+          isVerified: true,
+          role: 'ADMIN',
+        },
+        select: { id: true, email: true },
+      }),
+    ]);
 
     userId = user.id;
     adminId = admin.id;
-    guestId = guest.id;
 
-    const { headers: userHeaders } = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({ email: user.email, password: '123456' });
+    const [{ headers: userHeaders }, { headers: guestHeaders }] =
+      await Promise.all([
+        request(app.getHttpServer())
+          .post('/api/auth/login')
+          .send({ email: user.email, password: '123456' }),
+        request(app.getHttpServer())
+          .post('/api/auth/login')
+          .send({ email: guest.email, password: '123456' }),
+      ]);
 
     userAccessToken = userHeaders['set-cookie'][0].split('=')[1].split(';')[0];
-
-    const { headers: guestHeaders } = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({ email: guest.email, password: '123456' });
-
     guestAccessToken = guestHeaders['set-cookie'][0]
       .split('=')[1]
       .split(';')[0];
-  }, 6500);
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany({});
     await prisma.chat.deleteMany({});
+    await app.close()
   });
 
   let chatId: number;
@@ -143,7 +144,7 @@ describe('ChatController (e2e)', () => {
       } else {
         await request(app.getHttpServer())
           .post('/api/chats')
-          .send({ ...dto, sellerId: code === 404 ? adminId + 2 : userId })
+          .send({ ...dto, sellerId: code === 404 ? adminId + 3 : userId })
           .set('Cookie', [`accessToken=${userAccessToken}`])
           .expect(code);
       }
@@ -187,7 +188,6 @@ describe('ChatController (e2e)', () => {
     });
   });
 
-
   describe('DELETE /api/chats/:chatId - Should DELETE chat by id', () => {
     it.each<[string, 204 | 403 | 404]>([
       [
@@ -213,6 +213,4 @@ describe('ChatController (e2e)', () => {
       }
     });
   });
-
-
 });

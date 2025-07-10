@@ -45,41 +45,45 @@ describe('ProductController (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     await app.init();
-  }, 6500);
+  });
 
   let userAccessToken: string, guestAccessToken: string;
   let category1Id: number, category2Id: number;
   let userId: number;
 
   beforeAll(async () => {
-    const user = await prisma.user.create({
-      data: {
-        email: process.env.TEST_EMAIL,
-        password: await hash('password', 10),
-        nickname: 'user',
-        isVerified: true,
-        verifiedAt: new Date(),
-      },
-      select: { id: true },
-    });
-    const guest = await prisma.user.create({
-      data: {
-        email: "test@gmail.com",
-        password: await hash('password', 10),
-        nickname: 'guest',
-        isVerified: true,
-        verifiedAt: new Date(),
-      },
-      select: { email: true },
-    })
+    const [user, guest] = await Promise.all([
+      prisma.user.create({
+        data: {
+          email: 'test@gmail.com',
+          password: await hash('password', 10),
+          nickname: 'user',
+          isVerified: true,
+          verifiedAt: new Date(),
+        },
+        select: { id: true, email: true },
+      }),
+      prisma.user.create({
+        data: {
+          email: 'test2@gmail.com',
+          password: await hash('password', 10),
+          nickname: 'guest',
+          isVerified: true,
+          verifiedAt: new Date(),
+        },
+        select: { email: true },
+      }),
+    ]);
 
-    const { headers: userHeaders } = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({ email: process.env.TEST_EMAIL, password: 'password' });
-
-      const { headers: guestHeaders } = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({ email: guest.email, password: 'password' });
+    const [{ headers: userHeaders }, { headers: guestHeaders }] =
+      await Promise.all([
+        request(app.getHttpServer())
+          .post('/api/auth/login')
+          .send({ email: user.email, password: 'password' }),
+        request(app.getHttpServer())
+          .post('/api/auth/login')
+          .send({ email: guest.email, password: 'password' }),
+      ]);
 
     const [category1, category2] = await Promise.all([
       prisma.category.create({
@@ -93,9 +97,11 @@ describe('ProductController (e2e)', () => {
     category1Id = category1.id;
     category2Id = category2.id;
     userAccessToken = userHeaders['set-cookie'][0].split('=')[1].split(';')[0];
-    guestAccessToken = guestHeaders['set-cookie'][0].split('=')[1].split(';')[0];
+    guestAccessToken = guestHeaders['set-cookie'][0]
+      .split('=')[1]
+      .split(';')[0];
     userId = user.id;
-  }, 6500);
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany();
@@ -305,7 +311,9 @@ describe('ProductController (e2e)', () => {
   });
 
   describe('PATCH /api/products/:productId - Should update product', () => {
-    it.each<[string, 200 | 400 | 403 | 404, UpdateProductDto | null, Buffer | null]>([
+    it.each<
+      [string, 200 | 400 | 403 | 404, UpdateProductDto | null, Buffer | null]
+    >([
       [
         'PATCH /api/products/:productId - 200 OK - Should update title in product',
         200,
@@ -372,7 +380,9 @@ describe('ProductController (e2e)', () => {
         .patch(
           `/api/products/${statusCode === 404 ? productId - 1 : productId}`,
         )
-        .set('Cookie', [`accessToken=${statusCode === 403 ? guestAccessToken : userAccessToken}`]);
+        .set('Cookie', [
+          `accessToken=${statusCode === 403 ? guestAccessToken : userAccessToken}`,
+        ]);
 
       if (dto) {
         Object.entries(dto).forEach(([key, value]) => {

@@ -40,54 +40,54 @@ describe('UserController (e2e)', () => {
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.init();
-  }, 6500);
+  });
 
   let adminAccessToken: string, userAccessToken: string;
   let adminId: number, userId: number;
   beforeAll(async () => {
     const hashedPassword = await hash('password', 10);
 
-    const user = await prisma.user.create({
-      data: {
-        email: 'user@gmail.com',
-        password: hashedPassword,
-        nickname: 'user',
-      },
-      select: { id: true },
-    });
-
-    const admin = await prisma.user.create({
-      data: {
-        email: 'admin@gmail.com',
-        password: hashedPassword,
-        nickname: 'admin',
-        role: 'ADMIN',
-      },
-      select: { id: true },
-    });
-
-    const [adminRes, userRes] = await Promise.all([
-      //Login as admin
-      request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({ email: 'admin@gmail.com', password: 'password' }),
-
-      //Login as user
-      request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({ email: 'user@gmail.com', password: 'password' }),
+    const [user, admin] = await Promise.all([
+      prisma.user.create({
+        data: {
+          email: 'user@gmail.com',
+          password: hashedPassword,
+          nickname: 'user',
+        },
+        select: { id: true },
+      }),
+      prisma.user.create({
+        data: {
+          email: 'admin@gmail.com',
+          password: hashedPassword,
+          nickname: 'admin',
+          role: 'ADMIN',
+        },
+        select: { id: true },
+      }),
     ]);
 
-    adminAccessToken = adminRes.headers['set-cookie'][0]
+    const [{ headers: adminHeaders }, { headers: userHeaders }] =
+      await Promise.all([
+        //Login as admin
+        request(app.getHttpServer())
+          .post('/api/auth/login')
+          .send({ email: 'admin@gmail.com', password: 'password' }),
+
+        //Login as user
+        request(app.getHttpServer())
+          .post('/api/auth/login')
+          .send({ email: 'user@gmail.com', password: 'password' }),
+      ]);
+
+    adminAccessToken = adminHeaders['set-cookie'][0]
       .split('=')[1]
       .split(';')[0];
-    userAccessToken = userRes.headers['set-cookie'][0]
-      .split('=')[1]
-      .split(';')[0];
+    userAccessToken = userHeaders['set-cookie'][0].split('=')[1].split(';')[0];
 
     userId = user.id;
     adminId = admin.id;
-  }, 6500);
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany();
