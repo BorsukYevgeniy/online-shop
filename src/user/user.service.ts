@@ -90,7 +90,7 @@ export class UserService {
     return user;
   }
 
-  async getByEmail(email: string): Promise<User | null> {
+  async getByEmail(email: string) {
     const user = await this.userRepository.findOneByEmail(email);
 
     if (!user) {

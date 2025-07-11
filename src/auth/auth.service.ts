@@ -39,7 +39,7 @@ export class AuthService {
     dto: CreateUserDto,
     mode: 'api' | 'ssr' = 'api',
   ): Promise<Tokens> {
-    const candidate: User | null = await this.userService.getByEmail(dto.email);
+    const candidate = await this.userService.getByEmail(dto.email);
 
     if (candidate) {
       this.logger.warn(`User already exists: ${dto.email}`);
@@ -64,7 +64,7 @@ export class AuthService {
   }
 
   async login(dto: LoginUserDto): Promise<Tokens> {
-    const candidate: User | null = await this.userService.getByEmail(dto.email);
+    const candidate = await this.userService.getByEmail(dto.email);
 
     if (!candidate) {
       this.logger.warn(`User not found: ${dto.email}`);
