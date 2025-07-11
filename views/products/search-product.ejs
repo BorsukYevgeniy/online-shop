@@ -42,8 +42,13 @@
               <option value="<%= c.id %>"><%= c.name %></option>
             <% }) %>
           </select>
+
+          <button id="loadCategories" type="button"> More </button>
+          <script src="/js/load-categories.js"></script>
         </div>
         
+        <br>
+
         <button type="submit" id="submit-btn">Search</button>
       </form>
     </section>

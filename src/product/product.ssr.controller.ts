@@ -46,8 +46,6 @@ export class ProductSsrController {
     @Query() sortDto: SortProductDto,
     @Query() paginationDto: PaginationDto,
   ) {
-    const categories = await this.categorySerivce.getAllCategories();
-
     const { products, ...pagination } = await this.productService.getAll(
       paginationDto,
       sortDto,
@@ -60,7 +58,6 @@ export class ProductSsrController {
       ...sortDto,
       currentPage: paginationDto.page,
       currentSize: paginationDto.pageSize,
-      categories,
     };
   }
 
@@ -72,9 +69,7 @@ export class ProductSsrController {
     @Query() sortDto: SortProductDto,
     @Query() paginationDto: PaginationDto,
   ) {
-    console.log(searchDto);
-
-    const categories = await this.categorySerivce.getAllCategories();
+    const { categories } = await this.categorySerivce.getAll({page:1, pageSize: 10}, {}, {});
 
     const { products, ...pagination } = await this.productService.getAll(
       paginationDto,
@@ -96,7 +91,12 @@ export class ProductSsrController {
   @Render('products/create-product')
   @UseInterceptors(CacheInterceptor)
   async getCreateProductPage() {
-    const categories = await this.categorySerivce.getAllCategories();
+    const { categories } = await this.categorySerivce.getAll(
+      { page: 1, pageSize: 10 },
+      {},
+      {},
+    );
+
     return { categories };
   }
 
@@ -122,6 +122,8 @@ export class ProductSsrController {
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
   ) {
+    console.log(productId);
+
     const product = await this.productService.getById(productId);
 
     return {
@@ -141,7 +143,11 @@ export class ProductSsrController {
   @UseInterceptors(CacheInterceptor)
   async getUpdateProductPage(@Param('productId') productId: number) {
     const product = await this.productService.getById(productId);
-    const categories = await this.categorySerivce.getAllCategories();
+    const { categories } = await this.categorySerivce.getAll(
+      { page: 1, pageSize: 10 },
+      {},
+      {},
+    );
 
     return {
       categories,

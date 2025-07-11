@@ -54,7 +54,7 @@ export class CategorySsrController {
       ...pagination,
       ...sortDto,
       currentPage: paginationDto.page,
-      currentPageSize: paginationDto.pageSize,
+      currentSize: paginationDto.pageSize,
       role: req.user.role,
     };
   }

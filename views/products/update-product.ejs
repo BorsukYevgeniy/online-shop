@@ -44,7 +44,7 @@
         ><%= product.description %></textarea>
 
       <label for="category">Category:</label>
-      <select id="category" name="categoryIds" multiple>
+      <select id="categories" name="categoryIds" multiple>
         <% categories.forEach(category => { %>
           <option 
             value="<%= category.id %>" 
@@ -53,6 +53,9 @@
           </option>
         <% }) %>
       </select>
+
+      <button id="loadCategories" type="button" class="btn"> More </button>
+      <script src="/js/load-categories.js"></script>
 
       <label for="images">Upload new photos:</label>
       <input 

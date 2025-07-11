@@ -22,10 +22,6 @@ export class CategoryService {
 
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async getAllCategories() {
-    return await this.categoryRepository.findAllCategories();
-  }
-
   async getAll(
     paginationDto: PaginationDto,
     sortDto: SortCategoryDto,

@@ -23,11 +23,14 @@
       <textarea id="description" name="description" rows="4" required></textarea>
 
       <label for="category">Categories:</label>
-      <select id="category" name="categoryIds" multiple required>
-        <% categories.forEach(function (category) { %>
-          <option value="<%= category.id %>"><%= category.name %></option>
-        <% }) %>
+      <select id="categories" name="categoryIds" multiple required size="10">
+        <% categories.forEach(c => { %>
+          <option value="<%= c.id %>"><%= c.name %></option>
+        <% }) %> 
       </select>
+
+      <button id="loadCategories" type="button"> More </button>
+      <script src="/js/load-categories.js"></script>
 
       <label for="images">Product photos:</label>
       <input type="file" name="images" id="images" multiple/>
