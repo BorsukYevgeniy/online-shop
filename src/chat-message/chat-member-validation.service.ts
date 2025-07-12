@@ -16,10 +16,7 @@ export class ChatMemberValidationService {
 
   constructor(private readonly repository: ChatMemberValidationRepository) {}
 
-  async validateChatMembers(
-    chatId: number,
-    userId: number,
-  ): Promise<void> {
+  async validateChatMembers(chatId: number, userId: number): Promise<void> {
     this.logger.log(`Validating participants for chat ID ${chatId}.`);
 
     const chat = await this.repository.getUsersInChat(chatId);

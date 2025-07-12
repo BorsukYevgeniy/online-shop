@@ -19,10 +19,10 @@ import { ChatMemberValidationService } from '../chat-message/chat-member-validat
 export class MessageService {
   private readonly logger: Logger = new Logger(MessageService.name);
 
-  constructor(private readonly messageRepository: MessageRepository,
+  constructor(
+    private readonly messageRepository: MessageRepository,
     private readonly validationService: ChatMemberValidationService,
   ) {}
-
 
   async getMessageById(messageId: number, userId: number) {
     await this.validateMessageOwnership(messageId, userId);
@@ -50,7 +50,7 @@ export class MessageService {
     chatId: number,
     userId: number,
   ): Promise<MessageNickname> {
-    await this.validationService.validateChatMembers(chatId, userId)
+    await this.validationService.validateChatMembers(chatId, userId);
 
     this.logger.log(
       `Creating message in chat ID ${chatId} from user ID ${userId}.`,
@@ -79,15 +79,13 @@ export class MessageService {
         this.logger.warn(`Message with ID ${messageId} not found for update.`);
         throw new NotFoundException(MessageErrMsg.MessageNotFound);
       }
-
     }
   }
 
   async deleteMessage(messageId: number, userId: number): Promise<Message> {
     await this.validateMessageOwnership(messageId, userId);
-    
-    try {
 
+    try {
       this.logger.log(`Deleting message with ID ${messageId}.`);
 
       return await this.messageRepository.deleteMessage(messageId);
@@ -105,13 +103,12 @@ export class MessageService {
   private async validateMessageOwnership(
     messageId: number,
     userId: number,
-  ): Promise<boolean> {    
+  ): Promise<boolean> {
     this.logger.log(
       `Validating ownership of message ID ${messageId} for user ID ${userId}.`,
     );
 
     const message = await this.messageRepository.getMessageById(messageId);
-
 
     if (!message) {
       this.logger.warn(`Message with ID ${messageId} not found.`);

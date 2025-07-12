@@ -69,7 +69,11 @@ export class ProductSsrController {
     @Query() sortDto: SortProductDto,
     @Query() paginationDto: PaginationDto,
   ) {
-    const { categories } = await this.categorySerivce.getAll({page:1, pageSize: 10}, {}, {});
+    const { categories } = await this.categorySerivce.getAll(
+      { page: 1, pageSize: 10 },
+      {},
+      {},
+    );
 
     const { products, ...pagination } = await this.productService.getAll(
       paginationDto,

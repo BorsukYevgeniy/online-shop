@@ -198,7 +198,7 @@ describe('AuthService', () => {
   it('Should logout all users', async () => {
     const userId = 1;
 
-    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue( {} as Token);
+    jest.spyOn(tokenService, 'deleteUserToken').mockResolvedValue({} as Token);
 
     await service.logoutAll(userId);
 

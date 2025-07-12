@@ -11,7 +11,7 @@ import { ChatMemberValidationService } from '../chat-message/chat-member-validat
 describe('ChatService', () => {
   let repository: ChatRepository;
   let service: ChatService;
-  let validationService: ChatMemberValidationService
+  let validationService: ChatMemberValidationService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -39,7 +39,9 @@ describe('ChatService', () => {
 
     repository = module.get<ChatRepository>(ChatRepository);
     service = module.get<ChatService>(ChatService);
-    validationService = module.get<ChatMemberValidationService>(ChatMemberValidationService);
+    validationService = module.get<ChatMemberValidationService>(
+      ChatMemberValidationService,
+    );
   });
 
   afterEach(async () => {
@@ -133,7 +135,7 @@ describe('ChatService', () => {
         jest
           .spyOn(validationService, 'validateChatMembers')
           .mockResolvedValue(undefined);
-          
+
         jest.spyOn(repository, 'deleteChat').mockResolvedValue(undefined);
 
         const result = await service.deleteChat(1, 1);

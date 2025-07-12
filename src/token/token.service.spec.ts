@@ -128,7 +128,7 @@ describe('TokenService', () => {
       .spyOn(jwt, 'verifyAsync')
       .mockResolvedValueOnce({ id: 1, role: Role.USER, isVerified: true });
 
-      jest.spyOn(jwt, 'signAsync').mockResolvedValueOnce(refreshToken);
+    jest.spyOn(jwt, 'signAsync').mockResolvedValueOnce(refreshToken);
     jest.spyOn(jwt, 'signAsync').mockResolvedValueOnce(accessToken);
     jest
       .spyOn(repository, 'update')

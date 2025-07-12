@@ -92,7 +92,7 @@ describe('MessageService', () => {
       }
     });
   });
-  
+
   describe('Should get message by id', () => {
     const mockMessage = {
       id: 1,

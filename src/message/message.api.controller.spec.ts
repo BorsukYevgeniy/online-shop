@@ -141,7 +141,7 @@ describe('MessageApiController', () => {
           text: 'Hello',
           chatId: 1,
           userId: 1,
-      });
+        });
 
         const result = await controller.deleteMessage(req, id);
         expect(result).toEqual(undefined);

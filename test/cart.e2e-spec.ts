@@ -76,7 +76,7 @@ describe('UserController (e2e)', () => {
 
   afterAll(async () => {
     await prisma.user.deleteMany();
-    await app.close()
+    await app.close();
   });
 
   let cartId: number;

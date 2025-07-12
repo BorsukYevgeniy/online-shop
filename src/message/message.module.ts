@@ -8,9 +8,7 @@ import { ChatMessageModule } from '../chat-message/chat-message.module';
 
 @Module({
   imports: [PrismaModule, TokenModule, ChatMessageModule],
-  controllers: [
-    MessageApiController,
-  ],
+  controllers: [MessageApiController],
   providers: [MessageRepository, MessageService],
   exports: [MessageService],
 })

@@ -34,7 +34,7 @@ describe('MessageController (e2e)', () => {
           ],
         }),
         ConfigModule.forRoot({ envFilePath: '.env.test', isGlobal: true }),
-        MessageModule
+        MessageModule,
       ],
     }).compile();
 
@@ -51,8 +51,7 @@ describe('MessageController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany(),
-    await app.close();
+    (await prisma.user.deleteMany(), await app.close());
   });
 
   let messageId: number, userId: number, chatId: number;

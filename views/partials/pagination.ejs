@@ -3,18 +3,18 @@
 
   <% if (prevPage) { %>
     <a href="?page=<%= prevPage %>&pageSize=<%= currentSize %>">« Back</a>
-    <% } %>
+  <% } %>
 
     <div>Total pages: <%= totalPages %></div>
     <div>Total: <%= total %></div>
 
-    <div>
-      <label for="pageSizeInput">Page size:</label>
-      <input id="pageSizeInput" name="pageSize" min="1" value="<%= pageSize %>" />
-    </div>
+  <div>
+    <label for="pageSizeInput">Page size:</label>
+    <input id="pageSizeInput" name="pageSize" min="1" value="<%= pageSize %>" />
+  </div>
 
-    <% if (nextPage) { %>
+  <% if (nextPage) { %>
     <a href="?page=<%= nextPage %>&pageSize=<%= currentSize %>">Forward »</a>
-    <% } %>
-    <script src="/js/change-page-size.js"></script>
+  <% } %>
+  <script src="/js/change-page-size.js"></script>
   </div>

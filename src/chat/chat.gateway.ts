@@ -55,7 +55,9 @@ export class ChatGateway
   ) {}
 
   async afterInit() {
-    this.logger.debug(`WebSocket initialized on ws://localhost:${process.env.PORT}`);
+    this.logger.debug(
+      `WebSocket initialized on ws://localhost:${process.env.PORT}`,
+    );
   }
 
   async handleConnection(client: Socket) {

@@ -46,4 +46,4 @@ describe('ChatRepository', () => {
     const result = await repository.getUsersInChat(1);
     expect(result).toEqual(mockUsers);
   });
-})
+});

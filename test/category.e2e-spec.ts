@@ -52,17 +52,17 @@ describe('CategoryController (e2e)', () => {
   beforeAll(async () => {
     await prisma.user.create({
       data: {
-        email: "test@gmail.com",
+        email: 'test@gmail.com',
         password: await hash('password', 3),
         nickname: 'user',
         role: 'ADMIN',
-        isVerified: true
+        isVerified: true,
       },
     });
 
     const { headers } = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: "test@gmail.com", password: 'password' });
+      .send({ email: 'test@gmail.com', password: 'password' });
 
     accessToken = headers['set-cookie'][0].split('=')[1].split(';')[0];
   });

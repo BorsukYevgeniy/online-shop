@@ -110,12 +110,10 @@ export class AuthSsrController {
     res.redirect('/users/me');
   }
 
-
   @Get('check-your-email')
   @UseGuards(AuthGuard)
   @Render('email/check-your-email')
-  async getCheckEmailPage() {
-  }
+  async getCheckEmailPage() {}
 
   @Post('resend-email')
   @UseGuards(AuthGuard)
@@ -124,5 +122,4 @@ export class AuthSsrController {
 
     res.redirect('/auth/check-your-email');
   }
-
 }
