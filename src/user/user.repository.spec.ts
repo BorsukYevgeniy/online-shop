@@ -258,6 +258,15 @@ describe('UserRepository', () => {
 
     expect(prismaService.user.findUnique).toHaveBeenCalledWith({
       where: { email },
+
+      select: {
+        email: true,
+        id: true,
+        isVerified: true,
+        password: true,
+        role: true,
+        verificationLink: true,
+      },
     });
 
     expect(user).toEqual(mockUser);
