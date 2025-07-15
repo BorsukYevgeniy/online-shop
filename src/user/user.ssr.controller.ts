@@ -30,6 +30,17 @@ import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ChatService } from '../chat/chat.service';
 
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiQuery,
+  ApiParam,
+  ApiNotFoundResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
+
 @Controller('users')
 @UseFilters(SsrExceptionFilter)
 export class UserSsrController {
@@ -39,6 +50,11 @@ export class UserSsrController {
     private readonly chatService: ChatService,
   ) {}
 
+  @ApiOperation({ summary: 'Getting all users' })
+  @ApiOkResponse({ description: 'Users fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SortUserDto })
   @Get('')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -63,6 +79,12 @@ export class UserSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Searching users' })
+  @ApiOkResponse({ description: 'Users fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SearchUserDto })
+  @ApiQuery({ type: SortUserDto })
   @Get('search')
   @UseGuards(AuthGuard)
   @Render('users/search-user')
@@ -87,6 +109,9 @@ export class UserSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Getting my account' })
+  @ApiOkResponse({ description: 'User fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('me')
   @UseGuards(AuthGuard)
   @Render('users/user-account')
@@ -105,6 +130,11 @@ export class UserSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Getting user by id' })
+  @ApiOkResponse({ description: 'Users fetched' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiParam({ name: 'userId', type: Number })
   @Get(':userId')
   @Render('users/get-user-by-id')
   @UseGuards(AuthGuard)
@@ -131,6 +161,11 @@ export class UserSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Getting product of user by id' })
+  @ApiOkResponse({ description: 'Users fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiParam({ name: 'userId', type: Number })
   @Get(':userId/products')
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(CacheInterceptor)
@@ -156,6 +191,12 @@ export class UserSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Assinging admin by user id' })
+  @ApiOkResponse({ description: 'Admin assigned' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'Forbidden resource' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiParam({ name: 'userId', type: Number })
   @Patch('assing-admin/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -165,6 +206,10 @@ export class UserSsrController {
     res.redirect(`/users/${userId}`);
   }
 
+  @ApiOperation({ summary: 'Deleting user by id as ownership of account' })
+  @ApiNoContentResponse({ description: 'User deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @Delete('me')
   @Delete('delete/me')
   @UseGuards(AuthGuard)
   async handleDeleteUserByHimself(
@@ -179,6 +224,10 @@ export class UserSsrController {
     return res.redirect('/');
   }
 
+  @ApiOperation({ summary: 'Deleting user by id as admin' })
+  @ApiNoContentResponse({ description: 'User deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @Delete('me')
   @Delete('delete/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
