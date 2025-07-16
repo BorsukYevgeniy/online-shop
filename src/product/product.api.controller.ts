@@ -4,42 +4,67 @@ import {
   Post,
   Patch,
   Delete,
-  Req,
   Param,
-  Query,
   Body,
-  UploadedFiles,
+  Req,
   UseGuards,
   UseInterceptors,
+  UploadedFiles,
   HttpCode,
+  Query,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { SearchProductDto } from './dto/search-product.dto';
-import { PaginationDto } from '../dto/pagination.dto';
-import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+  ApiBadRequestResponse,
+  ApiConsumes,
+  ApiBody,
+  ApiCookieAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
-import { AuthRequest } from '../types/request.type';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
-import { SortProductDto } from './dto/sort-product.dto';
+import { AuthRequest } from '../types/request.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { PaginationDto } from '../dto/pagination.dto';
+import { SearchProductDto } from './dto/search-product.dto';
+import { SortProductDto } from './dto/sort-product.dto';
 
+@ApiTags('Products')
+@ApiCookieAuth('accessToken')
 @Controller('api/products')
-export class ProductApiController {
+export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @ApiOperation({ summary: 'Getting all products or searching products' })
+  @ApiOkResponse({ description: 'Products fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SearchProductDto })
+  @ApiQuery({ type: SortProductDto })
   @Get()
   @UseInterceptors(CacheInterceptor)
+  @UseGuards(VerifiedUserGuard)
   async getAll(
-    @Query(ValidateProductDtoPipe) searchDto: SearchProductDto,
+    @Query() searchDto: SearchProductDto,
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
     return await this.productService.getAll(paginationDto, sortDto, searchDto);
   }
 
+  @ApiOperation({ summary: 'Get product by ID' })
+  @ApiOkResponse({ description: 'Product found' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiParam({ name: 'productId', type: Number })
   @Get(':productId')
   @UseInterceptors(CacheInterceptor)
   async getById(
@@ -48,9 +73,17 @@ export class ProductApiController {
     return await this.productService.getById(productId);
   }
 
-  @Post()
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Product creation payload',
+    type: CreateProductDto,
+  })
+  @ApiOkResponse({ description: 'Product created' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
+  @Post()
   async create(
     @Req() req: AuthRequest,
     @Body() dto: CreateProductDto,
@@ -59,9 +92,19 @@ export class ProductApiController {
     return await this.productService.create(req.user.id, dto, images);
   }
 
-  @Patch(':productId')
+  @ApiOperation({ summary: 'Update an existing product' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Product update payload',
+    type: UpdateProductDto,
+  })
+  @ApiOkResponse({ description: 'Product updated' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiParam({ name: 'productId', type: Number })
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
+  @Patch(':productId')
   async update(
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
@@ -76,9 +119,14 @@ export class ProductApiController {
     );
   }
 
-  @Delete(':productId')
+  @ApiOperation({ summary: 'Delete a product' })
+  @ApiOkResponse({ description: 'Product deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiParam({ name: 'productId', type: Number })
   @UseGuards(VerifiedUserGuard)
   @HttpCode(204)
+  @Delete(':productId')
   async delete(
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
@@ -86,3 +134,4 @@ export class ProductApiController {
     return await this.productService.delete(req.user.id, productId);
   }
 }
+

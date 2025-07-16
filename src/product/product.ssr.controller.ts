@@ -15,22 +15,34 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-import { AuthRequest } from '../types/request.type';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiNotFoundResponse,
+  ApiConsumes,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Response } from 'express';
-import { CategoryService } from '../category/category.service';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { AuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthRequest } from '../types/request.type';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { ProductService } from './product.service';
+import { CategoryService } from '../category/category.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
 import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
 import { PaginationDto } from '../dto/pagination.dto';
-import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
+@ApiTags('SSR Products')
 @Controller('products')
 @UseFilters(SsrExceptionFilter)
 export class ProductSsrController {
@@ -39,6 +51,12 @@ export class ProductSsrController {
     private readonly categorySerivce: CategoryService,
   ) {}
 
+  @ApiOperation({ summary: 'Getting all products' })
+  @ApiOkResponse({ description: 'Products fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SearchProductDto })
+  @ApiQuery({ type: SortProductDto })
   @Get()
   @Render('products/get-all-products')
   @UseInterceptors(CacheInterceptor)
@@ -61,6 +79,12 @@ export class ProductSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Searching products' })
+  @ApiOkResponse({ description: 'Products fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SearchProductDto })
+  @ApiQuery({ type: SortProductDto })
   @Get('search')
   @UseInterceptors(CacheInterceptor)
   @Render('products/search-product')
@@ -91,6 +115,7 @@ export class ProductSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Render create product page' })
   @Get('create')
   @Render('products/create-product')
   @UseInterceptors(CacheInterceptor)
@@ -104,9 +129,14 @@ export class ProductSsrController {
     return { categories };
   }
 
-  @Post('create')
+  @ApiOperation({ summary: 'Creating new product' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateProductDto })
+  @ApiOkResponse({ description: 'Product created' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
+  @Post('create')
   async handleCreatingProduct(
     @Req() req: AuthRequest,
     @Body() dto: CreateProductDto,
@@ -114,10 +144,13 @@ export class ProductSsrController {
     @Res() res: Response,
   ) {
     await this.productService.create(req.user.id, dto, images);
-
     res.redirect('/users/me');
   }
 
+  @ApiOperation({ summary: 'Get product by ID' })
+  @ApiOkResponse({ description: 'Product found' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiParam({ name: 'productId', type: Number })
   @Get(':productId')
   @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
@@ -126,8 +159,6 @@ export class ProductSsrController {
     @Req() req: AuthRequest,
     @Param('productId') productId: number,
   ) {
-    console.log(productId);
-
     const product = await this.productService.getById(productId);
 
     return {
@@ -142,6 +173,8 @@ export class ProductSsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Render update product page' })
+  @ApiParam({ name: 'productId', type: Number })
   @Get('update/:productId')
   @Render('products/update-product')
   @UseInterceptors(CacheInterceptor)
@@ -159,9 +192,15 @@ export class ProductSsrController {
     };
   }
 
-  @Patch('update/:productId')
+  @ApiOperation({ summary: 'Update product' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateProductDto })
+  @ApiOkResponse({ description: 'Product updated' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiParam({ name: 'productId', type: Number })
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
+  @Patch('update/:productId')
   async handeProductUpdate(
     @Req() req: AuthRequest,
     @Res() res: Response,
@@ -170,19 +209,21 @@ export class ProductSsrController {
     @UploadedFiles() images: Express.Multer.File[],
   ) {
     await this.productService.update(req.user.id, productId, dto, images);
-
     res.redirect('/users/me');
   }
 
-  @Delete('delete/:productId')
+  @ApiOperation({ summary: 'Delete product' })
+  @ApiOkResponse({ description: 'Product deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiParam({ name: 'productId', type: Number })
   @UseGuards(VerifiedUserGuard)
+  @Delete('delete/:productId')
   async handleDeleteProduct(
     @Param('productId') productId: number,
     @Req() req: AuthRequest,
     @Res() res: Response,
   ) {
     await this.productService.delete(req.user.id, productId);
-
     res.redirect('/users/me');
   }
 }
