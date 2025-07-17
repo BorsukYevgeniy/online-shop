@@ -19,12 +19,30 @@ import { Role } from '../enum/role.enum';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+  ApiParam,
+  ApiTags,
+  ApiCookieAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 
+@ApiTags('API ChatMessages')
+@ApiCookieAuth('accessToken')
 @Controller('api/chats/:chatId/messages')
 @UseGuards(VerifiedUserGuard)
 export class ChatMessageApiController {
   constructor(private readonly messageService: MessageService) {}
 
+  @ApiOperation({ summary: 'Get messages in chat' })
+  @ApiOkResponse({ description: 'Messages fetched' })
+  @ApiNotFoundResponse({ description: 'Chat not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiParam({ name: 'chatId', type: Number })
   @Get()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -33,6 +51,13 @@ export class ChatMessageApiController {
     return await this.messageService.getMessagesByChatId(chatId);
   }
 
+  @ApiOperation({ summary: 'Create message in chat' })
+  @ApiOkResponse({ description: 'Message created' })
+  @ApiBadRequestResponse({description: 'Invalid request body'})
+  @ApiNotFoundResponse({ description: 'Chat not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiParam({ name: 'chatId', type: Number })
+  @ApiBody({ type: CreateMessageDto })
   @Post()
   async createMessage(
     @Req() req: AuthRequest,

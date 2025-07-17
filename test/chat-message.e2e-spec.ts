@@ -66,16 +66,16 @@ describe('ChatController (e2e)', () => {
         data: {
           email: 'test@gmail.com',
           password,
-          nickname: 'user1',
+          nickname: 'user',
           isVerified: true,
         },
         select: { id: true, email: true },
       }),
       prisma.user.create({
         data: {
-          email: 'test2@gmail.com',
+          email: 'admin@gmail.com',
           password,
-          nickname: 'user2',
+          nickname: 'admin',
           isVerified: true,
           role: 'ADMIN',
         },
@@ -83,7 +83,7 @@ describe('ChatController (e2e)', () => {
       }),
       prisma.user.create({
         data: {
-          email: 'test3@gmail.com',
+          email: 'guest@gmail.com',
           password,
           nickname: 'guest',
           isVerified: true,
@@ -168,7 +168,7 @@ describe('ChatController (e2e)', () => {
         case 400:
           await request(app.getHttpServer())
             .post(`/api/chats/${chatId}/messages`)
-            .send({ text: '1' }) // не валідний dto
+            .send({ text: undefined }) // не валідний dto
             .set('Cookie', [`accessToken=${guestAccessToken}`])
             .expect(400);
           break;

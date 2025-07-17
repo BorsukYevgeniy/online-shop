@@ -62,6 +62,7 @@ describe('UserController (e2e)', () => {
           password: hashedPassword,
           nickname: 'admin',
           role: 'ADMIN',
+          isVerified:true
         },
         select: { id: true },
       }),
@@ -113,7 +114,7 @@ describe('UserController (e2e)', () => {
           id: adminId,
           nickname: 'admin',
           role: 'ADMIN',
-          isVerified: false,
+          isVerified: true,
           verifiedAt: null,
         },
         {
@@ -219,7 +220,7 @@ describe('UserController (e2e)', () => {
               id: expect.any(Number),
               nickname: 'admin',
               role: 'ADMIN',
-              isVerified: false,
+              isVerified: true,
               verifiedAt: null,
             },
             {

@@ -25,6 +25,7 @@ import {
   ApiCookieAuth,
   ApiParam,
   ApiQuery,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
@@ -38,21 +39,19 @@ import { PaginationDto } from '../dto/pagination.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
 
-@ApiTags('Products')
-@ApiCookieAuth('accessToken')
+@ApiTags('API Products')
 @Controller('api/products')
-export class ProductController {
+export class ProductApiController {
   constructor(private readonly productService: ProductService) {}
 
   @ApiOperation({ summary: 'Getting all products or searching products' })
   @ApiOkResponse({ description: 'Products fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiQuery({ type: PaginationDto })
   @ApiQuery({ type: SearchProductDto })
   @ApiQuery({ type: SortProductDto })
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @UseGuards(VerifiedUserGuard)
   async getAll(
     @Query() searchDto: SearchProductDto,
     @Query() paginationDto: PaginationDto,
@@ -80,7 +79,10 @@ export class ProductController {
     type: CreateProductDto,
   })
   @ApiOkResponse({ description: 'Product created' })
+  @ApiBadRequestResponse({ description: 'Ivalid request body' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   @Post()
@@ -99,9 +101,14 @@ export class ProductController {
     type: UpdateProductDto,
   })
   @ApiOkResponse({ description: 'Product updated' })
+  @ApiBadRequestResponse({ description: 'Ivalid request body' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({
+    description: 'You must be verified user or you isnt ownership of product',
+  })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiParam({ name: 'productId', type: Number })
+  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   @Patch(':productId')
@@ -123,7 +130,11 @@ export class ProductController {
   @ApiOkResponse({ description: 'Product deleted' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiForbiddenResponse({
+    description: 'You must be verified user or you isnt ownership of product',
+  })
   @ApiParam({ name: 'productId', type: Number })
+  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @HttpCode(204)
   @Delete(':productId')

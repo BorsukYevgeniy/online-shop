@@ -37,7 +37,7 @@ export class CreateProductDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Trim()
+  // @Trim()
   @MinLength(10, { message: ProductDtoErrMsg.InvalidDescription })
   @MaxLength(500, { message: ProductDtoErrMsg.InvalidDescription })
   readonly description: string;
@@ -62,11 +62,8 @@ export class CreateProductDto {
     description: 'Id of categories to which the product belongs',
   })
   @IsNotEmpty()
-  @IsNumber()
-  @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
-  @ToNumber()
-  @IsNotEmpty()
+  @Min(0, { each: true, message: ProductDtoErrMsg.InvalidPrice })
   @IsArray()
   @ToNumberArray()
-  readonly categoryIds: number[];
+  categoryIds: number[];
 }

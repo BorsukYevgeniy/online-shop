@@ -20,17 +20,45 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+
+@ApiTags('API Chats')
+@ApiCookieAuth('accessToken')
 @Controller('api/chats')
 @UseGuards(VerifiedUserGuard)
 export class ChatApiController {
   constructor(private readonly chatService: ChatService) {}
 
+  @ApiOperation({ summary: 'Fecth my chats' })
+  @ApiOkResponse({ description: 'Message fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getMyChats(@Req() req: AuthRequest): Promise<UserChat[]> {
     return await this.chatService.getUserChats(req.user.id);
   }
 
+  @ApiOperation({ summary: 'Fetch chat by id' })
+  @ApiOkResponse({ description: 'Chat fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({
+    description: 'You isnt participant of chat or you must be verified user',
+  })
+  @ApiNotFoundResponse({ description: 'Chat not found' })
+  @ApiParam({ name: 'chatId', type: Number })
   @Get(':chatId')
   @UseInterceptors(CacheInterceptor)
   async getСhatById(
@@ -40,6 +68,12 @@ export class ChatApiController {
     return await this.chatService.getChatById(chatId, req.user.id);
   }
 
+  @ApiOperation({ summary: 'Fetch chat by id' })
+  @ApiOkResponse({ description: 'Chat fetched' })
+  @ApiBadRequestResponse({description: 'Invalid request body'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiBody({type: CreateChatDto})
   @Post()
   async createChat(
     @Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto,
@@ -47,6 +81,14 @@ export class ChatApiController {
     return await this.chatService.createChat(createDto);
   }
 
+  @ApiOperation({ summary: 'Delete chat by id' })
+  @ApiOkResponse({ description: 'Chat delete' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({
+    description: 'You isnt participant of chat or you must be verified user',
+  })
+  @ApiNotFoundResponse({ description: 'Chat not found' })
+  @ApiParam({ name: 'chatId', type: Number })
   @Delete(':chatId')
   @HttpCode(204)
   async deleteChat(

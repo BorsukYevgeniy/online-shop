@@ -39,9 +39,15 @@ import {
   ApiNotFoundResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
+  ApiTags,
+  ApiCookieAuth,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 
+@ApiTags('SSR Users')
+@ApiCookieAuth('accessToken')
 @Controller('users')
+@UseGuards(AuthGuard)
 @UseFilters(SsrExceptionFilter)
 export class UserSsrController {
   constructor(
@@ -52,10 +58,11 @@ export class UserSsrController {
 
   @ApiOperation({ summary: 'Getting all users' })
   @ApiOkResponse({ description: 'Users fetched' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiQuery({ type: PaginationDto })
   @ApiQuery({ type: SortUserDto })
-  @Get('')
+  @Get()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
@@ -81,12 +88,12 @@ export class UserSsrController {
 
   @ApiOperation({ summary: 'Searching users' })
   @ApiOkResponse({ description: 'Users fetched' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiQuery({ type: PaginationDto })
   @ApiQuery({ type: SearchUserDto })
   @ApiQuery({ type: SortUserDto })
   @Get('search')
-  @UseGuards(AuthGuard)
   @Render('users/search-user')
   @UseInterceptors(CacheInterceptor)
   async getSearchUserPage(
@@ -113,7 +120,6 @@ export class UserSsrController {
   @ApiOkResponse({ description: 'User fetched' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('me')
-  @UseGuards(AuthGuard)
   @Render('users/user-account')
   @UseInterceptors(CacheInterceptor)
   async getUserAccountPage(@Req() req: AuthRequest) {
@@ -137,7 +143,6 @@ export class UserSsrController {
   @ApiParam({ name: 'userId', type: Number })
   @Get(':userId')
   @Render('users/get-user-by-id')
-  @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
   async getUserByIdPage(
     @Param('userId') userId: number,
@@ -163,6 +168,7 @@ export class UserSsrController {
 
   @ApiOperation({ summary: 'Getting product of user by id' })
   @ApiOkResponse({ description: 'Users fetched' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiParam({ name: 'userId', type: Number })
@@ -211,7 +217,6 @@ export class UserSsrController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('me')
   @Delete('delete/me')
-  @UseGuards(AuthGuard)
   async handleDeleteUserByHimself(
     @Req() req: AuthRequest,
     @Res() res: Response,

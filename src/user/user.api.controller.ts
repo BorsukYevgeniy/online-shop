@@ -35,7 +35,6 @@ import {
   ApiCookieAuth,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
   ApiOkResponse,
   ApiUnauthorizedResponse,
@@ -43,11 +42,14 @@ import {
   ApiNotFoundResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
-@ApiTags('users')
+@ApiTags('API Users')
 @ApiCookieAuth('accessToken')
 @Controller('api/users')
+@UseGuards(AuthGuard)
 export class UserApiController {
   constructor(
     private readonly userService: UserService,
@@ -57,12 +59,12 @@ export class UserApiController {
   @ApiOperation({ summary: 'Getting all users or searching users' })
   @ApiOkResponse({ description: 'Users fetched' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiQuery({ type: PaginationDto })
   @ApiQuery({ type: SearchUserDto })
   @ApiQuery({ type: SortUserDto })
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @UseGuards(AuthGuard)
   async getAll(
     @Query(ValidateUserFilterPipe) searchDto: SearchUserDto,
     @Query() paginationDto: PaginationDto,
@@ -75,7 +77,6 @@ export class UserApiController {
   @ApiOkResponse({ description: 'User fetched' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('me')
-  @UseGuards(AuthGuard)
   async getMe(@Req() req: AuthRequest): Promise<UserNoPasswordVLink> {
     return await this.userService.getMe(req.user.id);
   }
@@ -87,19 +88,19 @@ export class UserApiController {
   @ApiParam({ name: 'userId', type: Number })
   @Get(':userId')
   @UseInterceptors(CacheInterceptor)
-  @UseGuards(AuthGuard)
   async getById(@Param('userId') userId: number): Promise<UserNoCred | void> {
     return await this.userService.getById(userId);
   }
 
   @ApiOperation({ summary: 'Getting product of user by id' })
   @ApiOkResponse({ description: 'Users fetched' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiParam({ name: 'userId', type: Number })
   @Get(':userId/products')
+  @UseGuards(VerifiedUserGuard)
   @UseInterceptors(CacheInterceptor)
-  @UseGuards(AuthGuard)
   async getUserProducts(
     @Param('userId') userId: number,
     @Query() paginationDto: PaginationDto,
@@ -131,7 +132,6 @@ export class UserApiController {
   @ApiNoContentResponse({ description: 'User deleted' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('me')
-  @UseGuards(AuthGuard)
   @HttpCode(204)
   async deleteMe(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
     await this.userService.delete(req.user.id);
@@ -146,7 +146,7 @@ export class UserApiController {
   @ApiOperation({ summary: 'Deleting user by id as admin' })
   @ApiNoContentResponse({ description: 'User deleted' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiNotFoundResponse({description: 'User not found'})
+  @ApiNotFoundResponse({ description: 'User not found' })
   @ApiParam({ name: 'userId', type: Number })
   @Delete(':userId')
   @RequieredRoles(Role.ADMIN)

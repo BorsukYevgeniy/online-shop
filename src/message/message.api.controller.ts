@@ -18,11 +18,32 @@ import { MessageNickname } from './types/message.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AuthRequest } from 'src/types/request.type';
 
+import {
+  ApiTags,
+  ApiCookieAuth,
+  ApiOperation,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiParam,
+  ApiBody,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
+
+@ApiTags('API Messages')
+@ApiCookieAuth('accessToken')
 @Controller('api/messages')
 @UseGuards(VerifiedUserGuard)
 export class MessageApiController {
   constructor(private readonly messageService: MessageService) {}
 
+  @ApiOperation({ summary: 'Get message by id' })
+  @ApiOkResponse({ description: 'Message fetched' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ApiParam({ name: 'messageId', type: Number })
   @Get(':messageId')
   @UseInterceptors(CacheInterceptor)
   async getMessageById(
@@ -32,6 +53,13 @@ export class MessageApiController {
     return await this.messageService.getMessageById(messageId, req.user.id);
   }
 
+  @ApiOperation({ summary: 'Update message by id' })
+  @ApiOkResponse({ description: 'Message updated' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ApiParam({ name: 'messageId', type: Number })
+  @ApiBody({ type: UpdateMessageDto })
   @Patch(':messageId')
   async updateMessage(
     @Req() req: AuthRequest,
@@ -45,6 +73,12 @@ export class MessageApiController {
     );
   }
 
+  @ApiOperation({ summary: 'Delete message by id' })
+  @ApiNoContentResponse({ description: 'Message deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ApiParam({ name: 'messageId', type: Number })
   @Delete(':messageId')
   @HttpCode(204)
   async deleteMessage(

@@ -291,7 +291,7 @@ describe('ProductController (e2e)', () => {
       ],
     ])('%s', async (_, status) => {
       const { body: product } = await request(app.getHttpServer())
-        .get(`/api/products/${status === 404 ? productId - 1 : productId}`)
+        .get(`/api/products/${status === 404 ? productId + 2 : productId}`)
         .expect(status);
 
       if (status === 200) {

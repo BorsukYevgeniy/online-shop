@@ -25,6 +25,9 @@ import {
   ApiBody,
   ApiParam,
   ApiQuery,
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
@@ -53,9 +56,8 @@ export class ProductSsrController {
 
   @ApiOperation({ summary: 'Getting all products' })
   @ApiOkResponse({ description: 'Products fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiQuery({ type: PaginationDto })
-  @ApiQuery({ type: SearchProductDto })
   @ApiQuery({ type: SortProductDto })
   @Get()
   @Render('products/get-all-products')
@@ -81,7 +83,7 @@ export class ProductSsrController {
 
   @ApiOperation({ summary: 'Searching products' })
   @ApiOkResponse({ description: 'Products fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
   @ApiQuery({ type: PaginationDto })
   @ApiQuery({ type: SearchProductDto })
   @ApiQuery({ type: SortProductDto })
@@ -129,11 +131,17 @@ export class ProductSsrController {
     return { categories };
   }
 
-  @ApiOperation({ summary: 'Creating new product' })
+  @ApiOperation({ summary: 'Create a new product' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateProductDto })
+  @ApiBody({
+    description: 'Product creation payload',
+    type: CreateProductDto,
+  })
   @ApiOkResponse({ description: 'Product created' })
+  @ApiBadRequestResponse({ description: 'Ivalid request body' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   @Post('create')
@@ -151,6 +159,7 @@ export class ProductSsrController {
   @ApiOkResponse({ description: 'Product found' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiParam({ name: 'productId', type: Number })
+  @ApiCookieAuth('accessToken')
   @Get(':productId')
   @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
@@ -192,12 +201,21 @@ export class ProductSsrController {
     };
   }
 
-  @ApiOperation({ summary: 'Update product' })
+  @ApiOperation({ summary: 'Update an existing product' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: UpdateProductDto })
+  @ApiBody({
+    description: 'Product update payload',
+    type: UpdateProductDto,
+  })
   @ApiOkResponse({ description: 'Product updated' })
+  @ApiBadRequestResponse({ description: 'Ivalid request body' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({
+    description: 'You must be verified user or you isnt ownership of product',
+  })
+  @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiParam({ name: 'productId', type: Number })
+  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   @Patch('update/:productId')
@@ -212,10 +230,15 @@ export class ProductSsrController {
     res.redirect('/users/me');
   }
 
-  @ApiOperation({ summary: 'Delete product' })
+  @ApiOperation({ summary: 'Delete a product' })
   @ApiOkResponse({ description: 'Product deleted' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiForbiddenResponse({
+    description: 'You must be verified user or you isnt ownership of product',
+  })
   @ApiParam({ name: 'productId', type: Number })
+  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @Delete('delete/:productId')
   async handleDeleteProduct(
