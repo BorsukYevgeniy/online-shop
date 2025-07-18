@@ -28,12 +28,33 @@ import { Response } from 'express';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiQuery,
+  ApiTags,
+  ApiParam,
+  ApiBody,
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiUnauthorizedResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('SSR Categories')
 @Controller('categories')
 @UseFilters(SsrExceptionFilter)
 export class CategorySsrController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @ApiOperation({ summary: 'Get all categories' })
+  @ApiOkResponse({ description: 'Categories fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parametres' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SortCategoryDto })
+  @ApiQuery({ type: SearchCategoryDto })
+  @ApiCookieAuth('accessToken')
   @Get()
   @Render('categories/get-all-categories')
   @UseGuards(AuthGuard)
@@ -59,6 +80,12 @@ export class CategorySsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Search category' })
+  @ApiOkResponse({ description: 'Categories fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parametres' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SortCategoryDto })
+  @ApiQuery({ type: SearchCategoryDto })
   @Get('search')
   @Render('categories/search-category')
   @UseInterceptors(CacheInterceptor)
@@ -82,12 +109,21 @@ export class CategorySsrController {
     };
   }
 
+  @ApiOperation({ summary: 'Render create category page' })
+  @ApiCookieAuth('accessToken')
   @Get('create')
   @Render('categories/create-category')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async getCreateCategoryPage() {}
 
+  @ApiOperation({ summary: 'Create category' })
+  @ApiOkResponse({ description: 'Category created' })
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be an administrator' })
+  @ApiBody({ type: CreateCategoryDto })
+  @ApiCookieAuth('accessToken')
   @Post('create')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -100,6 +136,10 @@ export class CategorySsrController {
     res.redirect('/categories');
   }
 
+  @ApiOperation({ summary: 'Get category by id' })
+  @ApiOkResponse({ description: 'Category fetched' })
+  @ApiParam({ name: 'categoryId', type: Number })
+  @ApiCookieAuth('accessToken')
   @Get(':categoryId')
   @UseGuards(AuthGuard)
   @Render('categories/get-category-by-id')
@@ -113,6 +153,8 @@ export class CategorySsrController {
     return { ...category, role: req.user.role };
   }
 
+  @ApiOperation({ summary: 'Render update category page' })
+  @ApiCookieAuth('accessToken')
   @Get('update/:categoryId')
   @Render('categories/update-category')
   @RequieredRoles(Role.ADMIN)
@@ -122,6 +164,14 @@ export class CategorySsrController {
     return await this.categoryService.getById(categoryId);
   }
 
+  @ApiOperation({ summary: 'Update category' })
+  @ApiOkResponse({ description: 'Category updated' })
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be an administrator' })
+  @ApiBody({ type: UpdateCategoryDto })
+  @ApiParam({ name: 'categoryId', type: Number })
+  @ApiCookieAuth('accessToken')
   @Patch('update/:categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -135,6 +185,12 @@ export class CategorySsrController {
     res.redirect(`/categories/${categoryId}`);
   }
 
+  @ApiOperation({ summary: 'Delete category' })
+  @ApiNoContentResponse({ description: 'Category deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be an administrator' })
+  @ApiParam({ name: 'categoryId', type: Number })
+  @ApiCookieAuth('accessToken')
   @Delete('delete/:categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)

@@ -24,10 +24,31 @@ import { Role } from '../enum/role.enum';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiCookieAuth,
+} from '@nestjs/swagger';
+
+@ApiTags('API Categories')
 @Controller('api/categories')
 export class CategoryApiController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @ApiOperation({ summary: 'Get all categories or search category' })
+  @ApiOkResponse({ description: 'Categories fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parametres' })
+  @ApiQuery({ type: PaginationDto })
+  @ApiQuery({ type: SortCategoryDto })
+  @ApiQuery({ type: SearchCategoryDto })
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getAll(
@@ -38,12 +59,22 @@ export class CategoryApiController {
     return await this.categoryService.getAll(pagination, sortDto, searchDto);
   }
 
+  @ApiOperation({ summary: 'Get category by id' })
+  @ApiOkResponse({ description: 'Category fetched' })
+  @ApiParam({ name: 'categoryId', type: Number })
   @Get(':categoryId')
   @UseInterceptors(CacheInterceptor)
   async getById(@Param('categoryId') id: number): Promise<Category> {
     return await this.categoryService.getById(id);
   }
 
+  @ApiOperation({ summary: 'Create category' })
+  @ApiOkResponse({ description: 'Category created' })
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be an administrator' })
+  @ApiBody({ type: CreateCategoryDto })
+  @ApiCookieAuth('accessToken')
   @Post()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -51,6 +82,14 @@ export class CategoryApiController {
     return await this.categoryService.create(dto);
   }
 
+  @ApiOperation({ summary: 'Update category' })
+  @ApiOkResponse({ description: 'Category updated' })
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be an administrator' })
+  @ApiBody({ type: UpdateCategoryDto })
+  @ApiParam({ name: 'categoryId', type: Number })
+  @ApiCookieAuth('accessToken')
   @Patch(':categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -61,6 +100,12 @@ export class CategoryApiController {
     return await this.categoryService.update(id, dto);
   }
 
+  @ApiOperation({ summary: 'Delete category' })
+  @ApiNoContentResponse({ description: 'Category deleted' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiForbiddenResponse({ description: 'You must be an administrator' })
+  @ApiParam({ name: 'categoryId', type: Number })
+  @ApiCookieAuth('accessToken')
   @Delete(':categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
