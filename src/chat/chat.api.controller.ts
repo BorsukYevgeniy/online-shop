@@ -70,10 +70,10 @@ export class ChatApiController {
 
   @ApiOperation({ summary: 'Fetch chat by id' })
   @ApiOkResponse({ description: 'Chat fetched' })
-  @ApiBadRequestResponse({description: 'Invalid request body'})
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiBody({type: CreateChatDto})
+  @ApiBody({ type: CreateChatDto })
   @Post()
   async createChat(
     @Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto,

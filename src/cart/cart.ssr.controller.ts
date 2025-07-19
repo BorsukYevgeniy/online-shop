@@ -27,7 +27,7 @@ import {
   ApiForbiddenResponse,
   ApiParam,
   ApiTags,
-  ApiCookieAuth
+  ApiCookieAuth,
 } from '@nestjs/swagger';
 
 @ApiTags('SSR Carts')

@@ -145,4 +145,3 @@ export class ProductApiController {
     return await this.productService.delete(req.user.id, productId);
   }
 }
-

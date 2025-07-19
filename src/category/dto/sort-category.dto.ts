@@ -11,7 +11,7 @@ export class SortCategoryDto extends SortDto {
     enumName: 'SortCategoryFields',
     description: 'The field by which sorting will take place',
     default: 'id',
-    example: 'name'
+    example: 'name',
   })
   @IsOptional()
   @IsString()

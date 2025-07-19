@@ -9,7 +9,7 @@ export class SortDto {
     enumName: 'Order',
     default: Order.DESC,
     description: 'In which order (ASCending or DESCending)',
-    example: Order.ASC
+    example: Order.ASC,
   })
   @IsOptional()
   @IsString()

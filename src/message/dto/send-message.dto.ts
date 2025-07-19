@@ -7,7 +7,7 @@ export class SendMessageDto extends CreateMessageDto {
     type: Number,
     description: 'Id of chat in which the message will be sent',
     required: true,
-    example: 1
+    example: 1,
   })
   @IsNumber()
   chatId: number;

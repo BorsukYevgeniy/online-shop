@@ -62,7 +62,7 @@ describe('UserController (e2e)', () => {
           password: hashedPassword,
           nickname: 'admin',
           role: 'ADMIN',
-          isVerified:true
+          isVerified: true,
         },
         select: { id: true },
       }),

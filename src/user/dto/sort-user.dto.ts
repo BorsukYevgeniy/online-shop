@@ -13,7 +13,7 @@ export class SortUserDto extends SortDto {
     enumName: 'SortUserFields',
     required: false,
     example: 'role',
-    default: 'id'
+    default: 'id',
   })
   @IsOptional()
   @IsString()

@@ -12,7 +12,7 @@ export class CreateMessageDto {
     required: true,
     minLength: 1,
     maxLength: 400,
-    example: 'Hello'
+    example: 'Hello',
   })
   @IsString({ message: MessageDtoErrMsg.InvalidText })
   @MinLength(1, { message: MessageDtoErrMsg.InvalidText })

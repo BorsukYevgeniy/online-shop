@@ -53,7 +53,7 @@ export class ChatMessageApiController {
 
   @ApiOperation({ summary: 'Create message in chat' })
   @ApiOkResponse({ description: 'Message created' })
-  @ApiBadRequestResponse({description: 'Invalid request body'})
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
   @ApiNotFoundResponse({ description: 'Chat not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiParam({ name: 'chatId', type: Number })
