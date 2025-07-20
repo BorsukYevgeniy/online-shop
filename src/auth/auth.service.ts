@@ -146,8 +146,11 @@ export class AuthService {
     userId: number,
     mode: 'api' | 'ssr' = 'api',
   ): Promise<void> {
-    const { email, verificationLink }: UserNoPassword =
+    const { email, verificationLink, isVerified }: UserNoPassword =
       await this.userService.getFullUserById(userId);
+
+    if (isVerified)
+      throw new BadRequestException(AuthErrMsg.UserAlreadyVerified);
 
     return await this.sendVerificationMail(email, verificationLink, mode);
   }
