@@ -1,6 +1,6 @@
 export type Paginated<
   T extends object,
-  F extends 'users' | 'products' | 'categories',
+  F extends 'users' | 'products' | 'categories' | 'chat' | 'chats',
 > = {
   total: number;
   pageSize: number;
@@ -8,4 +8,4 @@ export type Paginated<
   totalPages: number;
   prevPage: number;
   nextPage: number;
-} & Record<F, T[]>;
+} & Record<F, T>;

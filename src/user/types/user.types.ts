@@ -27,4 +27,4 @@ export type UserNoCred = Omit<
 /**
  * Represents a users with pagination ,but without sensitive fields (`password`, `email` and `verificationLink`).
  */
-export type PaginatedUserNoCreds = Paginated<UserNoCred, 'users'>;
+export type PaginatedUserNoCreds = Paginated<UserNoCred[], 'users'>;

@@ -9,4 +9,4 @@ export type ProductCategory = Product & { categories: Category[] };
 /**
  * Represents products with pagination
  */
-export type PaginatedProduct = Paginated<Product, 'products'>;
+export type PaginatedProduct = Paginated<Product[], 'products'>;
