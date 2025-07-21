@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
-import { ChatMessages, UserChat } from './types/chat.types';
+import { ChatMessages, PaginatedChat, UserChat } from './types/chat.types';
 import { Chat } from '@prisma/client';
 
 import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum';
@@ -14,6 +14,7 @@ import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-me
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { PaginationDto } from '../dto/pagination.dto';
 
 @Injectable()
 export class ChatService {
@@ -56,19 +57,42 @@ export class ChatService {
     return userChats;
   }
 
-  async getChatById(id: number, userId: number): Promise<ChatMessages> {
+  async getChatById(
+    id: number,
+    userId: number,
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedChat> {
     await this.validationService.validateChatMembers(id, userId);
+    const { page, pageSize } = paginationDto;
+    const skip = (page - 1) * pageSize;
 
-    const chat = await this.chatRepository.getChatById(id);
+
+    const [chat, totalMessages] = await Promise.all([
+      this.chatRepository.getChatById(id, skip, pageSize),
+      this.chatRepository.countMessagesInChat(id),
+    ]);
+    
 
     if (!chat) {
       this.logger.warn(`Chat with ID ${id} not found.`);
       throw new NotFoundException(ChatErrMsg.ChatNotFound);
     }
 
-    this.logger.log(`Fetched chat with ID ${id}.`);
+    const totalPages: number = Math.ceil(totalMessages / pageSize);
 
-    return chat;
+    this.logger.log(
+      'Chat fetched successfully, totalMessages messages: ' + totalMessages,
+    );
+
+    return {
+      chat,
+      total: totalMessages,
+      pageSize,
+      page,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
   }
 
   async createChat(createDto: CreateChatDto): Promise<Chat> {

@@ -48,7 +48,17 @@ export class ChatRepository {
     }));
   }
 
-  async getChatById(id: number): Promise<ChatMessages> {
+  async countMessagesInChat(chatId: number): Promise<number> {
+    return await this.prisma.message.count({
+      where: { chatId },
+    });
+  }
+
+  async getChatById(
+    id: number,
+    skip: number,
+    take: number,
+  ): Promise<ChatMessages> {
     return await this.prisma.chat.findUnique({
       where: { id },
       select: {
@@ -61,6 +71,8 @@ export class ChatRepository {
             chatId: true,
             user: { select: { nickname: true } },
           },
+          skip,
+          take,
         },
       },
     });

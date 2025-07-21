@@ -11,6 +11,7 @@ import {
   Render,
   UseFilters,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -30,7 +31,10 @@ import {
   ApiUnauthorizedResponse,
   ApiParam,
   ApiBody,
+  ApiBadRequestResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
+import { PaginationDto } from '../dto/pagination.dto';
 
 @ApiTags('SSR Chats')
 @ApiCookieAuth('accessToken')
@@ -71,18 +75,35 @@ export class ChatSsrController {
 
   @ApiOperation({ summary: 'Fetch chat by id' })
   @ApiOkResponse({ description: 'Chat fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({
     description: 'You isnt participant of chat or you must be verified user',
   })
   @ApiNotFoundResponse({ description: 'Chat not found' })
   @ApiParam({ name: 'chatId', type: Number })
+  @ApiQuery({ type: PaginationDto })
   @Get(':chatId')
   @Render('chat/get-chat-by-id')
-  async getChatById(@Param('chatId') chatId: number, @Req() req: AuthRequest) {
-    const chat = await this.chatService.getChatById(chatId, req.user.id);
+  async getChatById(
+    @Param('chatId') chatId: number,
+    @Query() paginationDto: PaginationDto,
+    @Req() req: AuthRequest,
+  ) {
+    const { chat, ...pagination } = await this.chatService.getChatById(
+      chatId,
+      req.user.id,
+      paginationDto,
+    );
 
-    return { chatId: chat.id, messages: chat.messages, userId: req.user.id };
+    return {
+      chatId: chat.id,
+      messages: chat.messages,
+      userId: req.user.id,
+      ...pagination,
+      currentSize: paginationDto.pageSize,
+      currentPage: paginationDto.page,
+    };
   }
 
   @ApiOperation({ summary: 'Delete chat by id' })

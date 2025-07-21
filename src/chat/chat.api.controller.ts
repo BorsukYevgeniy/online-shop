@@ -9,13 +9,14 @@ import {
   Delete,
   UseInterceptors,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 import { Chat } from '@prisma/client';
-import { ChatMessages, UserChat } from './types/chat.types';
+import { ChatMessages, PaginatedChat, UserChat } from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 import { CacheInterceptor } from '@nestjs/cache-manager';
@@ -29,9 +30,11 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { PaginationDto } from '../dto/pagination.dto';
 
 @ApiTags('API Chats')
 @ApiCookieAuth('accessToken')
@@ -53,19 +56,22 @@ export class ChatApiController {
 
   @ApiOperation({ summary: 'Fetch chat by id' })
   @ApiOkResponse({ description: 'Chat fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({
     description: 'You isnt participant of chat or you must be verified user',
   })
   @ApiNotFoundResponse({ description: 'Chat not found' })
   @ApiParam({ name: 'chatId', type: Number })
+  @ApiQuery({type: PaginationDto})
   @Get(':chatId')
   @UseInterceptors(CacheInterceptor)
   async getСhatById(
     @Param('chatId') chatId: number,
+    @Query() paginationDto: PaginationDto,
     @Req() req: AuthRequest,
-  ): Promise<ChatMessages> {
-    return await this.chatService.getChatById(chatId, req.user.id);
+  ): Promise<PaginatedChat> {
+    return await this.chatService.getChatById(chatId, req.user.id,paginationDto);
   }
 
   @ApiOperation({ summary: 'Fetch chat by id' })
