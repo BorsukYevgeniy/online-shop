@@ -20,7 +20,10 @@ describe('ChatRepository', () => {
               create: jest.fn(),
               findMany: jest.fn(),
               findFirst: jest.fn(),
-            },
+              countMessagesInChat: jest.fn()
+            },message: {
+              count: jest.fn()
+            }
           },
         },
       ],
@@ -73,6 +76,15 @@ describe('ChatRepository', () => {
     ]);
   });
 
+  it('Should count messages in chat', async () => {
+    const mockCount=10
+
+    jest.spyOn(prisma.message, 'count').mockResolvedValue(mockCount);
+
+    const result = await repository.countMessagesInChat(1);
+    expect(result).toEqual(mockCount);
+  });
+
   it('Should get chat by id', async () => {
     const mockChat: ChatMessages = {
       id: 1,
@@ -89,7 +101,7 @@ describe('ChatRepository', () => {
 
     jest.spyOn(prisma.chat, 'findUnique').mockResolvedValue(mockChat as any);
 
-    const result = await repository.getChatById(1);
+    const result = await repository.getChatById(1,0,10);
     expect(result).toEqual(mockChat);
   });
 

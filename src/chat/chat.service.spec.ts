@@ -26,6 +26,7 @@ describe('ChatService', () => {
             getChatById: jest.fn(),
             createChat: jest.fn(),
             deleteChat: jest.fn(),
+            countMessagesInChat: jest.fn(),
           },
         },
         {
@@ -86,17 +87,29 @@ describe('ChatService', () => {
         jest
           .spyOn(validationService, 'validateChatMembers')
           .mockResolvedValue(undefined);
+        jest.spyOn(repository, 'countMessagesInChat').mockResolvedValue(10);
 
-        const result = await service.getChatById(1, 2);
-        expect(result).toEqual(chat);
+        const result = await service.getChatById(1, 2, {
+          page: 1,
+          pageSize: 10,
+        });
+        expect(result).toEqual({
+          chat,
+          nextPage: null,
+          page: 1,
+          pageSize: 10,
+          prevPage: null,
+          total: 10,
+          totalPages: 1,
+        });
       } else {
         jest
           .spyOn(validationService, 'validateChatMembers')
           .mockRejectedValue(new NotFoundException());
 
-        await expect(service.getChatById(1, 2)).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(
+          service.getChatById(1, 2, { page: 1, pageSize: 10 }),
+        ).rejects.toThrow(NotFoundException);
       }
     });
   });

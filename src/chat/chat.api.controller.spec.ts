@@ -60,12 +60,31 @@ describe('ChatApiController', () => {
       ['Should get chat by id', { id: 1, messages: [] }],
       ['Should not get chat by id', null],
     ])('%s', async (_, chat) => {
-      jest.spyOn(service, 'getChatById').mockResolvedValue(chat);
-      const result = await controller.getСhatById(1, {
-        user: { id: 1 },
-      } as AuthRequest);
+      jest.spyOn(service, 'getChatById').mockResolvedValue({
+        chat,
+        nextPage: null,
+        page: 1,
+        pageSize: 10,
+        prevPage: null,
+        total: 10,
+        totalPages: 1,
+      });
+      
+      const result = await controller.getСhatById(
+        1,
+        { page: 1, pageSize: 10 },
+        { user: { id: 1 } } as AuthRequest,
+      );
 
-      expect(result).toEqual(chat);
+      expect(result).toEqual({
+        chat,
+        nextPage: null,
+        page: 1,
+        pageSize: 10,
+        prevPage: null,
+        total: 10,
+        totalPages: 1,
+      });
     });
   });
 
