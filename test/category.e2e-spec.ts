@@ -160,7 +160,7 @@ describe('CategoryController (e2e)', () => {
     ])('%s', async (_, statusCode) => {
       const { body: category } = await request(app.getHttpServer())
         .get(
-          `/api/categories/${statusCode === 404 ? categoryId - 1 : categoryId}`,
+          `/api/categories/${statusCode === 404 ? categoryId + 2 : categoryId}`,
         )
         .expect(statusCode);
 

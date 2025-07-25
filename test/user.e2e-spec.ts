@@ -202,7 +202,7 @@ describe('UserController (e2e)', () => {
       ],
     ])('%s', async (_, statusCode, dto) => {
       const { body: users } = await request(app.getHttpServer())
-        .get('/api/users')
+        .get('/api/users?sortBy=role&order=desc')
         .query(dto)
         .set('Cookie', [`accessToken=${userAccessToken}`])
         .expect(statusCode);

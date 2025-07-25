@@ -49,7 +49,7 @@ describe('AuthController (e2e)', () => {
 
   afterAll(async () => {
     await prisma.user.deleteMany({});
-    await prisma.token.deleteMany({});
+    // await prisma.token.deleteMany({});
     await app.close();
   });
 
@@ -59,7 +59,7 @@ describe('AuthController (e2e)', () => {
         'POST /api/auth/register - 201 CREATED - Should register a new user',
         201,
         {
-          email: process.env.TEST_EMAIL,
+          email: "user@gmail.com",
           nickname: 'user',
           password: 'password',
         },
@@ -68,7 +68,7 @@ describe('AuthController (e2e)', () => {
         'POST /api/auth/register - 400 BAD REQUEST - Should return 400 http code because user already exists',
         400,
         {
-          email: process.env.TEST_EMAIL,
+          email: "user@gmail.com",
           nickname: 'user',
           password: 'password',
         },
@@ -114,7 +114,7 @@ describe('AuthController (e2e)', () => {
       [
         'POST /api/auth/login - 200 OK - Should login a user',
         200,
-        { email: process.env.TEST_EMAIL, password: 'password' },
+        { email: "user@gmail.com", password: 'password' },
       ],
       [
         'POST /api/auth/login - 404 NOT FOUND - Should return 404 HTTP code because user not found',
@@ -186,7 +186,7 @@ describe('AuthController (e2e)', () => {
       ],
     ])('%s', async (_, statusCode) => {
       const { verificationLink } = await prisma.user.findUnique({
-        where: { email: process.env.TEST_EMAIL },
+        where: { email: "user@gmail.com" },
       });
 
       if (statusCode === 200) {
