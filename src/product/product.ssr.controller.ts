@@ -76,8 +76,6 @@ export class ProductSsrController {
       products,
       ...pagination,
       ...sortDto,
-      currentPage: paginationDto.page,
-      currentSize: paginationDto.pageSize,
     };
   }
 
@@ -111,8 +109,6 @@ export class ProductSsrController {
       products: searchDto.title ? products : [],
       ...pagination,
       ...sortDto,
-      currentPage: paginationDto.page,
-      currentPageSize: paginationDto.pageSize,
       categories,
     };
   }
@@ -171,14 +167,8 @@ export class ProductSsrController {
     const product = await this.productService.getById(productId);
 
     return {
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      description: product.description,
-      categories: product.categories,
-      images: product.images,
-      authorId: product.userId,
-      userId: !req.user?.id ? -1 : req.user.id,
+      ...product,
+      guestId: !req.user?.id ? -1 : req.user.id,
     };
   }
 

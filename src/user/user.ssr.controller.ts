@@ -81,8 +81,6 @@ export class UserSsrController {
       users,
       ...pagination,
       ...sortDto,
-      currentPage: pagination.page,
-      currentSize: pagination.pageSize,
     };
   }
 
@@ -111,8 +109,6 @@ export class UserSsrController {
       users: searchDto.nickname ? users : [],
       ...pagination,
       ...sortDto,
-      currentPage: pagination.page,
-      currentSize: pagination.pageSize,
     };
   }
 
@@ -122,18 +118,8 @@ export class UserSsrController {
   @Get('me')
   @Render('users/user-account')
   @UseInterceptors(CacheInterceptor)
-  async getUserAccountPage(@Req() req: AuthRequest) {
-    const user = await this.userService.getMe(req.user.id);
-
-    return {
-      id: user.id,
-      nickname: user.nickname,
-      email: user.email,
-      createdAt: user.createdAt,
-      role: user.role,
-      isVerified: user.isVerified,
-      verifiedAt: user.verifiedAt,
-    };
+  async getUserAccountPage(@Req() req: AuthRequest){
+    return await this.userService.getMe(req.user.id);
   }
 
   @ApiOperation({ summary: 'Getting user by id' })
@@ -192,8 +178,6 @@ export class UserSsrController {
       ...pagination,
       ...sortDto,
       guestId: req.user.id,
-      currentPage: paginationDto.page,
-      currentSize: paginationDto.pageSize,
     };
   }
 
