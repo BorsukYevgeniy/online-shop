@@ -48,7 +48,8 @@ describe('AuthController (e2e)', () => {
   }, 6500);
 
   afterAll(async () => {
-    await prisma.user.deleteMany();
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
     await app.close();
   });
 

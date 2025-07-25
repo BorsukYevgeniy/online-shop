@@ -68,8 +68,9 @@ describe('CategoryController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany();
-    await prisma.category.deleteMany();
+    await prisma.user.deleteMany({});
+    await prisma.category.deleteMany({});
+    await prisma.token.deleteMany({});
     await app.close();
   });
 

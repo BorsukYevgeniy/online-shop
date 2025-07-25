@@ -91,7 +91,8 @@ describe('UserController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany();
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
     await app.close();
   });
 

@@ -114,6 +114,7 @@ describe('ChatController (e2e)', () => {
   afterAll(async () => {
     await prisma.user.deleteMany({});
     await prisma.chat.deleteMany({});
+    await prisma.token.deleteMany({});
     await app.close();
   });
 
@@ -157,7 +158,15 @@ describe('ChatController (e2e)', () => {
       .set('Cookie', [`accessToken=${userAccessToken}`])
       .expect(200);
 
-    expect(body).toEqual([{ id: chatId, withWhom: 'user2' }]);
+    expect(body).toEqual({
+      chats: [{ id: chatId, withWhom: 'user2' }],
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+      prevPage: null,
+      total: 1,
+      totalPages: 1,
+    });
   });
 
   describe('GET /api/chats/:chatId - Should get chat by id', () => {
@@ -178,7 +187,15 @@ describe('ChatController (e2e)', () => {
           .set('Cookie', [`accessToken=${userAccessToken}`])
           .expect(200);
 
-        expect(body).toEqual({ id: chatId, messages: [] });
+        expect(body).toEqual({
+          chat: { id: chatId, messages: [] },
+          nextPage: null,
+          page: 1,
+          pageSize: 10,
+          prevPage: null,
+          total: 0,
+          totalPages: 0,
+        });
       } else {
         await request(app.getHttpServer())
           .get(`/api/chats/${code === 404 ? chatId + 1 : chatId}`)

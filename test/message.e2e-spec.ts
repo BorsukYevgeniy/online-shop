@@ -13,7 +13,6 @@ import Keyv from 'keyv';
 
 import { hash } from 'bcryptjs';
 import { MessageModule } from '../src/message/message.module';
-import { ChatModule } from '../src/chat/chat.module';
 
 describe('MessageController (e2e)', () => {
   let app: NestExpressApplication;
@@ -51,7 +50,11 @@ describe('MessageController (e2e)', () => {
   });
 
   afterAll(async () => {
-    (await prisma.user.deleteMany(), await app.close());
+    await prisma.user.deleteMany({});
+    await prisma.chat.deleteMany({});
+    await prisma.message.deleteMany({});
+    await prisma.token.deleteMany({});
+    await app.close();
   });
 
   let messageId: number, userId: number, chatId: number;
