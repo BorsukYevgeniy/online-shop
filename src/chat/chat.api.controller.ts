@@ -16,7 +16,7 @@ import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 import { Chat } from '@prisma/client';
-import { ChatMessages, PaginatedChat, UserChat } from './types/chat.types';
+import { ChatMessages, PaginatedChat, PaginatedUserChats, UserChat } from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 import { CacheInterceptor } from '@nestjs/cache-manager';
@@ -45,13 +45,17 @@ export class ChatApiController {
 
   @ApiOperation({ summary: 'Fecth my chats' })
   @ApiOkResponse({ description: 'Message fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({ description: 'You must be verified user' })
   @ApiNotFoundResponse({ description: 'Message not found' })
   @Get()
   @UseInterceptors(CacheInterceptor)
-  async getMyChats(@Req() req: AuthRequest): Promise<UserChat[]> {
-    return await this.chatService.getUserChats(req.user.id);
+  async getMyChats(
+    @Req() req: AuthRequest,
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedUserChats> {
+    return await this.chatService.getUserChats(req.user.id, paginationDto);
   }
 
   @ApiOperation({ summary: 'Fetch chat by id' })
@@ -63,7 +67,7 @@ export class ChatApiController {
   })
   @ApiNotFoundResponse({ description: 'Chat not found' })
   @ApiParam({ name: 'chatId', type: Number })
-  @ApiQuery({type: PaginationDto})
+  @ApiQuery({ type: PaginationDto })
   @Get(':chatId')
   @UseInterceptors(CacheInterceptor)
   async getСhatById(
@@ -71,7 +75,11 @@ export class ChatApiController {
     @Query() paginationDto: PaginationDto,
     @Req() req: AuthRequest,
   ): Promise<PaginatedChat> {
-    return await this.chatService.getChatById(chatId, req.user.id,paginationDto);
+    return await this.chatService.getChatById(
+      chatId,
+      req.user.id,
+      paginationDto,
+    );
   }
 
   @ApiOperation({ summary: 'Fetch chat by id' })

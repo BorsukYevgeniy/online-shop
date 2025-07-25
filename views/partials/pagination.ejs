@@ -2,11 +2,11 @@
 <div class="pagination">
 
   <% if (prevPage) { %>
-    <a href="?page=<%= prevPage %>&pageSize=<%= currentSize %>">« Back</a>
+    <a href="?page=<%= prevPage %>&pageSize=<%= pageSize %>">« Back</a>
   <% } %>
 
-    <div>Total pages: <%= totalPages %></div>
-    <div>Total: <%= total %></div>
+  <div>Total pages: <%= totalPages %></div>
+  <div>Total: <%= total %></div>
 
   <div>
     <label for="pageSizeInput">Page size:</label>
@@ -14,7 +14,8 @@
   </div>
 
   <% if (nextPage) { %>
-    <a href="?page=<%= nextPage %>&pageSize=<%= currentSize %>">Forward »</a>
+    <a href="?page=<%= nextPage %>&pageSize=<%= pageSize %>">Forward »</a>
   <% } %>
+
   <script src="/js/change-page-size.js"></script>
-  </div>
+</div>

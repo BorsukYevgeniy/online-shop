@@ -1,12 +1,12 @@
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatRepository } from './chat.repository';
-import { ChatMessages, PaginatedChat, UserChat } from './types/chat.types';
+import {
+  ChatMessages,
+  PaginatedChat,
+  PaginatedUserChats,
+  UserChat,
+} from './types/chat.types';
 import { Chat } from '@prisma/client';
 
 import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum';
@@ -44,17 +44,35 @@ export class ChatService {
     this.logger.log(`Chat found between user ${buyerId} and user ${sellerId}.`);
     return chat;
   }
+  async getUserChats(
+    userId: number,
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedUserChats> {
+    const { page, pageSize } = paginationDto;
+    const skip = (page - 1) * pageSize;
 
-  async getUserChats(userId: number): Promise<UserChat[]> {
-    const userChats = await this.chatRepository.getUserChats(userId);
+    const [chats, total] = await Promise.all([
+      this.chatRepository.getUserChats(userId, skip, pageSize),
+      this.chatRepository.countUserChats(userId),
+    ]);
 
-    if (!userChats) {
+    if (!chats) {
       this.logger.warn(`User with ID ${userId} has no chats.`);
     }
 
-    this.logger.log(`User with ID ${userId} has ${userChats.length} chats.`);
+    const totalPages: number = Math.ceil(total / pageSize);
 
-    return userChats;
+    this.logger.log(`User with ID ${userId} has ${chats.length} chats.`);
+
+    return {
+      chats,
+      total,
+      pageSize,
+      page,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
   }
 
   async getChatById(
@@ -63,15 +81,14 @@ export class ChatService {
     paginationDto: PaginationDto,
   ): Promise<PaginatedChat> {
     await this.validationService.validateChatMembers(id, userId);
+
     const { page, pageSize } = paginationDto;
     const skip = (page - 1) * pageSize;
-
 
     const [chat, totalMessages] = await Promise.all([
       this.chatRepository.getChatById(id, skip, pageSize),
       this.chatRepository.countMessagesInChat(id),
     ]);
-    
 
     if (!chat) {
       this.logger.warn(`Chat with ID ${id} not found.`);
@@ -85,7 +102,7 @@ export class ChatService {
     );
 
     return {
-      chat,
+      chat: chat,
       total: totalMessages,
       pageSize,
       page,

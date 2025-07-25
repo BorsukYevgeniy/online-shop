@@ -24,7 +24,19 @@ export class ChatRepository {
     });
   }
 
-  async getUserChats(userId: number): Promise<UserChat[]> {
+  async countUserChats(userId: number): Promise<number> {
+    return await this.prisma.chat.count({
+      where: {
+        users: { some: { id: userId } },
+      },
+    });
+  }
+
+  async getUserChats(
+    userId: number,
+    skip: number,
+    take: number,
+  ): Promise<UserChat[]> {
     const chats = await this.prisma.chat.findMany({
       where: {
         users: { some: { id: userId } },
@@ -38,6 +50,8 @@ export class ChatRepository {
           },
         },
       },
+      skip,
+      take,
     });
 
     return chats.map((chat) => ({

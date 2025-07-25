@@ -61,16 +61,23 @@ export class ChatSsrController {
 
   @ApiOperation({ summary: 'Fecth my chats' })
   @ApiOkResponse({ description: 'Message fetched' })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({ description: 'You must be verified user' })
   @ApiNotFoundResponse({ description: 'Message not found' })
   @Get()
   @Render('users/my-chats')
   @UseInterceptors(CacheInterceptor)
-  async getAllChats(@Req() req: AuthRequest) {
-    const chats = await this.chatService.getUserChats(req.user.id);
+  async getAllChats(
+    @Req() req: AuthRequest,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    const {chats, ...pagination} = await this.chatService.getUserChats(
+      req.user.id,
+      paginationDto,
+    );
 
-    return { chats };
+    return { chats, ... pagination};
   }
 
   @ApiOperation({ summary: 'Fetch chat by id' })
@@ -101,8 +108,6 @@ export class ChatSsrController {
       messages: chat.messages,
       userId: req.user.id,
       ...pagination,
-      currentSize: paginationDto.pageSize,
-      currentPage: paginationDto.page,
     };
   }
 

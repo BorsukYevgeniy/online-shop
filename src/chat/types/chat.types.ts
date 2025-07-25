@@ -24,3 +24,5 @@ export type PaginatedChat = Paginated<
   ChatMessages,
   'chat'
 >;
+
+export type PaginatedUserChats = Paginated<UserChat[],'chats'>
