@@ -27,6 +27,7 @@ describe('ChatService', () => {
             createChat: jest.fn(),
             deleteChat: jest.fn(),
             countMessagesInChat: jest.fn(),
+            countUserChats: jest.fn(),
           },
         },
         {
@@ -69,9 +70,20 @@ describe('ChatService', () => {
       { id: 1, withWhom: 'user2' },
       { id: 2, withWhom: 'user1' },
     ];
+
     jest.spyOn(repository, 'getUserChats').mockResolvedValue(userChats);
-    const result = await service.getUserChats(1);
-    expect(result).toEqual(userChats);
+    jest.spyOn(repository, 'countUserChats').mockResolvedValue(2);
+
+    const result = await service.getUserChats(1, { page: 1, pageSize: 10 });
+    expect(result).toEqual({
+      chats: userChats,
+      total: 2,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
   });
 
   describe('Sould get chat by id', () => {
