@@ -62,12 +62,6 @@ export class ChatRepository {
     }));
   }
 
-  async countMessagesInChat(chatId: number): Promise<number> {
-    return await this.prisma.message.count({
-      where: { chatId },
-    });
-  }
-
   async getChatById(
     id: number,
     skip: number,

@@ -47,10 +47,29 @@ describe('ChatMessageApiController', () => {
       },
     ];
 
-    jest.spyOn(service, 'getMessagesByChatId').mockResolvedValue(messages);
+    jest.spyOn(service, 'getMessagesByChatId').mockResolvedValue({
+      messages: messages,
+      total: messages.length,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
 
-    const result = await controller.getMessagesByChatId(chatId);
-    expect(result).toEqual(messages);
+    const result = await controller.getMessagesByChatId(chatId, {
+      page: 1,
+      pageSize: 10,
+    });
+    expect(result).toEqual({
+      messages,
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+      prevPage: null,
+      total: 1,
+      totalPages: 1,
+    });
   });
 
   it('Should create a message', async () => {

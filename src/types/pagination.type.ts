@@ -1,6 +1,6 @@
 export type Paginated<
   T extends object,
-  F extends 'users' | 'products' | 'categories' | 'chat' | 'chats',
+  F extends 'users' | 'products' | 'categories' | 'chat' | 'chats' | 'messages',
 > = {
   total: number;
   pageSize: number;

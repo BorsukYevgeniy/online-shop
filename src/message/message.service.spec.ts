@@ -16,6 +16,7 @@ describe('MessageService', () => {
         {
           provide: MessageRepository,
           useValue: {
+            countMessagesInChat: jest.fn(),
             createMessage: jest.fn(),
             getMessageById: jest.fn(),
             getMessagesByChatId: jest.fn(),
@@ -132,6 +133,15 @@ describe('MessageService', () => {
     });
   });
 
+  it('Should count messages in chat', async () => {
+    const mockCount = 10;
+
+    jest.spyOn(repository, 'countMessagesInChat').mockResolvedValue(mockCount);
+
+    const result = await service.countMessagesInChat(1);
+    expect(result).toEqual(mockCount);
+  });
+
   it('Should get messages by chat id', async () => {
     const mockMessages = [
       {
@@ -148,9 +158,24 @@ describe('MessageService', () => {
       .spyOn(repository, 'getMessagesByChatId')
       .mockResolvedValue(mockMessages);
 
-    const result = await service.getMessagesByChatId(1);
+    jest
+      .spyOn(service, 'countMessagesInChat')
+      .mockResolvedValue(mockMessages.length);
 
-    expect(result).toEqual(mockMessages);
+    const result = await service.getMessagesByChatId(1, {
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(result).toEqual({
+      messages: mockMessages,
+      total: mockMessages.length,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
   });
 
   describe('Should update message', () => {

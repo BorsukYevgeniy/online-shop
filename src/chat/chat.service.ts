@@ -15,6 +15,7 @@ import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-me
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 import { PaginationDto } from '../dto/pagination.dto';
+import { MessageService } from '../message/message.service';
 
 @Injectable()
 export class ChatService {
@@ -23,6 +24,7 @@ export class ChatService {
   constructor(
     private readonly chatRepository: ChatRepository,
     private readonly validationService: ChatMemberValidationService,
+    private readonly messageService: MessageService
   ) {}
 
   async findChatBetweenUsers(
@@ -87,7 +89,7 @@ export class ChatService {
 
     const [chat, totalMessages] = await Promise.all([
       this.chatRepository.getChatById(id, skip, pageSize),
-      this.chatRepository.countMessagesInChat(id),
+      this.messageService.countMessagesInChat(id),
     ]);
 
     if (!chat) {

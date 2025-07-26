@@ -9,11 +9,12 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
 import { Message } from '@prisma/client';
-import { MessageNickname } from './types/message.type';
+import { MessageNickname, PaginatedMessages } from './types/message.type';
 
 import { MessageErrorMessages as MessageErrMsg } from './enum/message-error-messages.enum';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { PaginationDto } from '../dto/pagination.dto';
 
 @Injectable()
 export class MessageService {
@@ -39,10 +40,41 @@ export class MessageService {
     return message;
   }
 
-  async getMessagesByChatId(chatId: number): Promise<MessageNickname[]> {
-    this.logger.log(`Fetching messages for chat ID ${chatId}.`);
+  async countMessagesInChat(chatId: number): Promise<number> {
+    return await this.messageRepository.countMessagesInChat(chatId);
+  }
 
-    return await this.messageRepository.getMessagesByChatId(chatId);
+  async getMessagesByChatId(
+    chatId: number,
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedMessages> {
+    const { page, pageSize } = paginationDto;
+    const skip = (page - 1) * pageSize;
+
+    const [messages, totalMessages] = await Promise.all([
+      this.messageRepository.getMessagesByChatId(chatId, skip, pageSize),
+      this.countMessagesInChat(chatId),
+    ]);
+
+    if (!messages) {
+      this.logger.warn(`Chat with id ${chatId} not found.`);
+    }
+
+    const totalPages: number = Math.ceil(totalMessages / pageSize);
+
+    this.logger.log(
+      'Chat fetched successfully, totalMessages messages: ' + totalMessages,
+    );
+
+    return {
+      messages,
+      total: totalMessages,
+      pageSize,
+      page,
+      totalPages,
+      prevPage: page > 1 ? page - 1 : null,
+      nextPage: page < totalPages ? page + 1 : null,
+    };
   }
 
   async createMessage(

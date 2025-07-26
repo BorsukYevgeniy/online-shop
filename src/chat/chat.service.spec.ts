@@ -7,11 +7,13 @@ import { NotFoundException } from '@nestjs/common';
 import { MessageNickname } from '../message/types/message.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { MessageService } from '../message/message.service';
 
 describe('ChatService', () => {
   let repository: ChatRepository;
   let service: ChatService;
   let validationService: ChatMemberValidationService;
+  let messageService: MessageService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -36,6 +38,7 @@ describe('ChatService', () => {
             validateChatMembers: jest.fn(),
           },
         },
+        { provide: MessageService, useValue: { countMessagesInChat: jest.fn() } }
       ],
     }).compile();
 
@@ -44,6 +47,8 @@ describe('ChatService', () => {
     validationService = module.get<ChatMemberValidationService>(
       ChatMemberValidationService,
     );
+
+    messageService = module.get<MessageService>(MessageService);
   });
 
   afterEach(async () => {
@@ -99,12 +104,14 @@ describe('ChatService', () => {
         jest
           .spyOn(validationService, 'validateChatMembers')
           .mockResolvedValue(undefined);
-        jest.spyOn(repository, 'countMessagesInChat').mockResolvedValue(10);
+      
+        jest.spyOn(messageService, 'countMessagesInChat').mockResolvedValue(10);
 
         const result = await service.getChatById(1, 2, {
           page: 1,
           pageSize: 10,
         });
+    
         expect(result).toEqual({
           chat,
           nextPage: null,

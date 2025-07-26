@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Query,
   Render,
   UseFilters,
   UseGuards,
@@ -24,6 +25,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { PaginationDto } from '../dto/pagination.dto';
 
 @ApiTags('SSR ChatMessages')
 @ApiCookieAuth('accessToken')
@@ -43,9 +45,9 @@ export class ChatMessageSsrController {
   @UseGuards(RolesGuard)
   @Render('message/get-all-messages')
   @UseInterceptors(CacheInterceptor)
-  async getMessagesByChatId(@Param('chatId') chatId: number) {
-    const messages = await this.messageService.getMessagesByChatId(chatId);
+  async getMessagesByChatId(@Param('chatId') chatId: number, @Query() paginationDto: PaginationDto) {
+    const {messages , ...pagination} = await this.messageService.getMessagesByChatId(chatId,paginationDto);
 
-    return { messages, chatId };
+    return { messages, chatId, ...pagination };
   }
 }

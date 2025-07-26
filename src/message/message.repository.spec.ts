@@ -14,6 +14,7 @@ describe('MessageRepository', () => {
           provide: PrismaService,
           useValue: {
             message: {
+              count: jest.fn(),
               findMany: jest.fn(),
               findUnique: jest.fn(),
               create: jest.fn(),
@@ -31,6 +32,15 @@ describe('MessageRepository', () => {
 
   it('Should be defined', () => {
     expect(repository).toBeDefined();
+  });
+
+  it('Should count messages in chat', async () => {
+    const mockCount = 10;
+
+    jest.spyOn(prisma.message, 'count').mockResolvedValue(mockCount);
+
+    const result = await repository.countMessagesInChat(1);
+    expect(result).toEqual(mockCount);
   });
 
   it('Should create a message', async () => {
@@ -94,7 +104,7 @@ describe('MessageRepository', () => {
 
     jest.spyOn(prisma.message, 'findMany').mockResolvedValue(mockMessages);
 
-    const result = await repository.getMessagesByChatId(1);
+    const result = await repository.getMessagesByChatId(1, 0, 10);
 
     expect(result).toEqual(mockMessages);
     expect(prisma.message.findMany).toHaveBeenCalledWith({
@@ -106,6 +116,8 @@ describe('MessageRepository', () => {
         userId: true,
         user: { select: { nickname: true } },
       },
+      skip: 0,
+      take: 10,
     });
   });
 

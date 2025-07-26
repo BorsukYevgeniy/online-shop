@@ -15,12 +15,12 @@ describe('ChatRepository', () => {
           provide: PrismaService,
           useValue: {
             chat: {
+              count: jest.fn(),
               findUnique: jest.fn(),
               delete: jest.fn(),
               create: jest.fn(),
               findMany: jest.fn(),
               findFirst: jest.fn(),
-              countMessagesInChat: jest.fn(),
             },
             message: {
               count: jest.fn(),
@@ -53,9 +53,9 @@ describe('ChatRepository', () => {
   it('Should count user chats', async () => {
     const mockCount = 10;
 
-    jest.spyOn(prisma.message, 'count').mockResolvedValue(mockCount);
+    jest.spyOn(prisma.chat, 'count').mockResolvedValue(mockCount);
 
-    const result = await repository.countMessagesInChat(1);
+    const result = await repository.countUserChats(1);
     expect(result).toEqual(mockCount);
   });
 
@@ -84,15 +84,6 @@ describe('ChatRepository', () => {
       { id: 1, withWhom: 'User2' },
       { id: 2, withWhom: 'User3' },
     ]);
-  });
-
-  it('Should count messages in chat', async () => {
-    const mockCount = 10;
-
-    jest.spyOn(prisma.message, 'count').mockResolvedValue(mockCount);
-
-    const result = await repository.countMessagesInChat(1);
-    expect(result).toEqual(mockCount);
   });
 
   it('Should get chat by id', async () => {

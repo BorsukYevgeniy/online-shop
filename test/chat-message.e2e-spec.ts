@@ -127,7 +127,15 @@ describe('ChatController (e2e)', () => {
       .set('Cookie', [`accessToken=${guestAccessToken}`]) // guestAccessToken because guest is an admin
       .expect(200);
 
-    expect(body).toEqual([]);
+    expect(body).toEqual({
+      messages: [],
+      nextPage: null,
+      page: 1,
+      pageSize: 10,
+      prevPage: null,
+      total: 0,
+      totalPages: 0,
+    });
   });
 
   describe('POST /api/chats/:chatId/messages - Should create message in chat', () => {

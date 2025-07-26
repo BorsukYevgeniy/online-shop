@@ -58,7 +58,11 @@ export class MessageRepository {
     });
   }
 
-  async getMessagesByChatId(chatId: number): Promise<MessageNickname[]> {
+  async getMessagesByChatId(
+    chatId: number,
+    skip: number,
+    take: number,
+  ): Promise<MessageNickname[]> {
     return await this.prisma.message.findMany({
       where: { chatId },
       select: {
@@ -68,6 +72,14 @@ export class MessageRepository {
         userId: true,
         user: { select: { nickname: true } },
       },
+      skip,
+      take,
+    });
+  }
+
+  async countMessagesInChat(chatId: number): Promise<number> {
+    return await this.prisma.message.count({
+      where: { chatId },
     });
   }
 }
