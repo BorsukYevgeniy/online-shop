@@ -9,7 +9,7 @@ btn.addEventListener('click', async () => {
 
     const { categories } = await response.json();
 
-    console.log(categories)
+    console.log(categories);
 
     if (categories.length === 0) {
       btn.disabled = true;

@@ -15,7 +15,7 @@ a {
   text-decoration: none;
 }
 
-h1{ 
+h1 {
   text-align: center;
 }
 
@@ -69,7 +69,7 @@ h1{
   transition: background-color 0.3s ease;
 }
 
-.btn-create{
+.btn-create {
   background-color: #007bff;
   color: white;
 }
@@ -78,7 +78,7 @@ h1{
   transition: background-color 0.3s ease;
 }
 
-.get-all{
+.get-all {
   background-color: #00ff00;
   color: white;
 }
@@ -98,9 +98,9 @@ h1{
   transition: background-color 0.3s ease;
 }
 
-.get-all-products{
+.get-all-products {
   background-color: rgb(1, 219, 219);
-  color: white
+  color: white;
 }
 
 .get-all-products:hover {
@@ -110,7 +110,7 @@ h1{
 
 #btn-assign-admin {
   background-color: rgb(223, 223, 1);
-  color: white
+  color: white;
 }
 
 #btn-assign-admin:hover {
@@ -120,7 +120,7 @@ h1{
 
 #send {
   background-color: rgb(25, 216, 0);
-  color: white
+  color: white;
 }
 
 #send:hover {

@@ -1,4 +1,4 @@
-const searchForm = document.getElementById('search-form')
+const searchForm = document.getElementById('search-form');
 
 searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -19,4 +19,3 @@ searchForm.addEventListener('submit', (e) => {
 
   window.location.href = currentUrl.toString();
 });
-

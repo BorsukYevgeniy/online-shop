@@ -1,3 +1,7 @@
+* {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .product {
   text-align: center;
   background-color: #fdfdfd;
@@ -6,7 +10,7 @@
   margin-bottom: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  max-width: 800px; 
+  max-width: 800px;
   margin: 20px auto;
 }
 
@@ -38,17 +42,13 @@ h1 {
   text-align: center;
 }
 
-* {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-
 .clear-form {
   text-align: center;
   border: none;
 }
 
-#btn-delete, #clear-cart {
+#btn-delete,
+#clear-cart {
   text-align: center;
   padding: 6px 12px;
   border-radius: 4px;
@@ -63,13 +63,13 @@ h1 {
   color: white;
 }
 
-
 #clear-cart {
   width: 140px;
   height: 75px;
 }
 
-#btn-delete:hover, #clear-cart:hover {
+#btn-delete:hover,
+#clear-cart:hover {
   background-color: #c53228;
   transition: background-color 0.3s ease;
 }

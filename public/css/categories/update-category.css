@@ -20,9 +20,9 @@ h1 {
   color: #333;
 }
 
-.update-form input[type="text"],
-.update-form input[type="number"],
-.update-form input[type="file"],
+.update-form input[type='text'],
+.update-form input[type='number'],
+.update-form input[type='file'],
 .update-form textarea,
 .update-form select {
   width: 100%;
@@ -59,7 +59,6 @@ h1 {
   text-align: center;
 }
 
-
 .update-form label {
   font-weight: bold;
 }
@@ -69,8 +68,6 @@ h1 {
   margin-top: 4px;
   box-sizing: border-box;
 }
-
-
 
 .update-form button {
   margin-top: 20px;
