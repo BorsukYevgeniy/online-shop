@@ -20,16 +20,20 @@
         <% }) %>
       </div>
     <% } else { %>
-      <p>Немає фотографій</p>
+      <p>No photos</p>
     <% } %>
 
     <div class="product-info">
-      <p><strong>Ціна:</strong> <%= price %> ₴</p>
-      <p><strong>Опис:</strong> <%= description %></p>
+      <p><strong>Price:</strong> <%= price %> ₴</p>
+      <p><strong>Description:</strong> <%= description %></p>
+      <p>
+        <strong>Created at:</strong>
+        <%= new Date(p.createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+      </p>
 
       <% if (categories && categories.length > 0) { %>
         <div class="product-categories">
-          <strong>Категорії:</strong>
+          <strong>Categories:</strong>
           <ul>
             <% categories.forEach((c) => { %>
               <li><a href="/categories/<%= c.id %>"><%= c.name %></a></li>
@@ -40,15 +44,15 @@
 
       <div class="product-actions">
         <% if (authorId === userId) { %>
-          <a href="/products/update/<%= id %>" class="btn btn-update">Редагувати</a>
+          <a href="/products/update/<%= id %>" class="btn btn-update">Update</a>
 
           <form action="/products/delete/<%= id %>?_method=DELETE" method="post" class="delete-form">
-            <button type="submit" class="btn btn-delete">Видалити</button>
+            <button type="submit" class="btn btn-delete">Delete</button>
           </form>
         <% } %>
 
         <form action="/cart/products/<%= id %>" method="post">
-          <button type="submit" id="add-to-cart" class="btn btn-add">Додати в кошик</button>
+          <button type="submit" id="add-to-cart" class="btn btn-add">Add to cart</button>
         </form>
       </div>
     </div>

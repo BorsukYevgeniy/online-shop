@@ -72,6 +72,10 @@
             </div>
             <div><strong>Price:</strong> <%= p.price %>₴</div>
             <div><strong>Description:</strong> <%= p.description %></div>
+            <p>
+              <strong>Created at:</strong>
+              <%= new Date(p.createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+            </p>
           </div>
         <% }) %>
       <% } else if (products) { %>

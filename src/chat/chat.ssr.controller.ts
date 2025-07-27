@@ -104,10 +104,9 @@ export class ChatSsrController {
     );
 
     return {
-      chatId: chat.id,
-      messages: chat.messages,
-      userId: req.user.id,
+      ...chat,
       ...pagination,
+      userId: req.user.id,
     };
   }
 

@@ -41,21 +41,14 @@ export class ChatRepository {
       where: {
         users: { some: { id: userId } },
       },
-      select: {
-        id: true,
-        users: {
-          select: {
-            id: true,
-            nickname: true,
-          },
-        },
-      },
+      include: { users: { select: { id: true, nickname: true } } },
       skip,
       take,
     });
 
     return chats.map((chat) => ({
       id: chat.id,
+      createdAt: chat.createdAt,
       withWhom:
         chat.users.find((user) => user.id !== userId)?.nickname ||
         'Unknown User',
@@ -69,16 +62,9 @@ export class ChatRepository {
   ): Promise<ChatMessages> {
     return await this.prisma.chat.findUnique({
       where: { id },
-      select: {
-        id: true,
+      include: {
         messages: {
-          select: {
-            userId: true,
-            id: true,
-            text: true,
-            chatId: true,
-            user: { select: { nickname: true } },
-          },
+          include: { user: { select: { nickname: true } } },
           skip,
           take,
         },

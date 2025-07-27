@@ -16,15 +16,23 @@
 
   <main>
 
-    <div>Nickname: <%= nickname %></div>
-    <div>Email: <%= email %></div>
-    <div>Created at: <%= new Date(createdAt).toLocaleDateString() %></div>
-    <div>Role: <%= role %></div>
 
-    <div>Is user verified: <%= isVerified ? 'yes' : 'no' %></div>
+
+    <div><strong>Nickname:</strong> <%= nickname %></div>
+    <div><strong>Email:</strong> <%= email %></div>
+    <div>
+      <strong>Created at:</strong>
+      <%= new Date(createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+    </div>
+    <div><strong>Role:</strong> <%= role %></div>
+
+    <div><strong>Is user verified:</strong> <%= isVerified ? 'yes' : 'no' %></div>
 
     <% if (isVerified) { %>
-      <div>Verified at: <%= new Date(verifiedAt).toLocaleDateString() %></div>
+      <div>
+        <strong>Verified:</strong>
+        <%= new Date(verifiedAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+      </div>
     <% } %>
   </main>
 
@@ -35,9 +43,7 @@
         <button type="submit" class="user-btn">Resend verification email</button>
       </form>
     <% } %>
-    
-    
-    
+      
     <form action="/auth/logout" method="post">
       <button type="submit" class="user-btn">Logout</button>
     </form>

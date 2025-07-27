@@ -30,6 +30,10 @@
             </p>
             <p><strong>Price:</strong> <%= p.price %> ₴</p>
             <p><strong>Description:</strong> <%= p.description %></p>
+            <p>
+              <strong>Created at:</strong> 
+              <%= new Date(p.createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+            </p>
           </div>
         </article>
       <% }) %>

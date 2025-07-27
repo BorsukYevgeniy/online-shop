@@ -8,7 +8,7 @@ import { Paginated } from '../../types/pagination.type';
  * @property id - The unique identifier of the chat.
  * @property withWhom - The nickname of the other participant in the chat (excluding the current user).
  */
-export type UserChat = { id: number; withWhom: string };
+export type UserChat = Chat & { withWhom: string };
 
 /**
  * Represents a chat with messages

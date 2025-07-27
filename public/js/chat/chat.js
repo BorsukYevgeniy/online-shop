@@ -77,8 +77,15 @@ socket.on('chatMessage', (msg) => {
   text.classList.add('text');
   text.textContent = msg.text;
 
+  const createdAt = document.createElement('p');
+  createdAt.id = 'messageCreatedAt';
+  createdAt.textContent = new Date(msg.createdAt).toLocaleString(
+    Intl.DateTimeFormat().resolvedOptions().locale,
+  );
+
   div.appendChild(sender);
   div.appendChild(text);
+  div.appendChild(createdAt);
 
   if (userId === msg.userId) {
     // Adding delete and update buttons to the message
@@ -144,7 +151,6 @@ document.getElementById('sendForm').addEventListener('submit', (e) => {
 });
 
 // Handling errors
-
 socket.on('error', (err) => {
   const { errorCode, message } = err;
 

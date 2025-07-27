@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat №<%= chatId %></title>
+  <title>Chat №<%= id %></title>
   <link rel="stylesheet" href="/css/chat/get-chat-by-id.css">
 </head>
 <body>
@@ -11,11 +11,11 @@
   <%- include('../partials/header.ejs') %>
 
   <main class="results">
-    <h1>Chat №<%= chatId %></h1>
+    <h1>Chat №<%= id %></h1>
 
     <!-- Hidden values for JS -->
     <input type="hidden" id="userId" value="<%= userId %>">
-    <input type="hidden" id="chatId" value="<%= chatId %>">
+    <input type="hidden" id="chatId" value="<%= id %>">
 
     <!-- Chat Messages -->
     <div id="messages">
@@ -23,6 +23,9 @@
         <div class="message" id="message-<%= m.id %>">
           <p class="sender"><%= m.user.nickname %>:</p>
           <p class="text"><%= m.text %></p>
+          <p id="messageCreatedAt">
+            <%= new Date(m.createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+          </p>
 
           <br>
 
@@ -38,10 +41,16 @@
 
     <!-- Send Message -->
     <form id="sendForm">
-      <input id="messageInput" type="text" placeholder="Введіть повідомлення..." autocomplete="off" />
-      <button type="submit">Відправити</button>
+      <input id="messageInput" type="text" placeholder="Enter message..." autocomplete="off" />
+      <button type="submit" id="sendButton">Send</button>
     </form>
   </main>
+
+  <br>
+  <p id="chatCreatedAt">
+    <strong>Chat created at:</strong>
+    <%= new Date(createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+  </p>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"
     integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q=="

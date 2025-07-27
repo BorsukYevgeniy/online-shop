@@ -26,13 +26,7 @@ export class MessageRepository {
         userId: userId,
       },
 
-      select: {
-        id: true,
-        chatId: true,
-        text: true,
-        userId: true,
-        user: { select: { nickname: true } },
-      },
+      include: { user: { select: { nickname: true } } },
     });
   }
 
@@ -48,13 +42,7 @@ export class MessageRepository {
       where: { id: messageId },
       data: { text: updateDto.text },
 
-      select: {
-        id: true,
-        chatId: true,
-        text: true,
-        userId: true,
-        user: { select: { nickname: true } },
-      },
+      include: { user: { select: { nickname: true } } },
     });
   }
 
@@ -65,13 +53,7 @@ export class MessageRepository {
   ): Promise<MessageNickname[]> {
     return await this.prisma.message.findMany({
       where: { chatId },
-      select: {
-        id: true,
-        chatId: true,
-        text: true,
-        userId: true,
-        user: { select: { nickname: true } },
-      },
+      include: { user: { select: { nickname: true } } },
       skip,
       take,
     });
