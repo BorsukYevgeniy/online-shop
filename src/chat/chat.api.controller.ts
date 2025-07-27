@@ -16,7 +16,12 @@ import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 import { Chat } from '@prisma/client';
-import { ChatMessages, PaginatedChat, PaginatedUserChats, UserChat } from './types/chat.types';
+import {
+  ChatMessages,
+  PaginatedChat,
+  PaginatedUserChats,
+  UserChat,
+} from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 import { CacheInterceptor } from '@nestjs/cache-manager';

@@ -24,7 +24,7 @@ export class ChatService {
   constructor(
     private readonly chatRepository: ChatRepository,
     private readonly validationService: ChatMemberValidationService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
   ) {}
 
   async findChatBetweenUsers(

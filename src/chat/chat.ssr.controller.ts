@@ -72,12 +72,12 @@ export class ChatSsrController {
     @Req() req: AuthRequest,
     @Query() paginationDto: PaginationDto,
   ) {
-    const {chats, ...pagination} = await this.chatService.getUserChats(
+    const { chats, ...pagination } = await this.chatService.getUserChats(
       req.user.id,
       paginationDto,
     );
 
-    return { chats, ... pagination};
+    return { chats, ...pagination };
   }
 
   @ApiOperation({ summary: 'Fetch chat by id' })

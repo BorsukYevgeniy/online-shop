@@ -118,7 +118,7 @@ export class UserSsrController {
   @Get('me')
   @Render('users/user-account')
   @UseInterceptors(CacheInterceptor)
-  async getUserAccountPage(@Req() req: AuthRequest){
+  async getUserAccountPage(@Req() req: AuthRequest) {
     return await this.userService.getMe(req.user.id);
   }
 

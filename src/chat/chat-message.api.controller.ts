@@ -11,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { MessageService } from '../message/message.service';
 import { CreateMessageDto } from '../message/dto/create-message.dto';
-import { MessageNickname, PaginatedMessages } from '../message/types/message.type';
+import {
+  MessageNickname,
+  PaginatedMessages,
+} from '../message/types/message.type';
 
 import { AuthRequest } from '../types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
@@ -54,7 +57,7 @@ export class ChatMessageApiController {
     @Param('chatId') chatId: number,
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedMessages> {
-    return await this.messageService.getMessagesByChatId(chatId,paginationDto);
+    return await this.messageService.getMessagesByChatId(chatId, paginationDto);
   }
 
   @ApiOperation({ summary: 'Create message in chat' })

@@ -2,7 +2,6 @@ import { Chat } from '@prisma/client';
 import { MessageNickname } from '../../message/types/message.type';
 import { Paginated } from '../../types/pagination.type';
 
-
 /**
  * Represents a chat entry for the current user.
  *
@@ -18,11 +17,6 @@ export type UserChat = { id: number; withWhom: string };
  */
 export type ChatMessages = Chat & { messages: MessageNickname[] };
 
+export type PaginatedChat = Paginated<ChatMessages, 'chat'>;
 
-
-export type PaginatedChat = Paginated<
-  ChatMessages,
-  'chat'
->;
-
-export type PaginatedUserChats = Paginated<UserChat[],'chats'>
+export type PaginatedUserChats = Paginated<UserChat[], 'chats'>;

@@ -7,6 +7,4 @@ import { Paginated } from '../../types/pagination.type';
 
 export type MessageNickname = Message & { user: { nickname: string } };
 
-
-
-export type PaginatedMessages = Paginated<MessageNickname[],'messages'>;
+export type PaginatedMessages = Paginated<MessageNickname[], 'messages'>;

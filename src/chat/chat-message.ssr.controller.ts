@@ -45,8 +45,12 @@ export class ChatMessageSsrController {
   @UseGuards(RolesGuard)
   @Render('message/get-all-messages')
   @UseInterceptors(CacheInterceptor)
-  async getMessagesByChatId(@Param('chatId') chatId: number, @Query() paginationDto: PaginationDto) {
-    const {messages , ...pagination} = await this.messageService.getMessagesByChatId(chatId,paginationDto);
+  async getMessagesByChatId(
+    @Param('chatId') chatId: number,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    const { messages, ...pagination } =
+      await this.messageService.getMessagesByChatId(chatId, paginationDto);
 
     return { messages, chatId, ...pagination };
   }

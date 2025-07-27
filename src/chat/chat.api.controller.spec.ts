@@ -48,18 +48,16 @@ describe('ChatApiController', () => {
       { id: 1, withWhom: 'user2' },
       { id: 2, withWhom: 'user1' },
     ];
-    
-    jest
-      .spyOn(service, 'getUserChats')
-      .mockResolvedValue({
-        chats: userChats,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
-        prevPage: null,
-        nextPage: null,
-      });
+
+    jest.spyOn(service, 'getUserChats').mockResolvedValue({
+      chats: userChats,
+      total: 2,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      prevPage: null,
+      nextPage: null,
+    });
 
     const result = await controller.getMyChats(
       {

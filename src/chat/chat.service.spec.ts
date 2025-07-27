@@ -38,7 +38,10 @@ describe('ChatService', () => {
             validateChatMembers: jest.fn(),
           },
         },
-        { provide: MessageService, useValue: { countMessagesInChat: jest.fn() } }
+        {
+          provide: MessageService,
+          useValue: { countMessagesInChat: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -104,14 +107,14 @@ describe('ChatService', () => {
         jest
           .spyOn(validationService, 'validateChatMembers')
           .mockResolvedValue(undefined);
-      
+
         jest.spyOn(messageService, 'countMessagesInChat').mockResolvedValue(10);
 
         const result = await service.getChatById(1, 2, {
           page: 1,
           pageSize: 10,
         });
-    
+
         expect(result).toEqual({
           chat,
           nextPage: null,
