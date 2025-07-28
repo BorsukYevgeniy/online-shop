@@ -4,7 +4,7 @@ h1 {
   text-align: center;
 }
 
-.deleteButton {
+.deleteButton, .updateButton {
   padding: 6px 12px;
   border-radius: 4px;
   text-decoration: none;

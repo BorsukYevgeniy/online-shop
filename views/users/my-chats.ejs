@@ -15,8 +15,12 @@
   <main>
     <% chats.forEach(c => { %>
       <div class="chats">
-        <div><strong>Title:</strong> 
+        <div>
           <a href="/chats/<%= c.id %>">Chat with <%= c.withWhom  %></a>
+          <p id="messageCreatedAt">
+            <%= new Date(c.createdAt).toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale) %>
+          </p>
+
         </div>
     
         <div class="chat-actions">
