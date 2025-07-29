@@ -45,6 +45,11 @@ describe('UserController (e2e)', () => {
   let adminAccessToken: string, userAccessToken: string;
   let adminId: number, userId: number;
   beforeAll(async () => {
+    await prisma.user.deleteMany({})
+    await prisma.token.deleteMany({})
+    await prisma.product.deleteMany({})
+
+  
     const hashedPassword = await hash('password', 10);
 
     const [user, admin] = await Promise.all([
@@ -98,7 +103,7 @@ describe('UserController (e2e)', () => {
 
   it('GET /api/users - 200 OK - Should return users with default sorting', async () => {
     const { body: users } = await request(app.getHttpServer())
-      .get('/api/users')
+      .get('/api/users?sortBy=role&order=desc')
       .set('Cookie', [`accessToken=${adminAccessToken}`])
       .expect(200);
 

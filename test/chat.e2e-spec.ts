@@ -58,6 +58,11 @@ describe('ChatController (e2e)', () => {
   let userId: number, adminId: number;
   let userAccessToken: string, guestAccessToken: string;
   beforeAll(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.chat.deleteMany({});
+    await prisma.message.deleteMany({});
+    await prisma.token.deleteMany({});
+
     const password = await hash('123456', 3);
 
     const [user, admin, guest] = await Promise.all([
@@ -139,7 +144,7 @@ describe('ChatController (e2e)', () => {
           .set('Cookie', [`accessToken=${userAccessToken}`])
           .expect(code);
 
-        expect(body).toEqual({ id: expect.any(Number) });
+        expect(body).toEqual({ id: expect.any(Number),createdAt: expect.any(String) });
 
         chatId = body.id;
       } else {
@@ -159,7 +164,7 @@ describe('ChatController (e2e)', () => {
       .expect(200);
 
     expect(body).toEqual({
-      chats: [{ id: chatId, withWhom: 'user2' }],
+      chats: [{ id: chatId, withWhom: 'user2', createdAt: expect.any(String) }],
       nextPage: null,
       page: 1,
       pageSize: 10,
@@ -188,7 +193,7 @@ describe('ChatController (e2e)', () => {
           .expect(200);
 
         expect(body).toEqual({
-          chat: { id: chatId, messages: [] },
+          chat: { id: chatId, messages: [], createdAt: expect.any(String) },
           nextPage: null,
           page: 1,
           pageSize: 10,

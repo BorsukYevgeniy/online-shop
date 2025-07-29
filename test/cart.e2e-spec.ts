@@ -45,6 +45,12 @@ describe('UserController (e2e)', () => {
   let accessToken: string;
   let userId: number, productId: number;
   beforeAll(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
+    await prisma.product.deleteMany({});
+    await prisma.category.deleteMany({});
+
+
     const password = await hash('123456', 3);
 
     const { id } = await prisma.user.create({
@@ -77,6 +83,7 @@ describe('UserController (e2e)', () => {
   afterAll(async () => {
     await prisma.user.deleteMany({});
     await prisma.product.deleteMany({});
+    await prisma.category.deleteMany({});
     await prisma.token.deleteMany({});
     await app.close();
   });
@@ -127,6 +134,7 @@ describe('UserController (e2e)', () => {
               price: 12,
               userId,
               images: [],
+              createdAt: expect.any(String),
             },
           ],
         });
@@ -159,6 +167,7 @@ describe('UserController (e2e)', () => {
               price: 12,
               userId,
               images: [],
+              createdAt: expect.any(String),
             },
           ],
         });

@@ -52,6 +52,11 @@ describe('ProductController (e2e)', () => {
   let userId: number;
 
   beforeAll(async () => {
+    await prisma.user.deleteMany({})
+    await prisma.token.deleteMany({})
+    await prisma.product.deleteMany({})
+    await prisma.category.deleteMany({})
+
     const [user, guest] = await Promise.all([
       prisma.user.create({
         data: {
@@ -275,6 +280,7 @@ describe('ProductController (e2e)', () => {
             { id: category1Id, name: 'category', description: 'description' },
           ],
           images: expect.any(Array<String>),
+          createdAt: expect.any(String),
           userId,
         });
       }
@@ -306,6 +312,7 @@ describe('ProductController (e2e)', () => {
             { id: category1Id, name: 'category', description: 'description' },
           ],
           images: expect.any(Array<String>),
+          createdAt: expect.any(String),
           userId,
         });
       }

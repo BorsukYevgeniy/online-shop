@@ -50,6 +50,11 @@ describe('CategoryController (e2e)', () => {
   let accessToken: string;
   // Створення адміністратора для подальших тестів
   beforeAll(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
+    await prisma.product.deleteMany({});
+    await prisma.category.deleteMany({});
+
     await prisma.user.create({
       data: {
         email: 'test@gmail.com',
@@ -70,6 +75,7 @@ describe('CategoryController (e2e)', () => {
   afterAll(async () => {
     await prisma.user.deleteMany({});
     await prisma.category.deleteMany({});
+    await prisma.product.deleteMany({});
     await prisma.token.deleteMany({});
     await app.close();
   });

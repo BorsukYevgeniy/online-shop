@@ -13,8 +13,6 @@ import Keyv from 'keyv';
 import { ChatModule } from '../src/chat/chat.module';
 
 import { hash } from 'bcryptjs';
-import { CreateChatDto } from '../src/chat/dto/create-chat.dto';
-import { JwtModule } from '@nestjs/jwt';
 
 describe('ChatController (e2e)', () => {
   let app: NestExpressApplication;
@@ -53,12 +51,21 @@ describe('ChatController (e2e)', () => {
 
   afterAll(async () => {
     await prisma.user.deleteMany();
+    await prisma.token.deleteMany();
+    await prisma.message.deleteMany();
+    await prisma.chat.deleteMany();
+
     await app.close();
   });
 
   let chatId: number;
   let userAccessToken: string, guestAccessToken: string;
   beforeAll(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.chat.deleteMany({});
+    await prisma.message.deleteMany({});
+    await prisma.token.deleteMany({});
+
     const password = await hash('123456', 3);
 
     const [user, admin, guest] = await Promise.all([
