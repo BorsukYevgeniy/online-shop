@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+
+    env_file: .env
+    ports:
+      - '${PORT}:3000'
+    command: 'sh -c "npx prisma db push && npm run start"'
+
+    depends_on:
+      - db
+      - redis
+
+  unit_tests:
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+    command: 'sh -c "npx prisma db push && npm run test"'
+    depends_on:
+      - test_db
+
+  e2e_tests:
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+    env_file: '.env.test'
+    command: 'sh -c "npx prisma db push && npm run test:e2e"'
+    depends_on:
+      - test_db
+
+  redis:
+    image: redis:alpine
+
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: postgress
+      POSTGRES_PASSWORD: postgress
+      POSTGRES_DB: online-shop
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  test_db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: postgress
+      POSTGRES_PASSWORD: postgress
+      POSTGRES_DB: online-shop-test
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+  db_test_data:
