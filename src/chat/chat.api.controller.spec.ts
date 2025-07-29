@@ -45,8 +45,8 @@ describe('ChatApiController', () => {
 
   it('Should get users chats', async () => {
     const userChats = [
-      { id: 1, withWhom: 'user2' },
-      { id: 2, withWhom: 'user1' },
+      { id: 1, withWhom: 'user2', createdAt: new Date() },
+      { id: 2, withWhom: 'user1', createdAt: new Date() },
     ];
 
     jest.spyOn(service, 'getUserChats').mockResolvedValue({
@@ -78,7 +78,7 @@ describe('ChatApiController', () => {
 
   describe('Should get chat by id', () => {
     it.each<[string, ChatMessages | null]>([
-      ['Should get chat by id', { id: 1, messages: [] }],
+      ['Should get chat by id', { id: 1, messages: [], createdAt: new Date() }],
       ['Should not get chat by id', null],
     ])('%s', async (_, chat) => {
       jest.spyOn(service, 'getChatById').mockResolvedValue({
@@ -116,10 +116,12 @@ describe('ChatApiController', () => {
       ['Should not create chat', false],
     ])('%s', async (_, succes) => {
       if (succes) {
-        jest.spyOn(service, 'createChat').mockResolvedValue({ id: 1 });
+        jest
+          .spyOn(service, 'createChat')
+          .mockResolvedValue({ id: 1, createdAt: new Date() });
 
         const result = await controller.createChat(createDto);
-        expect(result).toEqual({ id: 1 });
+        expect(result).toEqual({ id: 1, createdAt: expect.any(Date) });
       } else {
         jest
           .spyOn(service, 'createChat')

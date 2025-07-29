@@ -116,6 +116,7 @@ describe('ProductRepository', () => {
         userId: 1,
         description: 'MOCK1 description',
         images: ['1', '2'],
+        createdAt: new Date(),
       },
     ];
 
@@ -147,6 +148,7 @@ describe('ProductRepository', () => {
         description: 'Test description',
         userId: 5,
         images: ['9', '10'],
+        createdAt: new Date()
       },
     ];
     it.each<[string, SearchProductDto | null]>([
@@ -224,6 +226,7 @@ describe('ProductRepository', () => {
       price: 52,
       description: 'Test description',
       images: ['11', '12'],
+      createdAt: new Date(),
     };
 
     jest.spyOn(prisma.product, 'findUnique').mockResolvedValue(mockProduct);
@@ -258,6 +261,7 @@ describe('ProductRepository', () => {
       description: dto.description,
       images,
       categories: [{ id: 1, name: 'test', description: 'test' }],
+      createdAt: new Date(),
     };
 
     jest.spyOn(prisma.product, 'create').mockResolvedValue(mockProduct);
@@ -295,7 +299,8 @@ describe('ProductRepository', () => {
       description: 'Test description',
       images: ['image1.jpg', 'image2.jpg'],
       userId: 1,
-      // categories: [{ id: 1, name: 'test', description: 'test' }],
+      categories: [{ id: 1, name: 'test', description: 'test' }],
+      createdAt: new Date(),
     };
 
     it.each<[string, UpdateProductDto, string[] | null]>([
@@ -311,6 +316,7 @@ describe('ProductRepository', () => {
           categoryIds: [1],
         },
         ['image1.jpg', 'image2.jpg'],
+        
       ],
     ])('%s', async (_, updateProductDto, imagesNames) => {
       jest.spyOn(prisma.product, 'update').mockResolvedValue(mockProduct);

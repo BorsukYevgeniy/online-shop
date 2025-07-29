@@ -89,13 +89,15 @@ describe('ChatRepository', () => {
   it('Should get chat by id', async () => {
     const mockChat: ChatMessages = {
       id: 1,
+      createdAt: new Date(),
       messages: [
         {
           id: 1,
           text: 'Hello',
           userId: 1,
           chatId: 1,
-          user: { nickname: 'User1' },
+          createdAt: new Date(),
+          user: { nickname: 'user' },
         },
       ],
     };

@@ -49,6 +49,7 @@ describe('MessageRepository', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -67,18 +68,14 @@ describe('MessageRepository', () => {
         chatId: mockMessage.chatId,
         userId: mockMessage.userId,
       },
-      select: {
-        id: true,
-        chatId: true,
-        text: true,
-        userId: true,
+      include: {
         user: { select: { nickname: true } },
       },
     });
   });
 
   it('Should get a message by ID', async () => {
-    const mockMessage = { id: 1, text: 'Hello', chatId: 1, userId: 1 };
+    const mockMessage = { id: 1, text: 'Hello', chatId: 1, userId: 1, createdAt: new Date() };
 
     jest.spyOn(prisma.message, 'findUnique').mockResolvedValue(mockMessage);
 
@@ -96,10 +93,11 @@ describe('MessageRepository', () => {
         id: 1,
         text: 'Hello',
         chatId: 1,
-        userId: 1,
+        userId: 1,createdAt: new Date(),
+
         user: { nickname: 'User1' },
       },
-      { id: 2, text: 'Hi', chatId: 1, userId: 2, user: { nickname: 'User2' } },
+      { id: 2, text: 'Hi', chatId: 1, userId: 2, createdAt: new Date(),user: { nickname: 'User2' } },
     ];
 
     jest.spyOn(prisma.message, 'findMany').mockResolvedValue(mockMessages);
@@ -109,11 +107,7 @@ describe('MessageRepository', () => {
     expect(result).toEqual(mockMessages);
     expect(prisma.message.findMany).toHaveBeenCalledWith({
       where: { chatId: 1 },
-      select: {
-        id: true,
-        chatId: true,
-        text: true,
-        userId: true,
+      include: {
         user: { select: { nickname: true } },
       },
       skip: 0,
@@ -126,7 +120,7 @@ describe('MessageRepository', () => {
       id: 1,
       text: 'Updated message',
       chatId: 1,
-      userId: 1,
+      userId: 1,createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -140,18 +134,14 @@ describe('MessageRepository', () => {
     expect(prisma.message.update).toHaveBeenCalledWith({
       where: { id: mockMessage.id },
       data: { text: mockMessage.text },
-      select: {
-        id: true,
-        chatId: true,
-        text: true,
-        userId: true,
+      include: {
         user: { select: { nickname: true } },
       },
     });
   });
 
   it('Should delete a message', async () => {
-    const mockMessage = { id: 1, text: 'Hello', chatId: 1, userId: 1 };
+    const mockMessage = { id: 1, text: 'Hello', chatId: 1, userId: 1,createdAt: new Date() };
 
     jest.spyOn(prisma.message, 'delete').mockResolvedValue(mockMessage);
 

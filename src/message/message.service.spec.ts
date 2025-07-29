@@ -48,6 +48,7 @@ describe('MessageService', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -100,6 +101,7 @@ describe('MessageService', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -149,9 +151,17 @@ describe('MessageService', () => {
         text: 'Hello',
         chatId: 1,
         userId: 1,
+        createdAt: new Date(),
         user: { nickname: 'User1' },
       },
-      { id: 2, text: 'Hi', chatId: 1, userId: 2, user: { nickname: 'User2' } },
+      {
+        id: 2,
+        text: 'Hi',
+        chatId: 1,
+        userId: 2,
+        createdAt: new Date(),
+        user: { nickname: 'User2' },
+      },
     ];
 
     jest
@@ -184,6 +194,7 @@ describe('MessageService', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -227,6 +238,7 @@ describe('MessageService', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
     };
     it.each<[string, number, boolean, boolean]>([
       ['Should delete message', 1, true, true],

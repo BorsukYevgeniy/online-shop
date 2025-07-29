@@ -64,6 +64,7 @@ describe('ProductApiController', () => {
         userId: 1,
         description: 'description',
         images: ['1', '2'],
+        createdAt: new Date(),
         categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
@@ -144,6 +145,7 @@ describe('ProductApiController', () => {
       userId: 1,
       description: 'description',
       images: ['1', '2'],
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
@@ -182,6 +184,7 @@ describe('ProductApiController', () => {
       userId: 1,
       description: dto.description,
       images: ['1'],
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
@@ -201,6 +204,7 @@ describe('ProductApiController', () => {
       userId: 1,
       description: 'Description',
       images: ['1', '2'],
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
@@ -290,6 +294,7 @@ describe('ProductApiController', () => {
       images: ['1.png'],
       price: 100,
       userId: 1,
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'name', description: 'description' }],
     };
 

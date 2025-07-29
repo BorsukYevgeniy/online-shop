@@ -218,6 +218,7 @@ describe('UserApiController', () => {
         description: 'Product description',
         title: 'Product title',
         price: 100,
+        createdAt: new Date(),
         images: ['image1.jpg', 'image2.jpg'],
       },
     ];

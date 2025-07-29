@@ -72,6 +72,7 @@ describe('ProductService', () => {
         userId: 1,
         description: 'description',
         images: ['1', '2'],
+        createdAt: new Date(),
         categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
@@ -113,6 +114,7 @@ describe('ProductService', () => {
         userId: 1,
         description: 'description',
         images: ['1', '2'],
+        createdAt: new Date(),
         categories: [{ id: 1, name: 'test', description: 'test' }],
       },
     ];
@@ -188,6 +190,7 @@ describe('ProductService', () => {
       userId: 1,
       description: 'description',
       images: ['1', '2'],
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
@@ -226,6 +229,7 @@ describe('ProductService', () => {
       userId,
       description: dto.description,
       images,
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'test', description: 'test' }],
     };
 
@@ -244,6 +248,7 @@ describe('ProductService', () => {
       images: ['1.png'],
       price: 100,
       userId: 1,
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'name', description: 'description' }],
     };
 
@@ -337,6 +342,7 @@ describe('ProductService', () => {
       images: ['1.png'],
       price: 100,
       userId: 1,
+      createdAt: new Date(),
       categories: [{ id: 1, name: 'name', description: 'description' }],
     };
 

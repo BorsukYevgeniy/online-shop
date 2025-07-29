@@ -44,6 +44,7 @@ describe('MessageApiController', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -87,6 +88,7 @@ describe('MessageApiController', () => {
       text: 'Hello',
       chatId: 1,
       userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -141,6 +143,7 @@ describe('MessageApiController', () => {
           text: 'Hello',
           chatId: 1,
           userId: 1,
+          createdAt: new Date(),
         });
 
         const result = await controller.deleteMessage(req, id);

@@ -64,7 +64,7 @@ describe('ChatService', () => {
 
   describe('Should find chat between users', () => {
     it.each<[string, Chat | null]>([
-      ['Should find chat between users', { id: 1 }],
+      ['Should find chat between users', { id: 1, createdAt: new Date() }],
       ['Should not find chat between users', null],
     ])('%s', async (_, chat) => {
       jest.spyOn(repository, 'findChatBetweenUsers').mockResolvedValue(chat);
@@ -75,8 +75,8 @@ describe('ChatService', () => {
 
   it("Should get user's chats", async () => {
     const userChats: UserChat[] = [
-      { id: 1, withWhom: 'user2' },
-      { id: 2, withWhom: 'user1' },
+      { id: 1, withWhom: 'user2', createdAt: new Date() },
+      { id: 2, withWhom: 'user1', createdAt: new Date() },
     ];
 
     jest.spyOn(repository, 'getUserChats').mockResolvedValue(userChats);
@@ -98,7 +98,11 @@ describe('ChatService', () => {
     it.each<[string, ChatMessages | null]>([
       [
         'Should get chat by id',
-        { id: 1, messages: [{ userId: 1 }] as MessageNickname[] },
+        {
+          id: 1,
+          createdAt: new Date(),
+          messages: [{ userId: 1 }] as MessageNickname[],
+        },
       ],
       ['Should not get chat by id', null],
     ])('%s', async (_, chat) => {
