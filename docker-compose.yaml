@@ -35,19 +35,13 @@ services:
 
   db:
     image: postgres:alpine
-    environment:
-      POSTGRES_USER: postgress
-      POSTGRES_PASSWORD: postgress
-      POSTGRES_DB: online-shop
+    env_file: .env
     volumes:
       - db_data:/var/lib/postgresql/data
 
   test_db:
     image: postgres:alpine
-    environment:
-      POSTGRES_USER: postgress
-      POSTGRES_PASSWORD: postgress
-      POSTGRES_DB: online-shop-test
+    env_file: .env.test
     volumes:
       - db_test_data:/var/lib/postgresql/data
 

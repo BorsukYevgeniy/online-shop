@@ -14,7 +14,7 @@ import { ChatModule } from '../src/chat/chat.module';
 
 import { hash } from 'bcryptjs';
 
-describe('ChatController (e2e)', () => {
+describe('ChatMessageController (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
 
@@ -50,10 +50,10 @@ describe('ChatController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany();
-    await prisma.token.deleteMany();
-    await prisma.message.deleteMany();
-    await prisma.chat.deleteMany();
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
+    await prisma.message.deleteMany({});
+    await prisma.chat.deleteMany({});
 
     await app.close();
   });
