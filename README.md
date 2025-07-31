@@ -1,99 +1,133 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Online-shop
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is my first big project that I built myself.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# About
 
-## Description
+This is an online store where users can create ads to sell goods.  
+A key feature of the platform is the **lack of automatic payment**: buyers and sellers **negotiate directly via the built-in chat**, including payment terms, delivery, and other details.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+_Key functionality:_
+
+- **Registration and authorization**
+- **User verification via email**
+- **Unverified accounts are automatically deleted after 3 days**
+- **Role management**
+- **CRUD operations for products**
+- **Cart**
+- **Categories**
+- **Built-in chat for private communication**
+
+### Auth
+
+Authentication is implemented using **JWT** tokens, which are stored in **HTTP-only cookies**.  
+**Expired tokens are automatically deleted.**  
+The project uses **refresh token rotation**: each time tokens are refreshed, the previous refresh token is invalidated and replaced with a new one.  
+**Reusing old tokens is not allowed.**
+
+### Cart
+
+**Cart** is a place where you can save products you like.
+
+- Each authenticated user has their own cart stored in the database.
+- Users can add or remove products from the cart.
+- Users can also clear the cart (remove all products).
+
+### Category
+
+- Products are grouped by categories.
+- Only **administrators** can create, update, or delete categories.
+- Users can search products by category.
+- Products can have one or more categories.
+
+## Technologies
+
+The **online-shop** uses:
+
+- **NestJS** - for the server side
+- **EJS** - for client-side rendering
+- **WebSockets** - for chatting
+- **Swagger** - for API documentation
+- **Prisma** - for database access
+- **PostgreSQL** - as the main relational database
+- **Redis** - for caching
+- **Schedule (Cron Jobs)** - for deleting unverified users and expired refresh tokens
+- **Email sending** - for user email notifications
+- **Jest** - unit testing
+- **Supertest** - end-to-end testing
+
+## Architecture
+
+This project includes both a fully functional **REST API** and **server-side rendered pages (SSR)**.
+
+The project follows a **three-layer architecture**:
+
+1. **Controllers** - handle communication with users. Controllers are divided into two types:
+   1. **SSR Controllers** - used for rendering pages
+   2. **API Controllers** - default **REST API** controllers
+2. **Services** - responsible for the business logic of the application
+3. **Repositories** - responsible for database interactions
+
+For chatting, **Server-Sent Events (SSE)** are used.
+
+## Requirements
+
+To run the project, you need:
+
+- **Node.js** >= 20.14.0
+- **NPM** >= 10.9.0
+- **PostgreSQL**
+- **Redis**
+- **NestJS CLI** (global) `npm i -g @nestjs/cli`
+- **.env** file with environment variables
+- **SMTP access to a mailbox** (for sending emails to users)
+
+Or if running via Docker:
+
+- **Docker**
+- **Docker Compose**
+- **.env** file with environment variables
+- **SMTP access to a mailbox** (for sending emails to users)
+
+## Features
+
+1. **Pagination** - implemented for all routes where it is needed for better optimization.
+2. **Swagger** - OpenAPI documentation is available at the `/docs` route.
+3. **Data validation** is implemented in controllers.
 
 ## Project setup
 
 ```bash
+# Installation all dependencies
 $ npm install
 ```
 
 ## Compile and run the project
 
 ```bash
-# development
-$ npm run start
+# Unit tests
+$ npm run test
 
-# watch mode
-$ npm run start:dev
+E2e tests
+$ npm run test:e2e
 
-# production mode
-$ npm run start:prod
+# Test coverage
+$ npm run test:cov
 ```
 
 ## Run tests
 
 ```bash
-# unit tests
+# Unit tests
 $ npm run test
 
-# e2e tests
+# E2e tests
 $ npm run test:e2e
 
-# test coverage
+# Test coverage
 $ npm run test:cov
 ```
 
-## Deployment
+## Bugs
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+If you want report a bug write on this email: devmail473@gmail.com
