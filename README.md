@@ -56,7 +56,7 @@ The **online-shop** uses:
 - **Jest** - unit testing
 - **Supertest** - end-to-end testing
 
-## Architecture ⚙️
+## Architecture 🛠️
 
 This project includes both a fully functional **REST API** and **server-side rendered pages (SSR)**.
 
@@ -89,20 +89,20 @@ Or if running via Docker:
 - **.env** file with environment variables
 - **SMTP access to a mailbox** (for sending emails to users)
 
-## Features ⚙️
+## Features 💡
 
 1. **Pagination** - implemented for all routes where it is needed for better optimization.
 2. **Swagger** - OpenAPI documentation is available at the `/docs` route.
 3. **Data validation** is implemented in controllers.
 
-## Project setup
+## Project setup 🔧
 
 ```bash
 # Installation all dependencies
 $ npm install
 ```
 
-## Compile and run the project
+## Compile and run the project 🔨
 
 ```bash
 # Unit tests
@@ -115,7 +115,7 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Run tests
+## Run tests ⚒️
 
 ```bash
 # Unit tests
