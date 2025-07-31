@@ -1,8 +1,8 @@
-# Online-shop
+# Online-shop 🛍️
 
 This is my first big project that I built myself.
 
-# About
+# About 📖 
 
 This is an online store where users can create ads to sell goods.  
 A key feature of the platform is the **lack of automatic payment**: buyers and sellers **negotiate directly via the built-in chat**, including payment terms, delivery, and other details.
@@ -25,7 +25,7 @@ Authentication is implemented using **JWT** tokens, which are stored in **HTTP-o
 The project uses **refresh token rotation**: each time tokens are refreshed, the previous refresh token is invalidated and replaced with a new one.  
 **Reusing old tokens is not allowed.**
 
-### Cart
+### Cart 🛒
 
 **Cart** is a place where you can save products you like.
 
@@ -33,14 +33,14 @@ The project uses **refresh token rotation**: each time tokens are refreshed, the
 - Users can add or remove products from the cart.
 - Users can also clear the cart (remove all products).
 
-### Category
+### Category 📘
 
 - Products are grouped by categories.
 - Only **administrators** can create, update, or delete categories.
 - Users can search products by category.
 - Products can have one or more categories.
 
-## Technologies
+## Technologies ⚙️
 
 The **online-shop** uses:
 
@@ -56,7 +56,7 @@ The **online-shop** uses:
 - **Jest** - unit testing
 - **Supertest** - end-to-end testing
 
-## Architecture
+## Architecture ⚙️
 
 This project includes both a fully functional **REST API** and **server-side rendered pages (SSR)**.
 
@@ -70,7 +70,7 @@ The project follows a **three-layer architecture**:
 
 For chatting, **Server-Sent Events (SSE)** are used.
 
-## Requirements
+## Requirements 📖
 
 To run the project, you need:
 
@@ -89,7 +89,7 @@ Or if running via Docker:
 - **.env** file with environment variables
 - **SMTP access to a mailbox** (for sending emails to users)
 
-## Features
+## Features ⚙️
 
 1. **Pagination** - implemented for all routes where it is needed for better optimization.
 2. **Swagger** - OpenAPI documentation is available at the `/docs` route.
