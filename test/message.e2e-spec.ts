@@ -14,7 +14,7 @@ import Keyv from 'keyv';
 import { hash } from 'bcryptjs';
 import { MessageModule } from '../src/message/message.module';
 
-describe('MessageController (e2e)', () => {
+describe('MessageApiController (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
 

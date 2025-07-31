@@ -12,7 +12,7 @@ import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
 import { hash } from 'bcryptjs';
 
-describe('UserController (e2e)', () => {
+describe('CartApiController (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
 

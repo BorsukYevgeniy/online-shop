@@ -13,7 +13,7 @@ import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
 
-describe('AuthController (e2e)', () => {
+describe('AuthApiController (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
 

@@ -14,7 +14,7 @@ import { ChatModule } from '../src/chat/chat.module';
 
 import { hash } from 'bcryptjs';
 
-describe('ChatMessageController (e2e)', () => {
+describe('ChatMessageApiController (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
 
