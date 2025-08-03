@@ -50,7 +50,10 @@ export class CreateProductDto {
     description: 'Price of product',
   })
   @IsNotEmpty()
-  @IsNumber()
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false },
+    { message: ProductDtoErrMsg.InvalidPrice },
+  )
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   @ToNumber()
   readonly price: number;

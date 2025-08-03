@@ -36,7 +36,10 @@ export class SearchProductDto {
     description: 'Minimal price for searching',
   })
   @IsOptional()
-  @IsNumber({}, { message: ProductDtoErrMsg.InvalidPrice })
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false },
+    { message: ProductDtoErrMsg.InvalidPrice },
+  )
   @ToNumber()
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   readonly minPrice?: number;
@@ -49,7 +52,10 @@ export class SearchProductDto {
     description: 'Maximal price for searching',
   })
   @IsOptional()
-  @IsNumber({}, { message: ProductDtoErrMsg.InvalidPrice })
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false },
+    { message: ProductDtoErrMsg.InvalidPrice },
+  )
   @ToNumber()
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   readonly maxPrice?: number;

@@ -50,7 +50,10 @@ export class UpdateProductDto {
     description: 'Price of product',
   })
   @IsOptional()
-  @IsNumber()
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false },
+    { message: ProductDtoErrMsg.InvalidPrice },
+  )
   @ToNumber()
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   readonly price?: number;

@@ -8,7 +8,7 @@ export class DeleteMessageGatewayDto {
     required: true,
     example: 1,
   })
-  @IsNumber()
+  @IsNumber({ allowInfinity: false, allowNaN: false })
   messageId: number;
 
   @ApiProperty({
@@ -17,6 +17,6 @@ export class DeleteMessageGatewayDto {
     required: true,
     example: 1,
   })
-  @IsNumber()
+  @IsNumber({ allowInfinity: false, allowNaN: false })
   chatId: number;
 }

@@ -9,6 +9,6 @@ export class SendMessageDto extends CreateMessageDto {
     required: true,
     example: 1,
   })
-  @IsNumber()
+  @IsNumber({ allowInfinity: false, allowNaN: false })
   chatId: number;
 }
