@@ -13,6 +13,7 @@ import {
   Body,
   UseFilters,
   UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -142,7 +143,7 @@ export class CategorySsrController {
   @UseInterceptors(CacheInterceptor)
   async getCategoryByIdPage(
     @Req() req: AuthRequest,
-    @Param('categoryId') categoryId: number,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
   ) {
     const category = await this.categoryService.getById(Number(categoryId));
 
@@ -156,7 +157,7 @@ export class CategorySsrController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
-  async getUpdateCategoryPage(@Param('categoryId') categoryId: number) {
+  async getUpdateCategoryPage(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return await this.categoryService.getById(categoryId);
   }
 
@@ -172,7 +173,7 @@ export class CategorySsrController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async handleCategoryUpdate(
-    @Param('categoryId') categoryId: number,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
     @Body() updateDto: UpdateCategoryDto,
     @Res() res: Response,
   ) {
@@ -191,7 +192,7 @@ export class CategorySsrController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async handleCategoryDelete(
-    @Param('categoryId') categoryId: number,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
     @Res() res: Response,
   ) {
     await this.categoryService.delete(categoryId);

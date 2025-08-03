@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -162,7 +163,7 @@ export class ProductSsrController {
   @Render('products/get-product-by-id')
   async getProductByIdPage(
     @Req() req: AuthRequest,
-    @Param('productId') productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
   ) {
     const product = await this.productService.getById(productId);
 
@@ -177,7 +178,7 @@ export class ProductSsrController {
   @Get('update/:productId')
   @Render('products/update-product')
   @UseInterceptors(CacheInterceptor)
-  async getUpdateProductPage(@Param('productId') productId: number) {
+  async getUpdateProductPage(@Param('productId', ParseIntPipe) productId: number) {
     const product = await this.productService.getById(productId);
     const { categories } = await this.categorySerivce.getAll(
       { page: 1, pageSize: 10 },
@@ -212,7 +213,7 @@ export class ProductSsrController {
   async handeProductUpdate(
     @Req() req: AuthRequest,
     @Res() res: Response,
-    @Param('productId') productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ) {
@@ -232,7 +233,7 @@ export class ProductSsrController {
   @UseGuards(VerifiedUserGuard)
   @Delete('delete/:productId')
   async handleDeleteProduct(
-    @Param('productId') productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
     @Req() req: AuthRequest,
     @Res() res: Response,
   ) {

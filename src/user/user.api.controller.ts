@@ -10,6 +10,7 @@ import {
   Patch,
   HttpCode,
   UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -88,7 +89,9 @@ export class UserApiController {
   @ApiParam({ name: 'userId', type: Number })
   @Get(':userId')
   @UseInterceptors(CacheInterceptor)
-  async getById(@Param('userId') userId: number): Promise<UserNoCred | void> {
+  async getById(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<UserNoCred | void> {
     return await this.userService.getById(userId);
   }
 
@@ -102,7 +105,7 @@ export class UserApiController {
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(CacheInterceptor)
   async getUserProducts(
-    @Param('userId') userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortProductDto,
   ): Promise<PaginatedProduct> {
@@ -123,7 +126,7 @@ export class UserApiController {
   @Patch('assing-admin/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  async assignAdmin(@Param('userId') userId: number): Promise<UserNoCred> {
+  async assignAdmin(@Param('userId', ParseIntPipe) userId: number): Promise<UserNoCred> {
     return await this.userService.assignAdmin(userId);
   }
 
@@ -152,7 +155,7 @@ export class UserApiController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(204)
-  async delete(@Param('userId') userId: number): Promise<void> {
+  async delete(@Param('userId', ParseIntPipe) userId: number): Promise<void> {
     return await this.userService.delete(userId);
   }
 }

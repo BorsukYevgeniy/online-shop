@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -54,7 +55,7 @@ export class ChatMessageApiController {
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
   async getMessagesByChatId(
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedMessages> {
     return await this.messageService.getMessagesByChatId(chatId, paginationDto);
@@ -70,7 +71,7 @@ export class ChatMessageApiController {
   @Post()
   async createMessage(
     @Req() req: AuthRequest,
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
     @Body() createDto: CreateMessageDto,
   ): Promise<MessageNickname> {
     return await this.messageService.createMessage(

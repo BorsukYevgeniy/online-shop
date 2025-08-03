@@ -10,6 +10,7 @@ import {
   Query,
   HttpCode,
   UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -64,7 +65,7 @@ export class CategoryApiController {
   @ApiParam({ name: 'categoryId', type: Number })
   @Get(':categoryId')
   @UseInterceptors(CacheInterceptor)
-  async getById(@Param('categoryId') id: number): Promise<Category> {
+  async getById(@Param('categoryId', ParseIntPipe) id: number): Promise<Category> {
     return await this.categoryService.getById(id);
   }
 
@@ -94,7 +95,7 @@ export class CategoryApiController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async update(
-    @Param('categoryId') id: number,
+    @Param('categoryId', ParseIntPipe) id: number,
     @Body() dto: UpdateCategoryDto,
   ): Promise<Category> {
     return await this.categoryService.update(id, dto);
@@ -110,7 +111,7 @@ export class CategoryApiController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @HttpCode(204)
-  async delete(@Param('categoryId') id: number): Promise<void> {
+  async delete(@Param('categoryId', ParseIntPipe) id: number): Promise<void> {
     return await this.categoryService.delete(id);
   }
 }

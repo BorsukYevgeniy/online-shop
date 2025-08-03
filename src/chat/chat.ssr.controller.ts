@@ -12,6 +12,7 @@ import {
   UseFilters,
   UseInterceptors,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -93,7 +94,7 @@ export class ChatSsrController {
   @Get(':chatId')
   @Render('chat/get-chat-by-id')
   async getChatById(
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,
     @Req() req: AuthRequest,
   ) {
@@ -121,7 +122,7 @@ export class ChatSsrController {
   @Delete(':chatId')
   async handleDeleteChat(
     @Req() req: AuthRequest,
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
     @Res() res: Response,
   ) {
     await this.chatService.deleteChat(chatId, req.user.id);

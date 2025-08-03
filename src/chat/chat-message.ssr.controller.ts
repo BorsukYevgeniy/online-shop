@@ -7,6 +7,7 @@ import {
   UseFilters,
   UseGuards,
   UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
@@ -46,7 +47,7 @@ export class ChatMessageSsrController {
   @Render('message/get-all-messages')
   @UseInterceptors(CacheInterceptor)
   async getMessagesByChatId(
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,
   ) {
     const { messages, ...pagination } =

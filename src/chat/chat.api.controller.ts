@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   HttpCode,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthRequest } from '../types/request.type';
@@ -76,7 +77,7 @@ export class ChatApiController {
   @Get(':chatId')
   @UseInterceptors(CacheInterceptor)
   async getСhatById(
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,
     @Req() req: AuthRequest,
   ): Promise<PaginatedChat> {
@@ -112,7 +113,7 @@ export class ChatApiController {
   @HttpCode(204)
   async deleteChat(
     @Req() req: AuthRequest,
-    @Param('chatId') chatId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
   ): Promise<void> {
     return await this.chatService.deleteChat(chatId, req.user.id);
   }
