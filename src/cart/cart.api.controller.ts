@@ -8,6 +8,7 @@ import {
   Param,
   Req,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AuthRequest } from '../types/request.type';
@@ -43,7 +44,7 @@ export class CartApiController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
-  async getCart(@Param('cartId') cartId: number): Promise<CartProduct> {
+  async getCart(@Param('cartId', ParseIntPipe) cartId: number): Promise<CartProduct> {
     return await this.cartService.getCart(cartId);
   }
 
@@ -66,7 +67,7 @@ export class CartApiController {
   @HttpCode(200)
   async addToCart(
     @Req() req: AuthRequest,
-    @Param('productId') productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
   ): Promise<CartProduct> {
     return await this.cartService.addToCart(productId, req.user.id);
   }
@@ -79,7 +80,7 @@ export class CartApiController {
   @Delete('products/:productId')
   async removeFromCart(
     @Req() req: AuthRequest,
-    @Param('productId') productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
   ): Promise<CartProduct> {
     return await this.cartService.removeFromCart(productId, req.user.id);
   }
