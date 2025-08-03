@@ -132,7 +132,7 @@ export class UserSsrController {
   @Render('users/get-user-by-id')
   @UseInterceptors(CacheInterceptor)
   async getUserByIdPage(
-    @Param('userId',ParseIntPipe) userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Req() req: AuthRequest,
     @Res() res: Response,
   ) {
@@ -165,7 +165,7 @@ export class UserSsrController {
   @Render('users/my-products')
   async getUserProducts(
     @Req() req: AuthRequest,
-    @Param('userId',ParseIntPipe) userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortProductDto,
   ) {
@@ -191,7 +191,10 @@ export class UserSsrController {
   @Patch('assing-admin/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  async assignAdmin(@Res() res: Response, @Param('userId',ParseIntPipe) userId: number) {
+  async assignAdmin(
+    @Res() res: Response,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
     await this.userService.assignAdmin(userId);
 
     res.redirect(`/users/${userId}`);
@@ -222,7 +225,7 @@ export class UserSsrController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   async handleDeleteUserAdmin(
-    @Param('userId',ParseIntPipe) userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Res() res: Response,
   ) {
     await this.userService.delete(userId);

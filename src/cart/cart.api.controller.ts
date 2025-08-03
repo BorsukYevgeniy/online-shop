@@ -44,7 +44,9 @@ export class CartApiController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
-  async getCart(@Param('cartId', ParseIntPipe) cartId: number): Promise<CartProduct> {
+  async getCart(
+    @Param('cartId', ParseIntPipe) cartId: number,
+  ): Promise<CartProduct> {
     return await this.cartService.getCart(cartId);
   }
 

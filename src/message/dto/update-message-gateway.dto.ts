@@ -10,9 +10,7 @@ export class UpdateMessageGatewayDto extends UpdateMessageDto {
     required: true,
     example: 1,
   })
-  @IsNumber(
-      { allowInfinity: false, allowNaN: false },
-    )
+  @IsNumber({ allowInfinity: false, allowNaN: false })
   messageId: number;
 
   @ApiProperty({
@@ -21,8 +19,6 @@ export class UpdateMessageGatewayDto extends UpdateMessageDto {
     required: true,
     example: 1,
   })
-  @IsNumber(
-      { allowInfinity: false, allowNaN: false },
-    )
+  @IsNumber({ allowInfinity: false, allowNaN: false })
   chatId: number;
 }

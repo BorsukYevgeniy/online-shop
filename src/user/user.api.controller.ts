@@ -126,7 +126,9 @@ export class UserApiController {
   @Patch('assing-admin/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  async assignAdmin(@Param('userId', ParseIntPipe) userId: number): Promise<UserNoCred> {
+  async assignAdmin(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<UserNoCred> {
     return await this.userService.assignAdmin(userId);
   }
 

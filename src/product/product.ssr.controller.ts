@@ -178,7 +178,9 @@ export class ProductSsrController {
   @Get('update/:productId')
   @Render('products/update-product')
   @UseInterceptors(CacheInterceptor)
-  async getUpdateProductPage(@Param('productId', ParseIntPipe) productId: number) {
+  async getUpdateProductPage(
+    @Param('productId', ParseIntPipe) productId: number,
+  ) {
     const product = await this.productService.getById(productId);
     const { categories } = await this.categorySerivce.getAll(
       { page: 1, pageSize: 10 },

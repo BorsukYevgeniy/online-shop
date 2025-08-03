@@ -45,11 +45,10 @@ describe('UserApiController (e2e)', () => {
   let adminAccessToken: string, userAccessToken: string;
   let adminId: number, userId: number;
   beforeAll(async () => {
-    await prisma.user.deleteMany({})
-    await prisma.token.deleteMany({})
-    await prisma.product.deleteMany({})
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
+    await prisma.product.deleteMany({});
 
-  
     const hashedPassword = await hash('password', 10);
 
     const [user, admin] = await Promise.all([

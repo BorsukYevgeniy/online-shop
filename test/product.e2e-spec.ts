@@ -52,10 +52,10 @@ describe('ProductApiController (e2e)', () => {
   let userId: number;
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({})
-    await prisma.token.deleteMany({})
-    await prisma.product.deleteMany({})
-    await prisma.category.deleteMany({})
+    await prisma.user.deleteMany({});
+    await prisma.token.deleteMany({});
+    await prisma.product.deleteMany({});
+    await prisma.category.deleteMany({});
 
     const [user, guest] = await Promise.all([
       prisma.user.create({

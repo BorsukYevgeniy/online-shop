@@ -50,7 +50,6 @@ describe('CartApiController (e2e)', () => {
     await prisma.product.deleteMany({});
     await prisma.category.deleteMany({});
 
-
     const password = await hash('123456', 3);
 
     const { id } = await prisma.user.create({

@@ -148,7 +148,7 @@ describe('ProductRepository', () => {
         description: 'Test description',
         userId: 5,
         images: ['9', '10'],
-        createdAt: new Date()
+        createdAt: new Date(),
       },
     ];
     it.each<[string, SearchProductDto | null]>([
@@ -316,7 +316,6 @@ describe('ProductRepository', () => {
           categoryIds: [1],
         },
         ['image1.jpg', 'image2.jpg'],
-        
       ],
     ])('%s', async (_, updateProductDto, imagesNames) => {
       jest.spyOn(prisma.product, 'update').mockResolvedValue(mockProduct);

@@ -68,7 +68,7 @@ export class ProductApiController {
   @Get(':productId')
   @UseInterceptors(CacheInterceptor)
   async getById(
-    @Param('productId',ParseIntPipe) productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
   ): Promise<ProductCategory> {
     return await this.productService.getById(productId);
   }
@@ -115,7 +115,7 @@ export class ProductApiController {
   @Patch(':productId')
   async update(
     @Req() req: AuthRequest,
-    @Param('productId',ParseIntPipe) productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<ProductCategory> {
@@ -141,7 +141,7 @@ export class ProductApiController {
   @Delete(':productId')
   async delete(
     @Req() req: AuthRequest,
-    @Param('productId',ParseIntPipe) productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
   ): Promise<void> {
     return await this.productService.delete(req.user.id, productId);
   }

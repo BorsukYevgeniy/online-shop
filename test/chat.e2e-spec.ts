@@ -144,7 +144,10 @@ describe('ChatApiController (e2e)', () => {
           .set('Cookie', [`accessToken=${userAccessToken}`])
           .expect(code);
 
-        expect(body).toEqual({ id: expect.any(Number),createdAt: expect.any(String) });
+        expect(body).toEqual({
+          id: expect.any(Number),
+          createdAt: expect.any(String),
+        });
 
         chatId = body.id;
       } else {

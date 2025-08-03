@@ -65,7 +65,9 @@ export class CategoryApiController {
   @ApiParam({ name: 'categoryId', type: Number })
   @Get(':categoryId')
   @UseInterceptors(CacheInterceptor)
-  async getById(@Param('categoryId', ParseIntPipe) id: number): Promise<Category> {
+  async getById(
+    @Param('categoryId', ParseIntPipe) id: number,
+  ): Promise<Category> {
     return await this.categoryService.getById(id);
   }
 

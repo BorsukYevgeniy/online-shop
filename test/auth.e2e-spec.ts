@@ -49,9 +49,8 @@ describe('AuthApiController (e2e)', () => {
 
   beforeAll(async () => {
     await prisma.user.deleteMany({});
-    await prisma.token.deleteMany({});  
-  })
-
+    await prisma.token.deleteMany({});
+  });
 
   afterAll(async () => {
     await prisma.user.deleteMany({});

@@ -75,7 +75,13 @@ describe('MessageRepository', () => {
   });
 
   it('Should get a message by ID', async () => {
-    const mockMessage = { id: 1, text: 'Hello', chatId: 1, userId: 1, createdAt: new Date() };
+    const mockMessage = {
+      id: 1,
+      text: 'Hello',
+      chatId: 1,
+      userId: 1,
+      createdAt: new Date(),
+    };
 
     jest.spyOn(prisma.message, 'findUnique').mockResolvedValue(mockMessage);
 
@@ -93,11 +99,19 @@ describe('MessageRepository', () => {
         id: 1,
         text: 'Hello',
         chatId: 1,
-        userId: 1,createdAt: new Date(),
+        userId: 1,
+        createdAt: new Date(),
 
         user: { nickname: 'User1' },
       },
-      { id: 2, text: 'Hi', chatId: 1, userId: 2, createdAt: new Date(),user: { nickname: 'User2' } },
+      {
+        id: 2,
+        text: 'Hi',
+        chatId: 1,
+        userId: 2,
+        createdAt: new Date(),
+        user: { nickname: 'User2' },
+      },
     ];
 
     jest.spyOn(prisma.message, 'findMany').mockResolvedValue(mockMessages);
@@ -120,7 +134,8 @@ describe('MessageRepository', () => {
       id: 1,
       text: 'Updated message',
       chatId: 1,
-      userId: 1,createdAt: new Date(),
+      userId: 1,
+      createdAt: new Date(),
       user: { nickname: 'User1' },
     };
 
@@ -141,7 +156,13 @@ describe('MessageRepository', () => {
   });
 
   it('Should delete a message', async () => {
-    const mockMessage = { id: 1, text: 'Hello', chatId: 1, userId: 1,createdAt: new Date() };
+    const mockMessage = {
+      id: 1,
+      text: 'Hello',
+      chatId: 1,
+      userId: 1,
+      createdAt: new Date(),
+    };
 
     jest.spyOn(prisma.message, 'delete').mockResolvedValue(mockMessage);
 

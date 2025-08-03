@@ -157,7 +157,9 @@ export class CategorySsrController {
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
-  async getUpdateCategoryPage(@Param('categoryId', ParseIntPipe) categoryId: number) {
+  async getUpdateCategoryPage(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
     return await this.categoryService.getById(categoryId);
   }
 
