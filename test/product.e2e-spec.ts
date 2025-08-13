@@ -127,7 +127,7 @@ describe('ProductApiController (e2e)', () => {
       [
         'GET /api/products - 200 OK - Should get category products',
         200,
-        { categoryIds: [1] },
+        { categoryIds: [category1Id] },
       ],
       [
         'GET /api/products - 200 OK - Should search the product by title and min price',

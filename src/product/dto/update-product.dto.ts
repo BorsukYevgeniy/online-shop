@@ -7,9 +7,10 @@ import {
   IsArray,
   MinLength,
 } from 'class-validator';
-import { ToNumber, Trim, ToNumberArray } from '../../decorators';
+import { Trim, ToNumberArray } from '../../decorators';
 import { ProductDtoErrorMessages as ProductDtoErrMsg } from '../enum/product-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class UpdateProductDto {
   @ApiProperty({
@@ -54,7 +55,7 @@ export class UpdateProductDto {
     { allowInfinity: false, allowNaN: false },
     { message: ProductDtoErrMsg.InvalidPrice },
   )
-  @ToNumber()
+  @Type(() => Number)
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   readonly price?: number;
 

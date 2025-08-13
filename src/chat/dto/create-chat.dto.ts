@@ -1,7 +1,7 @@
-import { IsNumber, IsPositive } from 'class-validator';
+import { IsInt, IsPositive } from 'class-validator';
+import { Type } from 'class-transformer';
 
 import { ChatDtoErrorMessages as ChatDtoErrMsg } from '../enum/chat-dto-error-messages.enum';
-import { ToNumber } from '../../decorators';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateChatDto {
@@ -12,12 +12,9 @@ export class CreateChatDto {
     minimum: 1,
     example: 123,
   })
-  @IsNumber(
-    { allowNaN: false, allowInfinity: false },
-    { message: ChatDtoErrMsg.InvalidId },
-  )
+  @IsInt()
   @IsPositive({ message: ChatDtoErrMsg.InvalidId })
-  @ToNumber()
+  @Type(() => Number)
   sellerId: number;
 
   @ApiProperty({
@@ -27,11 +24,8 @@ export class CreateChatDto {
     minimum: 1,
     example: 123,
   })
-  @IsNumber(
-    { allowNaN: false, allowInfinity: false },
-    { message: ChatDtoErrMsg.InvalidId },
-  )
+  @IsInt()
   @IsPositive({ message: ChatDtoErrMsg.InvalidId })
-  @ToNumber()
+  @Type(() => Number)
   buyerId: number;
 }

@@ -5,10 +5,10 @@ import {
   MinLength,
   IsDate,
 } from 'class-validator';
-import { ToDate, Trim } from '../../decorators';
-
+import { Trim } from '../../decorators'
 import { UserDtoErrorMessages as UserDtoErrMsg } from '../constants/user-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class SearchUserDto {
   @ApiProperty({
@@ -32,7 +32,7 @@ export class SearchUserDto {
   })
   @IsOptional()
   @IsDate({ message: UserDtoErrMsg.InvalidDate })
-  @ToDate()
+  @Type(() => Date)
   readonly minDate?: Date;
 
   @ApiProperty({
@@ -43,6 +43,6 @@ export class SearchUserDto {
   })
   @IsOptional()
   @IsDate({ message: UserDtoErrMsg.InvalidDate })
-  @ToDate()
+  @Type(() => Date)
   readonly maxDate?: Date;
 }

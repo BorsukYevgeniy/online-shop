@@ -6,8 +6,11 @@ import {
   MaxLength,
   MinLength,
   IsArray,
+  IsInt,
 } from 'class-validator';
-import { ToNumber, Trim, ToNumberArray } from '../../decorators';
+import { Trim, ToNumberArray } from '../../decorators';
+import { Type } from 'class-transformer';
+
 import { ProductDtoErrorMessages as ProductDtoErrMsg } from '../enum/product-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -37,7 +40,7 @@ export class CreateProductDto {
   })
   @IsNotEmpty()
   @IsString()
-  // @Trim()
+  @Trim()
   @MinLength(10, { message: ProductDtoErrMsg.InvalidDescription })
   @MaxLength(500, { message: ProductDtoErrMsg.InvalidDescription })
   readonly description: string;
@@ -55,7 +58,7 @@ export class CreateProductDto {
     { message: ProductDtoErrMsg.InvalidPrice },
   )
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
-  @ToNumber()
+  @Type(() => Number)
   readonly price: number;
 
   @ApiProperty({
@@ -65,8 +68,9 @@ export class CreateProductDto {
     description: 'Id of categories to which the product belongs',
   })
   @IsNotEmpty()
-  @Min(0, { each: true, message: ProductDtoErrMsg.InvalidPrice })
   @IsArray()
+  @IsInt({ each: true })
+  @Min(0, { each: true })
   @ToNumberArray()
   categoryIds: number[];
 }

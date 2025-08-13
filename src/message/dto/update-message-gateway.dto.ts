@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UpdateMessageDto } from './update-message.dto';
 
-import { IsNumber } from 'class-validator';
+import { IsInt } from 'class-validator';
 
 export class UpdateMessageGatewayDto extends UpdateMessageDto {
   @ApiProperty({
@@ -10,7 +10,7 @@ export class UpdateMessageGatewayDto extends UpdateMessageDto {
     required: true,
     example: 1,
   })
-  @IsNumber({ allowInfinity: false, allowNaN: false })
+  @IsInt()
   messageId: number;
 
   @ApiProperty({
@@ -19,6 +19,6 @@ export class UpdateMessageGatewayDto extends UpdateMessageDto {
     required: true,
     example: 1,
   })
-  @IsNumber({ allowInfinity: false, allowNaN: false })
+  @IsInt()
   chatId: number;
 }

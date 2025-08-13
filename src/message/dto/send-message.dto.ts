@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsInt } from 'class-validator';
 import { CreateMessageDto } from './create-message.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -9,6 +9,6 @@ export class SendMessageDto extends CreateMessageDto {
     required: true,
     example: 1,
   })
-  @IsNumber({ allowInfinity: false, allowNaN: false })
+  @IsInt()
   chatId: number;
 }

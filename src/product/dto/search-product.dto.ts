@@ -7,10 +7,11 @@ import {
   IsNumber,
   IsArray,
 } from 'class-validator';
-import { ToNumber, ToNumberArray, Trim } from '../../decorators';
+import { Trim } from '../../decorators'
 
 import { ProductDtoErrorMessages as ProductDtoErrMsg } from '../enum/product-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class SearchProductDto {
   @ApiProperty({
@@ -40,7 +41,7 @@ export class SearchProductDto {
     { allowInfinity: false, allowNaN: false },
     { message: ProductDtoErrMsg.InvalidPrice },
   )
-  @ToNumber()
+  @Type(() => Number)
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   readonly minPrice?: number;
 
@@ -56,7 +57,7 @@ export class SearchProductDto {
     { allowInfinity: false, allowNaN: false },
     { message: ProductDtoErrMsg.InvalidPrice },
   )
-  @ToNumber()
+  @Type(() => Number)
   @Min(0, { message: ProductDtoErrMsg.InvalidPrice })
   readonly maxPrice?: number;
 
@@ -68,6 +69,6 @@ export class SearchProductDto {
   })
   @IsOptional()
   @IsArray()
-  @ToNumberArray()
+  @Type(() => Number)
   readonly categoryIds?: number[];
 }

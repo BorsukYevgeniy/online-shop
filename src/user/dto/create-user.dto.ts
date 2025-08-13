@@ -5,7 +5,7 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
-import { Trim } from '../../decorators';
+import { Trim } from '../../decorators'
 
 import { AuthDtoErrorMessages as AuthDtoErrMsg } from 'src/auth/enum/auth-dto-error-messages.enum';
 import { UserDtoErrorMessages as UserDtoErrMsg } from '../../user/constants/user-dto-error-messages.enum';

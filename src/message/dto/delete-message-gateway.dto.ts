@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { IsInt } from 'class-validator';
 
 export class DeleteMessageGatewayDto {
   @ApiProperty({
@@ -8,7 +8,7 @@ export class DeleteMessageGatewayDto {
     required: true,
     example: 1,
   })
-  @IsNumber({ allowInfinity: false, allowNaN: false })
+  @IsInt()
   messageId: number;
 
   @ApiProperty({
@@ -17,6 +17,6 @@ export class DeleteMessageGatewayDto {
     required: true,
     example: 1,
   })
-  @IsNumber({ allowInfinity: false, allowNaN: false })
+  @IsInt()
   chatId: number;
 }
