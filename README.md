@@ -105,14 +105,14 @@ $ npm install
 ## Compile and run the project 🔨
 
 ```bash
-# Unit tests
-$ npm run test
+# Build project
+$ npm run build
 
-E2e tests
-$ npm run test:e2e
+# Start project
+$ npm run start
 
-# Test coverage
-$ npm run test:cov
+# Start project in dev mode
+$ npm run start:dev
 ```
 
 ## Run tests ⚒️
@@ -121,7 +121,7 @@ $ npm run test:cov
 # Unit tests
 $ npm run test
 
-# E2e tests
+# E2E tests
 $ npm run test:e2e
 
 # Test coverage
