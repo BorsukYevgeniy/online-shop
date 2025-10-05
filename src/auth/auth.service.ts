@@ -43,7 +43,7 @@ export class AuthService {
 
     if (candidate) {
       this.logger.warn(`User already exists: ${dto.email}`);
-      throw new BadRequestException(UserErrMsg.UserAlreadyExists('email'));
+      throw new BadRequestException(AuthErrMsg.InvalidCredentials);
     }
 
     const hashedPassword: string = await hash(dto.password, 3);
@@ -68,7 +68,7 @@ export class AuthService {
 
     if (!candidate) {
       this.logger.warn(`User not found: ${dto.email}`);
-      throw new NotFoundException(UserErrMsg.UserNotFound);
+      throw new NotFoundException(AuthErrMsg.InvalidCredentials);
     }
 
     const { password: hashedPassword } = candidate;
