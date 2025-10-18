@@ -4,7 +4,7 @@ import { TokenRepository } from './token.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../prisma/prisma.module';
 import { TokenCleaningService } from './token-cleaning.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from '../config/config.module';
 
 @Module({
   imports: [JwtModule.register({ global: true }), PrismaModule, ConfigModule],

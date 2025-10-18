@@ -1,7 +1,6 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { UserModule } from './user/user.module';
-import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
 import { AuthModule } from './auth/auth.module';
@@ -23,32 +22,24 @@ import { AppSsrController } from './app.ssr.controller';
 import { IsAuthorizedMiddleware } from './middlewares/is-authorized.middleware';
 
 import { CacheModule } from '@nestjs/cache-manager';
-import Keyv from 'keyv';
-import KeyvRedis from '@keyv/redis';
 
 import { ErrorModule } from './error/error.module';
+import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [
     PrismaModule,
-    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-
     CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
       isGlobal: true,
-      useFactory: async () => {
+      useFactory: (configService: ConfigService) => {
         const logger: Logger = new Logger('Redis');
-        const redisStore = new KeyvRedis({ url: process.env.REDIS_URL });
 
         logger.debug('Connecting to Redis cache...');
 
-        return {
-          stores: new Keyv({
-            store: redisStore,
-            namespace: '',
-            useKeyPrefix: false,
-          }),
-          ttl: 60 * 1000,
-        };
+        return configService.REDIS_CONFIG;
       },
     }),
 
@@ -66,6 +57,7 @@ import { ErrorModule } from './error/error.module';
     ScheduleModule.forRoot(),
     CategoryModule,
     CartModule,
+    ConfigModule,
   ],
   controllers: [AppSsrController],
 })

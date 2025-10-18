@@ -1,26 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class MailService {
   private readonly logger: Logger = new Logger(MailService.name);
 
-  private readonly SMTP_USER: string;
-  private readonly APP_URL: string;
   constructor(
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) {
-    this.SMTP_USER = this.configService.get<string>('SMTP_USER');
-    this.APP_URL = this.configService.get<string>('APP_URL');
-  }
+  ) {}
 
   async sendVerificationMail(to: string, link: string): Promise<void> {
     await this.mailerService.sendMail({
       to,
-      from: this.SMTP_USER,
-      subject: 'Verification mail on ' + this.APP_URL,
+      from: this.configService.SMTP_USER,
+      subject: 'Verification mail on ' + this.configService.APP_URL,
       text: '',
       html: `
       <div>

@@ -5,9 +5,10 @@ import { UserModule } from '../user/user.module';
 import { TokenModule } from '../token/token.module';
 import { MailModule } from '../mail/mail.module';
 import { AuthSsrController } from './auth.ssr.controller';
+import { ConfigModule } from '../config/config.module';
 
 @Module({
-  imports: [UserModule, TokenModule, MailModule],
+  imports: [UserModule, TokenModule, MailModule,ConfigModule],
   controllers: [AuthApiController, AuthSsrController],
   providers: [AuthService],
 })

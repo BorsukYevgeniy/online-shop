@@ -15,7 +15,7 @@ import { DeletingCount } from '../types/deleting-count.type';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Role } from '../enum/role.enum';
 import { MailService } from '../mail/mail.service';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../config/config.service';
 
 import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
@@ -24,15 +24,13 @@ import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages.enum
 @Injectable()
 export class AuthService {
   private readonly logger: Logger = new Logger(AuthService.name);
-  private readonly APP_URL: string;
 
   constructor(
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
-  ) {
-    this.APP_URL = this.configService.get<string>('APP_URL');
+  ) {    
   }
 
   async register(
@@ -162,7 +160,7 @@ export class AuthService {
   ): Promise<void> {
     return await this.mailService.sendVerificationMail(
       email,
-      this.APP_URL +
+      this.configService.APP_URL +
         (mode === 'api' ? '/api' : '') +
         `/auth/verify/${verificationLink}`,
     );
