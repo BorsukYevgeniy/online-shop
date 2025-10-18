@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TokenService } from './token.service';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../config/config.service';
 import { Role } from '../enum/role.enum';
 import { Token } from '@prisma/client';
 
@@ -31,7 +31,14 @@ describe('TokenService', () => {
         },
         {
           provide: ConfigService,
-          useValue: { get: jest.fn() },
+          useValue: {
+            JWT_CONFIG: {
+              JWT_ACCESS_SECRET: '123',
+              JWT_REFRESH_SECRET: '321',
+              ACCESS_TOKEN_EXPIRATION_TIME: '1d',
+              REFRESH_TOKEN_EXPIRATION_TIME: '3d',
+            },
+          },
         },
       ],
     }).compile();
@@ -86,7 +93,7 @@ describe('TokenService', () => {
     const result = await service.verifyRefreshToken(refreshToken);
 
     expect(jwt.verifyAsync).toHaveBeenCalledWith(refreshToken, {
-      secret: undefined,
+      secret: '321',
     });
     expect(result).toEqual(payload);
   });
@@ -100,7 +107,7 @@ describe('TokenService', () => {
     const result = await service.verifyAccessToken(accessToken);
 
     expect(jwt.verifyAsync).toHaveBeenCalledWith(accessToken, {
-      secret: undefined,
+      secret: '123',
     });
     expect(result).toEqual(payload);
   });

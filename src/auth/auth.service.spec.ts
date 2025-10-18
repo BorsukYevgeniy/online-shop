@@ -6,7 +6,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
 import { MailService } from '../mail/mail.service';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../config/config.service';
 import { Token, User } from '@prisma/client';
 
 jest.mock('bcryptjs', () => ({
@@ -48,6 +48,7 @@ describe('AuthService', () => {
             updateTokens: jest.fn(),
           },
         },
+        { provide: ConfigService, useValue: { APP_URL: '123'}}
       ],
     }).compile();
 

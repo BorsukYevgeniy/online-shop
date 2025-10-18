@@ -6,28 +6,24 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from '../decorator/requiered-roles.decorator';
 import { TokenService } from '../../token/token.service';
 import { AuthRequest } from '../../types/request.type';
-import { Role } from '../../enum/role.enum';
 
 import { TokenErrorMessages as TokenErrMsg } from '../../token/enum/token-error-messages.enum';
+import { RequieredRoles } from '../decorator/requiered-roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   private readonly logger: Logger = new Logger(RolesGuard.name);
 
   constructor(
-    private tokenService: TokenService,
-    private reflector: Reflector,
+    private readonly tokenService: TokenService,
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      const requiredRole: Role = this.reflector.getAllAndOverride<Role>(
-        ROLES_KEY,
-        [context.getHandler(), context.getClass()],
-      );
+    const requiredRole = this.reflector.get(RequieredRoles, context.getHandler());
 
       if (!requiredRole) {
         return true;
