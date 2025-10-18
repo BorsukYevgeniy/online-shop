@@ -4,6 +4,7 @@ import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ChatMessageApiController } from '../chat/chat-message.api.controller';
 import { MessageService } from '../message/message.service';
+import { Role } from '../enum/role.enum';
 
 const req = { user: { id: 1 } } as AuthRequest;
 
@@ -87,7 +88,7 @@ describe('ChatMessageApiController', () => {
     jest.spyOn(service, 'createMessage').mockResolvedValue(message);
 
     const result = await controller.createMessage(
-      req,
+      { id: 1, role: Role.USER, isVerified: true },
       message.chatId,
       createDto,
     );

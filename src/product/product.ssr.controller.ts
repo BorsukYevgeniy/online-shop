@@ -9,7 +9,6 @@ import {
   Post,
   Query,
   Render,
-  Req,
   Res,
   UploadedFiles,
   UseFilters,
@@ -45,6 +44,8 @@ import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Products')
 @Controller('products')
@@ -143,12 +144,12 @@ export class ProductSsrController {
   @UseInterceptors(ImagesInterceptor())
   @Post('create')
   async handleCreatingProduct(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Body() dto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
     @Res() res: Response,
   ) {
-    await this.productService.create(req.user.id, dto, images);
+    await this.productService.create(user.id, dto, images);
     res.redirect('/users/me');
   }
 
@@ -162,14 +163,14 @@ export class ProductSsrController {
   @UseInterceptors(CacheInterceptor)
   @Render('products/get-product-by-id')
   async getProductByIdPage(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('productId', ParseIntPipe) productId: number,
   ) {
     const product = await this.productService.getById(productId);
 
     return {
       ...product,
-      guestId: !req.user?.id ? -1 : req.user.id,
+      guestId: !user?.id ? -1 : user.id,
     };
   }
 
@@ -213,13 +214,13 @@ export class ProductSsrController {
   @UseInterceptors(ImagesInterceptor())
   @Patch('update/:productId')
   async handeProductUpdate(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Res() res: Response,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ) {
-    await this.productService.update(req.user.id, productId, dto, images);
+    await this.productService.update(user.id, productId, dto, images);
     res.redirect('/users/me');
   }
 
@@ -236,10 +237,10 @@ export class ProductSsrController {
   @Delete('delete/:productId')
   async handleDeleteProduct(
     @Param('productId', ParseIntPipe) productId: number,
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Res() res: Response,
   ) {
-    await this.productService.delete(req.user.id, productId);
+    await this.productService.delete(user.id, productId);
     res.redirect('/users/me');
   }
 }

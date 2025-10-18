@@ -4,7 +4,6 @@ import {
   Post,
   UseGuards,
   Render,
-  Req,
   Param,
   Res,
   Delete,
@@ -29,6 +28,8 @@ import {
   ApiTags,
   ApiCookieAuth,
 } from '@nestjs/swagger';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Carts')
 @ApiCookieAuth('accessToken')
@@ -61,8 +62,8 @@ export class CartSsrController {
   @Get()
   @Render('cart/my-cart')
   @UseInterceptors(CacheInterceptor)
-  async getMyCart(@Req() req: AuthRequest) {
-    const cart = await this.cartService.getMyCart(req.user.id);
+  async getMyCart(@User() user: TokenPayload) {
+    const cart = await this.cartService.getMyCart(user.id);
 
     return { products: cart.products };
   }
@@ -75,10 +76,10 @@ export class CartSsrController {
   @Post('products/:productId')
   async handleAddToCart(
     @Param('productId') productId: number,
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Res() res: Response,
   ) {
-    await this.cartService.addToCart(productId, req.user.id);
+    await this.cartService.addToCart(productId, user.id);
 
     res.redirect(`/products/${productId}`);
   }
@@ -91,10 +92,10 @@ export class CartSsrController {
   @Delete('products/:productId')
   async handleDeleteCart(
     @Param('productId') productId: number,
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Res() res: Response,
   ) {
-    await this.cartService.removeFromCart(productId, req.user.id);
+    await this.cartService.removeFromCart(productId, user.id);
 
     res.redirect(`/cart`);
   }
@@ -104,8 +105,8 @@ export class CartSsrController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({ description: 'You must be verified user' })
   @Delete('products')
-  async handleClearCart(@Req() req: AuthRequest, @Res() res: Response) {
-    await this.cartService.clearCart(req.user.id);
+  async handleClearCart(@User() user: TokenPayload, @Res() res: Response) {
+    await this.cartService.clearCart(user.id);
 
     res.redirect('/cart');
   }

@@ -11,8 +11,9 @@ import { Order } from '../enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserNoCred, UserNoPasswordVLink } from './types/user.types';
 import { CacheModule } from '@nestjs/cache-manager';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
-const req = { user: { id: 2, role: Role.USER } } as AuthRequest;
+const user: TokenPayload = { id: 1, role: Role.USER, isVerified: true };
 
 describe('UserApiController', () => {
   let controller: UserApiController;
@@ -203,10 +204,10 @@ describe('UserApiController', () => {
 
     jest.spyOn(userService, 'getMe').mockResolvedValue(mockUser);
 
-    const user = await controller.getMe(req);
+    const userFromControllet = await controller.getMe(user)
 
-    expect(user).toEqual(mockUser);
-    expect(userService.getMe).toHaveBeenCalledWith(2);
+    expect(userFromControllet).toEqual(mockUser);
+    expect(userService.getMe).toHaveBeenCalledWith(1);
   });
 
   it('Should return user products with default sorting', async () => {
@@ -260,9 +261,9 @@ describe('UserApiController', () => {
     } as unknown as Response;
 
     it('Should delete user by himself', async () => {
-      await controller.deleteMe(req, res);
+      await controller.deleteMe(user, res);
 
-      expect(userService.delete).toHaveBeenCalledWith(req.user.id);
+      expect(userService.delete).toHaveBeenCalledWith(user.id);
       expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
       expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
     });

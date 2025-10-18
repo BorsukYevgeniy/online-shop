@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   UseGuards,
-  Req,
+
   Param,
   Body,
   Delete,
@@ -41,6 +41,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { PaginationDto } from '../dto/pagination.dto';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('API Chats')
 @ApiCookieAuth('accessToken')
@@ -58,10 +60,10 @@ export class ChatApiController {
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getMyChats(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Query() paginationDto: PaginationDto,
   ): Promise<PaginatedUserChats> {
-    return await this.chatService.getUserChats(req.user.id, paginationDto);
+    return await this.chatService.getUserChats(user.id, paginationDto);
   }
 
   @ApiOperation({ summary: 'Fetch chat by id' })
@@ -79,11 +81,11 @@ export class ChatApiController {
   async getСhatById(
     @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
   ): Promise<PaginatedChat> {
     return await this.chatService.getChatById(
       chatId,
-      req.user.id,
+      user.id,
       paginationDto,
     );
   }
@@ -112,9 +114,9 @@ export class ChatApiController {
   @Delete(':chatId')
   @HttpCode(204)
   async deleteChat(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('chatId', ParseIntPipe) chatId: number,
   ): Promise<void> {
-    return await this.chatService.deleteChat(chatId, req.user.id);
+    return await this.chatService.deleteChat(chatId, user.id);
   }
 }

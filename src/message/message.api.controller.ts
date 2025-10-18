@@ -7,7 +7,6 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +17,7 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageNickname } from './types/message.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AuthRequest } from 'src/types/request.type';
+import { TokenPayload } from '../../dist/token/interface/token.interfaces';
 
 import {
   ApiTags,
@@ -31,6 +31,8 @@ import {
   ApiBody,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
+import { User } from '../decorators/routes/user.decorator';
+
 
 @ApiTags('API Messages')
 @ApiCookieAuth('accessToken')
@@ -49,9 +51,9 @@ export class MessageApiController {
   @UseInterceptors(CacheInterceptor)
   async getMessageById(
     @Param('messageId', ParseIntPipe) messageId: number,
-    @Req() req: AuthRequest,
+@User() user: TokenPayload,
   ): Promise<Message> {
-    return await this.messageService.getMessageById(messageId, req.user.id);
+    return await this.messageService.getMessageById(messageId, user.id);
   }
 
   @ApiOperation({ summary: 'Update message by id' })
@@ -63,13 +65,13 @@ export class MessageApiController {
   @ApiBody({ type: UpdateMessageDto })
   @Patch(':messageId')
   async updateMessage(
-    @Req() req: AuthRequest,
+@User() user: TokenPayload,
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() updateDto: UpdateMessageDto,
   ): Promise<MessageNickname> {
     return await this.messageService.updateMessage(
       messageId,
-      req.user.id,
+      user.id,
       updateDto,
     );
   }
@@ -83,9 +85,9 @@ export class MessageApiController {
   @Delete(':messageId')
   @HttpCode(204)
   async deleteMessage(
-    @Req() req: AuthRequest,
+@User() user: TokenPayload,
     @Param('messageId', ParseIntPipe) messageId: number,
   ): Promise<void> {
-    await this.messageService.deleteMessage(messageId, req.user.id);
+    await this.messageService.deleteMessage(messageId, user.id);
   }
 }

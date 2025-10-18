@@ -8,6 +8,7 @@ import { TokenService } from '../token/token.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Token } from '@prisma/client';
+import { Role } from '../enum/role.enum';
 
 describe('AuthApiController', () => {
   let controller: AuthApiController;
@@ -183,7 +184,10 @@ describe('AuthApiController', () => {
 
     jest.spyOn(service, 'logoutAll').mockResolvedValue({ count: 1 });
 
-    await controller.logoutAll(req, res as Response);
+    await controller.logoutAll(
+      { id: 1, role: Role.USER, isVerified: true },
+      res as Response,
+    );
 
     expect(service.logoutAll).toHaveBeenCalledWith(req.user.id);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
@@ -232,7 +236,7 @@ describe('AuthApiController', () => {
     jest.spyOn(service, 'resendVerificationMail').mockResolvedValue(undefined);
 
     await expect(
-      controller.resendEmail({ user: { id: 1 } } as AuthRequest),
+      controller.resendEmail({ id: 1, role: Role.USER, isVerified: true }),
     ).resolves.toEqual(undefined);
   });
 });

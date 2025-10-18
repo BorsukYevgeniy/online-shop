@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Render,
-  Req,
   Res,
   UseGuards,
   UseInterceptors,
@@ -44,6 +43,8 @@ import {
   ApiCookieAuth,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Users')
 @ApiCookieAuth('accessToken')
@@ -119,8 +120,8 @@ export class UserSsrController {
   @Get('me')
   @Render('users/user-account')
   @UseInterceptors(CacheInterceptor)
-  async getUserAccountPage(@Req() req: AuthRequest) {
-    return await this.userService.getMe(req.user.id);
+  async getUserAccountPage(@User() user: TokenPayload) {
+    return await this.userService.getMe(user.id);
   }
 
   @ApiOperation({ summary: 'Getting user by id' })
@@ -133,22 +134,22 @@ export class UserSsrController {
   @UseInterceptors(CacheInterceptor)
   async getUserByIdPage(
     @Param('userId', ParseIntPipe) userId: number,
-    @Req() req: AuthRequest,
+    @User() userFromReq: TokenPayload,
     @Res() res: Response,
   ) {
     const user = await this.userService.getById(userId);
 
     const chatBeetweenUsers = await this.chatService.findChatBetweenUsers(
       userId,
-      req.user.id,
+      userFromReq.id,
     );
 
-    if (userId === req.user.id) return res.redirect('/users/me');
+    if (userId === userFromReq.id) return res.redirect('/users/me');
 
     return {
       ...user,
-      guestRole: req.user.role,
-      guestId: req.user.id,
+      guestRole: userFromReq.role,
+      guestId: userFromReq.id,
       chatId: chatBeetweenUsers?.id,
     };
   }
@@ -164,7 +165,7 @@ export class UserSsrController {
   @UseInterceptors(CacheInterceptor)
   @Render('users/my-products')
   async getUserProducts(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortProductDto,
@@ -178,7 +179,7 @@ export class UserSsrController {
       products: products,
       ...pagination,
       ...sortDto,
-      guestId: req.user.id,
+      guestId: user.id,
     };
   }
 
@@ -206,10 +207,10 @@ export class UserSsrController {
   @Delete('me')
   @Delete('delete/me')
   async handleDeleteUserByHimself(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Res() res: Response,
   ) {
-    await this.userService.delete(req.user.id);
+    await this.userService.delete(user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');

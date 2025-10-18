@@ -6,6 +6,7 @@ import { TokenService } from '../token/token.service';
 import { AuthRequest } from '../types/request.type';
 import { ChatMessages } from './types/chat.types';
 import { NotFoundException } from '@nestjs/common';
+import { Role } from '../enum/role.enum';
 
 describe('ChatApiController', () => {
   let controller: ChatApiController;
@@ -60,9 +61,7 @@ describe('ChatApiController', () => {
     });
 
     const result = await controller.getMyChats(
-      {
-        user: { id: 1 },
-      } as AuthRequest,
+      { id: 1, role: Role.USER, isVerified: true },
       { page: 1, pageSize: 10 },
     );
     expect(result).toEqual({
@@ -94,7 +93,7 @@ describe('ChatApiController', () => {
       const result = await controller.getСhatById(
         1,
         { page: 1, pageSize: 10 },
-        { user: { id: 1 } } as AuthRequest,
+        { id: 1, role: Role.USER, isVerified: true },
       );
 
       expect(result).toEqual({
@@ -143,7 +142,7 @@ describe('ChatApiController', () => {
         jest.spyOn(service, 'deleteChat').mockResolvedValue(undefined);
 
         const result = await controller.deleteChat(
-          { user: { id: 1 } } as AuthRequest,
+          { id: 1, role: Role.USER, isVerified: true },
           1,
         );
         expect(result).toEqual(undefined);
@@ -153,7 +152,7 @@ describe('ChatApiController', () => {
           .mockRejectedValue(new NotFoundException());
 
         await expect(
-          controller.deleteChat({ user: { id: 1 } } as AuthRequest, 1),
+          controller.deleteChat({ id: 1, role: Role.USER, isVerified: true }, 1),
         ).rejects.toThrow(NotFoundException);
       }
     });

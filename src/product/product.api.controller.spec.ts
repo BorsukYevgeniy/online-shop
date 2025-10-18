@@ -11,12 +11,13 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Role } from '../enum/role.enum';
 import { ProductCategory } from './types/product.types';
 import { CacheModule } from '@nestjs/cache-manager';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 describe('ProductApiController', () => {
   let controller: ProductApiController;
   let service: ProductService;
 
-  const req: AuthRequest = { user: { id: 1, role: Role.ADMIN } } as AuthRequest;
+  const user:TokenPayload = { id: 1, role: Role.USER, isVerified: true };
 
   const mockFiles: Express.Multer.File[] = [
     { filename: 'file1.jpg' } as Express.Multer.File,
@@ -190,9 +191,9 @@ describe('ProductApiController', () => {
 
     jest.spyOn(service, 'create').mockResolvedValue(mockProduct);
 
-    const product = await controller.create(req, dto, mockFiles);
+    const product = await controller.create(user, dto, mockFiles);
 
-    expect(service.create).toHaveBeenCalledWith(req.user.id, dto, mockFiles);
+    expect(service.create).toHaveBeenCalledWith(user.id, dto, mockFiles);
     expect(product).toEqual(mockProduct);
   });
 
@@ -253,7 +254,7 @@ describe('ProductApiController', () => {
         jest.spyOn(service, 'update').mockResolvedValue(mockProduct);
 
         const product = await controller.update(
-          req,
+          user,
           mockProduct.id,
           dto,
           files,
@@ -261,7 +262,7 @@ describe('ProductApiController', () => {
 
         expect(product).toEqual(mockProduct);
         expect(service.update).toHaveBeenCalledWith(
-          req.user.id,
+          user.id,
           mockProduct.id,
           dto,
           files,
@@ -272,7 +273,7 @@ describe('ProductApiController', () => {
           .mockRejectedValue(new NotFoundException('Product not found'));
 
         await expect(
-          controller.update(req, mockProduct.id, dto, files),
+          controller.update(user, mockProduct.id, dto, files),
         ).rejects.toThrow(NotFoundException);
       } else {
         jest
@@ -280,7 +281,7 @@ describe('ProductApiController', () => {
           .mockRejectedValue(new ForbiddenException());
 
         await expect(
-          controller.update(req, mockProduct.id, dto, files),
+          controller.update(user, mockProduct.id, dto, files),
         ).rejects.toThrow(ForbiddenException);
       }
     });
@@ -306,7 +307,7 @@ describe('ProductApiController', () => {
       if (isSuccess && isProductFounded) {
         jest.spyOn(service, 'delete').mockResolvedValue();
 
-        await controller.delete(req, 1);
+        await controller.delete(user, 1);
 
         expect(service.delete).toHaveBeenCalledWith(1, 1);
       } else if (!isSuccess && isProductFounded) {

@@ -4,7 +4,6 @@ import {
   Delete,
   Param,
   UseGuards,
-  Req,
   Res,
   Query,
   Patch,
@@ -46,6 +45,8 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('API Users')
 @ApiCookieAuth('accessToken')
@@ -78,8 +79,8 @@ export class UserApiController {
   @ApiOkResponse({ description: 'User fetched' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('me')
-  async getMe(@Req() req: AuthRequest): Promise<UserNoPasswordVLink> {
-    return await this.userService.getMe(req.user.id);
+  async getMe(@User() user: TokenPayload): Promise<UserNoPasswordVLink> {
+    return await this.userService.getMe(user.id);
   }
 
   @ApiOperation({ summary: 'Getting user by id' })
@@ -138,8 +139,8 @@ export class UserApiController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('me')
   @HttpCode(204)
-  async deleteMe(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
-    await this.userService.delete(req.user.id);
+  async deleteMe(@User() user: TokenPayload, @Res() res: Response): Promise<void> {
+    await this.userService.delete(user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');

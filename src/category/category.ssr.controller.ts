@@ -7,7 +7,6 @@ import {
   Param,
   Render,
   UseGuards,
-  Req,
   Res,
   Query,
   Body,
@@ -42,6 +41,8 @@ import {
   ApiUnauthorizedResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Categories')
 @Controller('categories')
@@ -61,7 +62,7 @@ export class CategorySsrController {
   @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
   async getAllCategoriesPage(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Query() paginationDto: PaginationDto,
     @Query() sortDto: SortCategoryDto,
   ) {
@@ -75,7 +76,7 @@ export class CategorySsrController {
       categories,
       ...pagination,
       ...sortDto,
-      role: req.user.role,
+      role: user.role,
     };
   }
 
@@ -142,12 +143,12 @@ export class CategorySsrController {
   @Render('categories/get-category-by-id')
   @UseInterceptors(CacheInterceptor)
   async getCategoryByIdPage(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('categoryId', ParseIntPipe) categoryId: number,
   ) {
     const category = await this.categoryService.getById(Number(categoryId));
 
-    return { ...category, role: req.user.role };
+    return { ...category, role: user.role };
   }
 
   @ApiOperation({ summary: 'Render update category page' })

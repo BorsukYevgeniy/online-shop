@@ -1,6 +1,6 @@
 import { Request } from 'express';
-import { Role } from '../enum/role.enum';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 export type AuthRequest = Request & {
-  user?: { id: number; role: Role; isVerified: boolean };
+  user?: TokenPayload;
 };

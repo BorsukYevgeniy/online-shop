@@ -3,17 +3,16 @@ import {
   Post,
   Body,
   Res,
-  Req,
   BadRequestException,
   UseGuards,
   HttpCode,
   Param,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
-import { AuthRequest } from '../types/request.type';
-import { Tokens } from '../token/interface/token.interfaces';
+import { TokenPayload, Tokens } from '../token/interface/token.interfaces';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from './guards/jwt-auth.guard';
 
@@ -31,6 +30,8 @@ import {
   ApiCookieAuth,
   ApiParam,
 } from '@nestjs/swagger';
+import { User } from '../decorators/routes/user.decorator';
+import { AuthRequest } from '../types/request.type';
 
 @ApiTags('API Auth')
 @Controller('api/auth')
@@ -108,8 +109,8 @@ export class AuthApiController {
   @Post('logout-all')
   @HttpCode(204)
   @UseGuards(AuthGuard)
-  async logoutAll(@Req() req: AuthRequest, @Res() res: Response) {
-    await this.authService.logoutAll(req.user.id);
+  async logoutAll(@User() user: TokenPayload, @Res() res: Response) {
+    await this.authService.logoutAll(user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -163,7 +164,7 @@ export class AuthApiController {
   @Post('resend-email')
   @UseGuards(AuthGuard)
   @HttpCode(204)
-  async resendEmail(@Req() req: AuthRequest) {
-    return await this.authService.resendVerificationMail(req.user.id);
+  async resendEmail(@User() user: TokenPayload) {
+    return await this.authService.resendVerificationMail(user.id);
   }
 }

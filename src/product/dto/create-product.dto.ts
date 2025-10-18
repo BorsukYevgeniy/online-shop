@@ -8,7 +8,7 @@ import {
   IsArray,
   IsInt,
 } from 'class-validator';
-import { Trim, ToNumberArray } from '../../decorators';
+import { Trim, ToNumberArray } from '../../decorators/validation';
 import { Type } from 'class-transformer';
 
 import { ProductDtoErrorMessages as ProductDtoErrMsg } from '../enum/product-dto-error-messages.enum';

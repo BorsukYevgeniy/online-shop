@@ -4,7 +4,6 @@ import { CategoryService } from './category.service';
 import { TokenService } from '../token/token.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ProductService } from '../product/product.service';
 import { Order } from '../enum/order.enum';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SearchCategoryDto } from './dto/search-category.dto';
@@ -13,7 +12,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 describe('CategoryApiController', () => {
   let controller: CategoryApiController;
   let categoryService: CategoryService;
-  let productService: ProductService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,18 +32,11 @@ describe('CategoryApiController', () => {
           },
         },
         { provide: TokenService, useValue: { verifyAccessToken: jest.fn() } },
-        {
-          provide: ProductService,
-          useValue: {
-            getCategoryProducts: jest.fn(),
-          },
-        },
       ],
     }).compile();
 
     controller = module.get<CategoryApiController>(CategoryApiController);
     categoryService = module.get<CategoryService>(CategoryService);
-    productService = module.get<ProductService>(ProductService);
   });
 
   afterEach(async () => {

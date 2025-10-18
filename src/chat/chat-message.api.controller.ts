@@ -6,7 +6,6 @@ import {
   ParseIntPipe,
   Post,
   Query,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -36,6 +35,8 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { PaginationDto } from '../dto/pagination.dto';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('API ChatMessages')
 @ApiCookieAuth('accessToken')
@@ -70,14 +71,10 @@ export class ChatMessageApiController {
   @ApiBody({ type: CreateMessageDto })
   @Post()
   async createMessage(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('chatId', ParseIntPipe) chatId: number,
     @Body() createDto: CreateMessageDto,
   ): Promise<MessageNickname> {
-    return await this.messageService.createMessage(
-      createDto,
-      chatId,
-      req.user.id,
-    );
+    return await this.messageService.createMessage(createDto, chatId, user.id);
   }
 }

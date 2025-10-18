@@ -6,7 +6,6 @@ import {
   UseGuards,
   UseInterceptors,
   Param,
-  Req,
   HttpCode,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -27,6 +26,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { User } from '../decorators/routes/user.decorator';
+import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('API Carts')
 @ApiCookieAuth('accessToken')
@@ -56,8 +57,8 @@ export class CartApiController {
   @ApiForbiddenResponse({ description: 'You must be verified user' })
   @Get()
   @UseInterceptors(CacheInterceptor)
-  async getMyCart(@Req() req: AuthRequest): Promise<CartProduct> {
-    return await this.cartService.getMyCart(req.user.id);
+  async getMyCart(@User() user: TokenPayload): Promise<CartProduct> {
+    return await this.cartService.getMyCart(user.id);
   }
 
   @ApiOperation({ summary: 'Add product to cart' })
@@ -68,10 +69,10 @@ export class CartApiController {
   @Post('products/:productId')
   @HttpCode(200)
   async addToCart(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('productId', ParseIntPipe) productId: number,
   ): Promise<CartProduct> {
-    return await this.cartService.addToCart(productId, req.user.id);
+    return await this.cartService.addToCart(productId, user.id);
   }
 
   @ApiOperation({ summary: 'Remove product from cart' })
@@ -81,10 +82,10 @@ export class CartApiController {
   @ApiParam({ name: 'productId', type: Number })
   @Delete('products/:productId')
   async removeFromCart(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('productId', ParseIntPipe) productId: number,
   ): Promise<CartProduct> {
-    return await this.cartService.removeFromCart(productId, req.user.id);
+    return await this.cartService.removeFromCart(productId, user.id);
   }
 
   @ApiOperation({ summary: 'Clear cart' })
@@ -92,7 +93,7 @@ export class CartApiController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({ description: 'You must be verified user' })
   @Delete('products')
-  async clearCart(@Req() req: AuthRequest): Promise<CartProduct> {
-    return await this.cartService.clearCart(req.user.id);
+  async clearCart(@User() user: TokenPayload): Promise<CartProduct> {
+    return await this.cartService.clearCart(user.id);
   }
 }

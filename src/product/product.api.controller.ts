@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Body,
-  Req,
   UseGuards,
   UseInterceptors,
   UploadedFiles,
@@ -39,6 +38,8 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginationDto } from '../dto/pagination.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
+import { TokenPayload } from '../token/interface/token.interfaces';
+import { User } from '../decorators/routes/user.decorator';
 
 @ApiTags('API Products')
 @Controller('api/products')
@@ -88,11 +89,11 @@ export class ProductApiController {
   @UseInterceptors(ImagesInterceptor())
   @Post()
   async create(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Body() dto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<ProductCategory> {
-    return await this.productService.create(req.user.id, dto, images);
+    return await this.productService.create(user.id, dto, images);
   }
 
   @ApiOperation({ summary: 'Update an existing product' })
@@ -114,13 +115,13 @@ export class ProductApiController {
   @UseInterceptors(ImagesInterceptor())
   @Patch(':productId')
   async update(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ): Promise<ProductCategory> {
     return await this.productService.update(
-      req.user.id,
+      user.id,
       productId,
       dto,
       images,
@@ -140,9 +141,9 @@ export class ProductApiController {
   @HttpCode(204)
   @Delete(':productId')
   async delete(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('productId', ParseIntPipe) productId: number,
   ): Promise<void> {
-    return await this.productService.delete(req.user.id, productId);
+    return await this.productService.delete(user.id, productId);
   }
 }
