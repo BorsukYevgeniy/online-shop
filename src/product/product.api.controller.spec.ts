@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductApiController } from './product.api.controller';
 import { ProductService } from './product.service';
 import { TokenService } from '../token/token.service';
-import { AuthRequest } from '../common/types/request.type';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Order } from '../common/enum/order.enum';

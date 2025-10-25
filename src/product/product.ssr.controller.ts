@@ -32,7 +32,6 @@ import {
 import { Response } from 'express';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthRequest } from '../common/types/request.type';
 import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { ProductService } from './product.service';
 import { CategoryService } from '../category/category.service';
@@ -44,7 +43,7 @@ import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Products')

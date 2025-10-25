@@ -16,7 +16,6 @@ import {
   PaginatedMessages,
 } from '../message/types/message.type';
 
-import { AuthRequest } from '../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 import { Role } from '../common/enum/role.enum';
@@ -35,7 +34,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { PaginationDto } from '../common/dto/pagination.dto';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('API ChatMessages')

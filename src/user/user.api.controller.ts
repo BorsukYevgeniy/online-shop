@@ -16,7 +16,6 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { AuthRequest } from '../common/types/request.type';
 import {
   PaginatedUserNoCreds,
   UserNoPasswordVLink,
@@ -45,7 +44,7 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('API Users')

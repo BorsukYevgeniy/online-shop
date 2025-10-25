@@ -16,7 +16,6 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthRequest } from '../common/types/request.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { SearchCategoryDto } from './dto/search-category.dto';
@@ -41,7 +40,7 @@ import {
   ApiUnauthorizedResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Categories')

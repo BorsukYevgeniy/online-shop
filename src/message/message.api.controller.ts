@@ -16,7 +16,6 @@ import { Message } from '@prisma/client';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageNickname } from './types/message.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { AuthRequest } from 'src/common/types/request.type';
 import { TokenPayload } from '../../dist/token/interface/token.interfaces';
 
 import {
@@ -31,7 +30,7 @@ import {
   ApiBody,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 
 
 @ApiTags('API Messages')

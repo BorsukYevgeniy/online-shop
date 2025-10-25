@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { CartService } from './cart.service';
-import { AuthRequest } from '../common/types/request.type';
 import { Response } from 'express';
 import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
@@ -28,7 +27,7 @@ import {
   ApiTags,
   ApiCookieAuth,
 } from '@nestjs/swagger';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Carts')

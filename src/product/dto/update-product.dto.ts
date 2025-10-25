@@ -7,7 +7,7 @@ import {
   IsArray,
   MinLength,
 } from 'class-validator';
-import { Trim, ToNumberArray } from '../../decorators/validation';
+import { Trim, ToNumberArray } from '../../common/decorators/validation';
 import { ProductDtoErrorMessages as ProductDtoErrMsg } from '../enum/product-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';

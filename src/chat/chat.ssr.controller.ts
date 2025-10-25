@@ -4,7 +4,6 @@ import {
   Get,
   Delete,
   UseGuards,
-  Req,
   Res,
   Param,
   Body,
@@ -17,7 +16,6 @@ import {
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Response } from 'express';
-import { AuthRequest } from '../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
@@ -36,6 +34,8 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { TokenPayload } from '../token/interface/token.interfaces';
+import { User } from '../common/decorators/routes/user.decorator';
 
 @ApiTags('SSR Chats')
 @ApiCookieAuth('accessToken')
@@ -70,11 +70,11 @@ export class ChatSsrController {
   @Render('users/my-chats')
   @UseInterceptors(CacheInterceptor)
   async getAllChats(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Query() paginationDto: PaginationDto,
   ) {
     const { chats, ...pagination } = await this.chatService.getUserChats(
-      req.user.id,
+      user.id,
       paginationDto,
     );
 
@@ -96,18 +96,18 @@ export class ChatSsrController {
   async getChatById(
     @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
   ) {
     const { chat, ...pagination } = await this.chatService.getChatById(
       chatId,
-      req.user.id,
+      user.id,
       paginationDto,
     );
 
     return {
       ...chat,
       ...pagination,
-      userId: req.user.id,
+      userId: user.id,
     };
   }
 
@@ -121,11 +121,11 @@ export class ChatSsrController {
   @ApiParam({ name: 'chatId', type: Number })
   @Delete(':chatId')
   async handleDeleteChat(
-    @Req() req: AuthRequest,
+    @User() user: TokenPayload,
     @Param('chatId', ParseIntPipe) chatId: number,
     @Res() res: Response,
   ) {
-    await this.chatService.deleteChat(chatId, req.user.id);
+    await this.chatService.deleteChat(chatId, user.id);
 
     res.redirect('/chats');
   }

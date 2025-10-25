@@ -170,13 +170,6 @@ describe('AuthApiController', () => {
   });
 
   it('Should logout all users', async () => {
-    const req: AuthRequest = {
-      user: {
-        id: 1,
-      },
-      cookies: { refreshToken: 'refreshToken' },
-    } as any;
-
     const res: Partial<Response> = {
       clearCookie: jest.fn(),
       sendStatus: jest.fn(),
@@ -189,7 +182,7 @@ describe('AuthApiController', () => {
       res as Response,
     );
 
-    expect(service.logoutAll).toHaveBeenCalledWith(req.user.id);
+    expect(service.logoutAll).toHaveBeenCalledWith(1);
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
   });

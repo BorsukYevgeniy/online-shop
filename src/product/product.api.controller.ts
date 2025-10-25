@@ -33,13 +33,12 @@ import { ImagesInterceptor } from './interceptor/images.interceptor';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
-import { AuthRequest } from '../common/types/request.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
 import { TokenPayload } from '../token/interface/token.interfaces';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 
 @ApiTags('API Products')
 @Controller('api/products')

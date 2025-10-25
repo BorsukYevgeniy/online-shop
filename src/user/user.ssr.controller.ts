@@ -13,7 +13,6 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthRequest } from '../common/types/request.type';
 import { UserService } from './user.service';
 import { ProductService } from '../product/product.service';
 import { PaginationDto } from '../common/dto/pagination.dto';
@@ -43,7 +42,7 @@ import {
   ApiCookieAuth,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 
 @ApiTags('SSR Users')

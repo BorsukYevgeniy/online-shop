@@ -30,7 +30,7 @@ import {
   ApiCookieAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import { User } from '../decorators/routes/user.decorator';
+import { User } from '../common/decorators/routes/user.decorator';
 import { AuthRequest } from '../common/types/request.type';
 
 @ApiTags('API Auth')

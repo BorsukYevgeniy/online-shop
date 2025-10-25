@@ -4,7 +4,6 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { Product } from '@prisma/client';
 import { CartApiController } from './cart.api.controller';
 import { Role } from '../common/enum/role.enum';
-import { AuthRequest } from '../common/types/request.type';
 import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
 
@@ -35,9 +34,6 @@ describe('CartApiController', () => {
     service = module.get<CartService>(CartService);
   });
 
-  const req = {
-    user: { id: 1, role: Role.USER, isVerified: true },
-  } as AuthRequest;
 
   it('Should be defined', async () => {
     expect(controller).toBeDefined();

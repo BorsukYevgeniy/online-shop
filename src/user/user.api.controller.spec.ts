@@ -5,7 +5,6 @@ import { UserService } from './user.service';
 import { TokenService } from '../token/token.service';
 import { Response } from 'express';
 import { ProductService } from '../product/product.service';
-import { AuthRequest } from '../common/types/request.type';
 import { Role } from '../common/enum/role.enum';
 import { Order } from '../common/enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';

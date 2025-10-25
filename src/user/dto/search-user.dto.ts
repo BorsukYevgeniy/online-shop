@@ -5,7 +5,7 @@ import {
   MinLength,
   IsDate,
 } from 'class-validator';
-import { Trim } from '../../decorators/validation'
+import { Trim } from '../../common/decorators/validation'
 import { UserDtoErrorMessages as UserDtoErrMsg } from '../constants/user-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';

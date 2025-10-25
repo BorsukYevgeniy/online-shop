@@ -14,7 +14,7 @@ import { Response } from 'express';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
-import { Tokens } from '../token/interface/token.interfaces';
+import { TokenPayload, Tokens } from '../token/interface/token.interfaces';
 import { AuthRequest } from '../common/types/request.type';
 import { AuthGuard } from './guards/jwt-auth.guard';
 import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
@@ -30,6 +30,7 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { User } from '../common/decorators/routes/user.decorator';
 
 @ApiTags('SSR Auth')
 @Controller('auth')
@@ -105,7 +106,7 @@ export class AuthSsrController {
   @Post('logout')
   @UseGuards(AuthGuard)
   async handleLogout(
-    @Req() req: AuthRequest,
+    @Req( ) req: AuthRequest,
     @Res() res: Response,
   ): Promise<void> {
     await this.authService.logout(req.cookies['refreshToken']);
@@ -121,8 +122,8 @@ export class AuthSsrController {
   @ApiCookieAuth('accessToken')
   @Post('logout-all')
   @UseGuards(AuthGuard)
-  async handleLogoutAll(@Req() req: AuthRequest, @Res() res: Response) {
-    await this.authService.logoutAll(req.user.id);
+  async handleLogoutAll(@User() user: TokenPayload, @Res() res: Response) {
+    await this.authService.logoutAll(user.id);
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -161,8 +162,8 @@ export class AuthSsrController {
   @ApiCookieAuth('accessToken')
   @Post('resend-email')
   @UseGuards(AuthGuard)
-  async handleResendEmail(@Req() req: AuthRequest, @Res() res: Response) {
-    await this.authService.resendVerificationMail(req.user.id, 'ssr');
+  async handleResendEmail(@User() user: TokenPayload, @Res() res: Response) {
+    await this.authService.resendVerificationMail(user.id, 'ssr');
 
     res.redirect('/auth/check-your-email');
   }
