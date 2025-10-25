@@ -1,5 +1,5 @@
 import { Category } from '@prisma/client';
-import { SortDto } from '../../dto/sort.dto';
+import { SortDto } from '../../common/dto/sort.dto';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';

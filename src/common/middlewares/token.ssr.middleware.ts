@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { Token } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
-import { TokenService } from '../token/token.service';
-import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
+import { TokenService } from '../../token/token.service';
+import { TokenErrorMessages as TokenErrMsg } from '../../token/enum/token-error-messages.enum';
 
 /**
  * Middleware for updating access token

@@ -15,9 +15,9 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Tokens } from '../token/interface/token.interfaces';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { AuthGuard } from './guards/jwt-auth.guard';
-import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import {
   ApiBadRequestResponse,
   ApiBody,

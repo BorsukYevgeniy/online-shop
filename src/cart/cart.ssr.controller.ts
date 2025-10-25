@@ -12,12 +12,12 @@ import {
 } from '@nestjs/common';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { CartService } from './cart.service';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { Response } from 'express';
-import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   ApiOperation,

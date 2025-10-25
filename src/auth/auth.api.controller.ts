@@ -31,7 +31,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { User } from '../decorators/routes/user.decorator';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 
 @ApiTags('API Auth')
 @Controller('api/auth')

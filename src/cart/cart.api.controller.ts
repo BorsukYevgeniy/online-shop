@@ -10,11 +10,11 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { CartProduct } from './types/cart.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import {

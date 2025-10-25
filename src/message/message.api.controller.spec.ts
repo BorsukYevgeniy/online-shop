@@ -3,10 +3,10 @@ import { MessageApiController } from './message.api.controller';
 import { MessageService } from './message.service';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 
 const req = { user: { id: 1 } } as AuthRequest;
 

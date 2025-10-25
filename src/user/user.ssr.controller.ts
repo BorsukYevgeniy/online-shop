@@ -13,20 +13,20 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { UserService } from './user.service';
 import { ProductService } from '../product/product.service';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { SortProductDto } from '../product/dto/sort-product.dto';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { Response } from 'express';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { SearchUserDto } from './dto/search-user.dto';
 import { SortUserDto } from './dto/sort-user.dto';
 import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
-import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ChatService } from '../chat/chat.service';
 

@@ -17,9 +17,9 @@ import {
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Response } from 'express';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
@@ -35,7 +35,7 @@ import {
   ApiBadRequestResponse,
   ApiQuery,
 } from '@nestjs/swagger';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @ApiTags('SSR Chats')
 @ApiCookieAuth('accessToken')

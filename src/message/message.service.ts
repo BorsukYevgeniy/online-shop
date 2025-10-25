@@ -14,7 +14,7 @@ import { MessageNickname, PaginatedMessages } from './types/message.type';
 import { MessageErrorMessages as MessageErrMsg } from './enum/message-error-messages.enum';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class MessageService {

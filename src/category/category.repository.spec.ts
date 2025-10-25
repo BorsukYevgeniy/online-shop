@@ -3,7 +3,7 @@ import { CategoryRepository } from './category.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Order } from '../enum/order.enum';
+import { Order } from '../common/enum/order.enum';
 import { SearchCategoryDto } from './dto/search-category.dto';
 
 describe('CategoryRepository', () => {

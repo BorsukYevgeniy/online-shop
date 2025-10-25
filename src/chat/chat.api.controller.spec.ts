@@ -3,10 +3,10 @@ import { ChatService } from './chat.service';
 import { ChatApiController } from './chat.api.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TokenService } from '../token/token.service';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { ChatMessages } from './types/chat.types';
 import { NotFoundException } from '@nestjs/common';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 
 describe('ChatApiController', () => {
   let controller: ChatApiController;

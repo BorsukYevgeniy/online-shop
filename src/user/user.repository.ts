@@ -9,7 +9,7 @@ import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 import { SortUserDto } from './dto/sort-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { DeletingCount } from 'src/types/deleting-count.type';
+import { DeletingCount } from 'src/common/types/deleting-count.type';
 
 @Injectable()
 export class UserRepository {

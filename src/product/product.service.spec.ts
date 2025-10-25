@@ -4,7 +4,7 @@ import { ProductRepository } from './product.repository';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
-import { Order } from '../enum/order.enum';
+import { Order } from '../common/enum/order.enum';
 import { SearchProductDto } from './dto/search-product.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Product } from '@prisma/client';

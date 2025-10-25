@@ -13,7 +13,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
 import { Chat } from '@prisma/client';
@@ -40,7 +40,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { User } from '../decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 

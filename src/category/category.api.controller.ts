@@ -16,12 +16,12 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { PaginatedCategory } from './type/category.type';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 

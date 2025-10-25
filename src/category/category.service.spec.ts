@@ -3,7 +3,7 @@ import { CategoryService } from './category.service';
 import { CategoryRepository } from './category.repository';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Order } from '../enum/order.enum';
+import { Order } from '../common/enum/order.enum';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SearchCategoryDto } from './dto/search-category.dto';

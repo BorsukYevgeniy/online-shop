@@ -13,7 +13,7 @@ import {
   PaginatedUserNoCreds,
   UserNoPassword,
 } from './types/user.types';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
 import { SortUserDto } from './dto/sort-user.dto';

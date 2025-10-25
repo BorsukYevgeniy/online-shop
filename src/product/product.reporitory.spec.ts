@@ -1,4 +1,4 @@
-import { Order } from '../enum/order.enum';
+import { Order } from '../common/enum/order.enum';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';

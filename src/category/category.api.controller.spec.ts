@@ -4,7 +4,7 @@ import { CategoryService } from './category.service';
 import { TokenService } from '../token/token.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Order } from '../enum/order.enum';
+import { Order } from '../common/enum/order.enum';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { CacheModule } from '@nestjs/cache-manager';

@@ -1,6 +1,6 @@
 import { Chat } from '@prisma/client';
 import { MessageNickname } from '../../message/types/message.type';
-import { Paginated } from '../../types/pagination.type';
+import { Paginated } from '../../common/types/pagination.type';
 
 /**
  * Represents a chat entry for the current user.

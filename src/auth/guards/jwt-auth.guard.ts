@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { TokenService } from '../../token/token.service';
-import { AuthRequest } from '../../types/request.type';
+import { AuthRequest } from '../../common/types/request.type';
 
 import { TokenErrorMessages as TokenErrMsg } from '../../token/enum/token-error-messages.enum';
 

@@ -11,9 +11,9 @@ import { Token, User } from '@prisma/client';
 import { TokenService } from '../token/token.service';
 import { Tokens } from '../token/interface/token.interfaces';
 import { UserNoCred, UserNoPassword } from '../user/types/user.types';
-import { DeletingCount } from '../types/deleting-count.type';
+import { DeletingCount } from '../common/types/deleting-count.type';
 import { LoginUserDto } from './dto/login-user.dto';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '../config/config.service';
 

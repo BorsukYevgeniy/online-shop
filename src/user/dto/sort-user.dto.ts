@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 import { IsString, IsOptional, IsEnum } from 'class-validator';
-import { SortDto } from '../../dto/sort.dto';
+import { SortDto } from '../../common/dto/sort.dto';
 
 import { UserDtoErrorMessages as UserDtoErrMsg } from '../constants/user-dto-error-messages.enum';
 

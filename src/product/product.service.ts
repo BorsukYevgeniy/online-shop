@@ -8,7 +8,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
-import { PaginationDto } from 'src/dto/pagination.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';

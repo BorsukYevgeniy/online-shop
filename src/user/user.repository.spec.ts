@@ -1,8 +1,8 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRepository } from './user.repository';
 import { TestingModule, Test } from '@nestjs/testing';
-import { Role } from '../enum/role.enum';
-import { Order } from '../enum/order.enum';
+import { Role } from '../common/enum/role.enum';
+import { Order } from '../common/enum/order.enum';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserNoPasswordVLink } from './types/user.types';

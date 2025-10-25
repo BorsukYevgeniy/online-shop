@@ -3,8 +3,8 @@ import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Role } from '../enum/role.enum';
-import { Order } from '../enum/order.enum';
+import { Role } from '../common/enum/role.enum';
+import { Order } from '../common/enum/order.enum';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserNoCred, UserNoPassword } from './types/user.types';
 

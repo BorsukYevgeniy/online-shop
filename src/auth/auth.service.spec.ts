@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '../config/config.service';
 import { Token, User } from '@prisma/client';

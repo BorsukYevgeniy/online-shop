@@ -11,7 +11,7 @@ import { MessageService } from '../message/message.service';
 import { TokenService } from '../token/token.service';
 import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SendMessageDto } from '../message/dto/send-message.dto';
-import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { UpdateMessageGatewayDto } from '../message/dto/update-message-gateway.dto';
 import { DeleteMessageGatewayDto } from '../message/dto/delete-message-gateway.dto';
 import { TokenPayload } from '../token/interface/token.interfaces';

@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { Paginated } from '../../types/pagination.type';
+import { Paginated } from '../../common/types/pagination.type';
 
 /**
  * Represents a user without the `verificationLink` field for security reasons.

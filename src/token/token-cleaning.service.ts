@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { TokenRepository } from './token.repository';
-import { DeletingCount } from 'src/types/deleting-count.type';
+import { DeletingCount } from 'src/common/types/deleting-count.type';
 
 @Injectable()
 export class TokenCleaningService {

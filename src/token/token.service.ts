@@ -10,7 +10,7 @@ import { ConfigService } from '../config/config.service';
 
 import { Token } from '@prisma/client';
 import { TokenPayload, Tokens } from './interface/token.interfaces';
-import { DeletingCount } from '../types/deleting-count.type';
+import { DeletingCount } from '../common/types/deleting-count.type';
 
 import { TokenErrorMessages as TokenErrMsg } from './enum/token-error-messages.enum';
 

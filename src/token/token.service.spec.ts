@@ -3,7 +3,7 @@ import { TokenService } from './token.service';
 import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '../config/config.service';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { Token } from '@prisma/client';
 
 describe('TokenService', () => {

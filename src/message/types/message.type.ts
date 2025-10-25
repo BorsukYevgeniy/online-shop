@@ -1,5 +1,5 @@
 import { Message } from '@prisma/client';
-import { Paginated } from '../../types/pagination.type';
+import { Paginated } from '../../common/types/pagination.type';
 
 /**
  * Represents message type with nickname fields

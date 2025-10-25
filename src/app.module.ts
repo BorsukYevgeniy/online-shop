@@ -15,11 +15,11 @@ import { MessageModule } from './message/message.module';
 import { join as joinPath } from 'path';
 import { CategoryModule } from './category/category.module';
 
-import { LoggerMiddleware } from './middlewares/logger.middleware';
-import { TokenSsrMiddleware } from './middlewares/token.ssr.middleware';
+import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { TokenSsrMiddleware } from './common/middlewares/token.ssr.middleware';
 
 import { AppSsrController } from './app.ssr.controller';
-import { IsAuthorizedMiddleware } from './middlewares/is-authorized.middleware';
+import { IsAuthorizedMiddleware } from './common/middlewares/is-authorized.middleware';
 
 import { CacheModule } from '@nestjs/cache-manager';
 

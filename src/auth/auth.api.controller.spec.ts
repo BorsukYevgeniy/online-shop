@@ -3,12 +3,12 @@ import { AuthApiController } from './auth.api.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Response } from 'express';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { TokenService } from '../token/token.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Token } from '@prisma/client';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 
 describe('AuthApiController', () => {
   let controller: AuthApiController;

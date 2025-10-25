@@ -16,17 +16,17 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { Response } from 'express';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { SsrExceptionFilter } from '../filter/ssr-exception.filter';
+import { SsrExceptionFilter } from '../common/filter/ssr-exception.filter';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   ApiOperation,

@@ -16,18 +16,18 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { Response } from 'express';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import {
   PaginatedUserNoCreds,
   UserNoPasswordVLink,
   UserNoCred,
 } from './types/user.types';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
 import { ProductService } from '../product/product.service';
 import { PaginatedProduct } from '../product/types/product.types';
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { SortUserDto } from './dto/sort-user.dto';
 import { SortProductDto } from '../product/dto/sort-product.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';

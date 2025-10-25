@@ -16,10 +16,10 @@ import {
   PaginatedMessages,
 } from '../message/types/message.type';
 
-import { AuthRequest } from '../types/request.type';
+import { AuthRequest } from '../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 
-import { Role } from '../enum/role.enum';
+import { Role } from '../common/enum/role.enum';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
@@ -34,7 +34,7 @@ import {
   ApiCookieAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { User } from '../decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
 

@@ -16,7 +16,7 @@ import { Message } from '@prisma/client';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageNickname } from './types/message.type';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { AuthRequest } from 'src/types/request.type';
+import { AuthRequest } from 'src/common/types/request.type';
 import { TokenPayload } from '../../dist/token/interface/token.interfaces';
 
 import {

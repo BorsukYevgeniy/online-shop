@@ -3,8 +3,8 @@ import { CartService } from './cart.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { Product } from '@prisma/client';
 import { CartApiController } from './cart.api.controller';
-import { Role } from '../enum/role.enum';
-import { AuthRequest } from '../types/request.type';
+import { Role } from '../common/enum/role.enum';
+import { AuthRequest } from '../common/types/request.type';
 import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
 

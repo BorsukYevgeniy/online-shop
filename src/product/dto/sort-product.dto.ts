@@ -1,5 +1,5 @@
 import { Product } from '@prisma/client';
-import { SortDto } from '../../dto/sort.dto';
+import { SortDto } from '../../common/dto/sort.dto';
 import { IsOptional, IsString, IsEnum } from 'class-validator';
 
 import { ProductDtoErrorMessages as ProductDtoErrMsg } from '../enum/product-dto-error-messages.enum';
