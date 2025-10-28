@@ -1,10 +1,10 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { CartModule } from '../src/cart/cart.module';
+import { CartModule } from '../src/modules/cart/cart.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TestingModule, Test } from '@nestjs/testing';
-import { AuthModule } from '../src/auth/auth.module';
-import { PrismaService } from '../src/prisma/prisma.service';
+import { AuthModule } from '../src/modules/auth/auth.module';
+import { PrismaService } from '../src/modules/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import * as request from 'supertest';
 import { CacheModule } from '@nestjs/cache-manager';

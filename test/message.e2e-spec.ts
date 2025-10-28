@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as request from 'supertest';
-import { AuthModule } from '../src/auth/auth.module';
+import { AuthModule } from '../src/modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from '../src/prisma/prisma.service';
+import { PrismaService } from '../src/modules/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
@@ -12,7 +12,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
 
 import { hash } from 'bcryptjs';
-import { MessageModule } from '../src/message/message.module';
+import { MessageModule } from '../src/modules/message/message.module';
 
 describe('MessageApiController (e2e)', () => {
   let app: NestExpressApplication;

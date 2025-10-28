@@ -1,19 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as request from 'supertest';
-import { AuthModule } from '../src/auth/auth.module';
+import { AuthModule } from '../src/modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from '../src/prisma/prisma.service';
+import { PrismaService } from '../src/modules/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import Keyv from 'keyv';
-import { ChatModule } from '../src/chat/chat.module';
+import { ChatModule } from '../src/modules/chat/chat.module';
 
 import { hash } from 'bcryptjs';
-import { CreateChatDto } from '../src/chat/dto/create-chat.dto';
+import { CreateChatDto } from '../src/modules/chat/dto/create-chat.dto';
 
 describe('ChatApiController (e2e)', () => {
   let app: NestExpressApplication;

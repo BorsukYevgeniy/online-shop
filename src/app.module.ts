@@ -1,31 +1,30 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
-import { UserModule } from './user/user.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { ProductModule } from './product/product.module';
-import { AuthModule } from './auth/auth.module';
-import { FileModule } from './file/file.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { TokenModule } from './token/token.module';
+import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
-import { CartModule } from './cart/cart.module';
-import { ChatModule } from './chat/chat.module';
-import { MessageModule } from './message/message.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { AuthModule } from './modules/auth/auth.module';
+import { CartModule } from './modules/cart/cart.module';
+import { CategoryModule } from './modules/category/category.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { ConfigModule } from './modules/config/config.module';
+import { ConfigService } from './modules/config/config.service';
+import { ErrorModule } from './modules/error/error.module';
+import { FileModule } from './modules/file/file.module';
+import { MessageModule } from './modules/message/message.module';
+import { PrismaModule } from './modules/prisma/prisma.module';
+import { ProductModule } from './modules/product/product.module';
+import { TokenModule } from './modules/token/token.module';
+import { UserModule } from './modules/user/user.module';
 
 import { join as joinPath } from 'path';
-import { CategoryModule } from './category/category.module';
 
+import { IsAuthorizedMiddleware } from './common/middlewares/is-authorized.middleware';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { TokenSsrMiddleware } from './common/middlewares/token.ssr.middleware';
 
 import { AppSsrController } from './app.ssr.controller';
-import { IsAuthorizedMiddleware } from './common/middlewares/is-authorized.middleware';
 
-import { CacheModule } from '@nestjs/cache-manager';
-
-import { ErrorModule } from './error/error.module';
-import { ConfigModule } from './config/config.module';
-import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [

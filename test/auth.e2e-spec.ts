@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as request from 'supertest';
-import { AuthModule } from '../src/auth/auth.module';
+import { AuthModule } from '../src/modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from '../src/prisma/prisma.service';
+import { PrismaService } from '../src/modules/prisma/prisma.service';
 import * as cookieParser from 'cookie-parser';
-import { CreateUserDto } from '../src/user/dto/create-user.dto';
+import { CreateUserDto } from '../src/modules/user/dto/create-user.dto';
 import { ValidationPipe } from '@nestjs/common';
-import { LoginUserDto } from '../src/auth/dto/login-user.dto';
+import { LoginUserDto } from '../src/modules/auth/dto/login-user.dto';
 import { join } from 'path';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
