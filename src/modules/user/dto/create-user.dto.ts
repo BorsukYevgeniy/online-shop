@@ -1,13 +1,6 @@
-import {
-  IsEmail,
-  IsString,
-  IsNotEmpty,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
-import { Trim } from '../../../common/decorators/validation'
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { Trim } from '../../../common/decorators/validation';
 
-import { AuthDtoErrorMessages as AuthDtoErrMsg } from 'src/modules/auth/enum/auth-dto-error-messages.enum';
 import { UserDtoErrorMessages as UserDtoErrMsg } from '../constants/user-dto-error-messages.enum';
 
 import { ApiProperty } from '@nestjs/swagger';
@@ -21,7 +14,7 @@ export class CreateUserDto {
   })
   @IsNotEmpty()
   @Trim()
-  @IsEmail({}, { message: AuthDtoErrMsg.InvalidEmail })
+  @IsEmail({}, { message: UserDtoErrMsg.InvalidEmail })
   readonly email: string;
 
   @ApiProperty({
@@ -33,8 +26,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @Trim()
-  @MinLength(3, { message: UserDtoErrMsg.InvalidNickname })
-  @MaxLength(15, { message: UserDtoErrMsg.InvalidNickname })
+  @Length(3, 15, { message: UserDtoErrMsg.InvalidNickname })
   readonly nickname: string;
 
   @ApiProperty({
@@ -46,7 +38,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @Trim()
-  @MinLength(6, { message: AuthDtoErrMsg.InvalidPassword })
-  @MaxLength(20, { message: AuthDtoErrMsg.InvalidPassword })
+  @Length(6, 20, { message: UserDtoErrMsg.InvalidPassword })
   readonly password: string;
 }

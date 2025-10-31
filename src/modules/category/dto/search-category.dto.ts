@@ -1,19 +1,6 @@
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
-import { ApiProperty } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
+import { CreateCategoryDto } from './create-category.dto';
 
-export class SearchCategoryDto {
-  @ApiProperty({
-    type: String,
-    required: false,
-    minLength: 3,
-    maxLength: 50,
-    description: 'Name of category',
-    example: 'Electronics',
-  })
-  @IsOptional()
-  @IsString()
-  @MinLength(3, { message: CategoryDtoErrMsg.InvalidName })
-  @MaxLength(50, { message: CategoryDtoErrMsg.InvalidName })
-  name?: string;
-}
+export class SearchCategoryDto extends PartialType(
+  OmitType(CreateCategoryDto, ['description']),
+) {}

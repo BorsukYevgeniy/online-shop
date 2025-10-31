@@ -1,3 +1,4 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -10,28 +11,26 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { MessageService } from './message.service';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { Message } from '@prisma/client';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { TokenPayload } from '../token/interface/token.interfaces';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { MessageService } from './message.service';
 import { MessageNickname } from './types/message.type';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { TokenPayload } from '../../../dist/token/interface/token.interfaces';
 
 import {
-  ApiTags,
-  ApiCookieAuth,
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiNotFoundResponse,
-  ApiParam,
   ApiBody,
+  ApiCookieAuth,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { User } from '../../common/decorators/routes/user.decorator';
-
 
 @ApiTags('API Messages')
 @ApiCookieAuth('accessToken')
@@ -50,7 +49,7 @@ export class MessageApiController {
   @UseInterceptors(CacheInterceptor)
   async getMessageById(
     @Param('messageId', ParseIntPipe) messageId: number,
-@User() user: TokenPayload,
+    @User() user: TokenPayload,
   ): Promise<Message> {
     return await this.messageService.getMessageById(messageId, user.id);
   }
@@ -64,7 +63,7 @@ export class MessageApiController {
   @ApiBody({ type: UpdateMessageDto })
   @Patch(':messageId')
   async updateMessage(
-@User() user: TokenPayload,
+    @User() user: TokenPayload,
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() updateDto: UpdateMessageDto,
   ): Promise<MessageNickname> {
@@ -84,7 +83,7 @@ export class MessageApiController {
   @Delete(':messageId')
   @HttpCode(204)
   async deleteMessage(
-@User() user: TokenPayload,
+    @User() user: TokenPayload,
     @Param('messageId', ParseIntPipe) messageId: number,
   ): Promise<void> {
     await this.messageService.deleteMessage(messageId, user.id);

@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
-import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { CategoryDtoErrorMessages as CategoryDtoErrMsg } from '../enum/category-dto-error-messages.enum';
 
 export class CreateCategoryDto {
   @ApiProperty({
@@ -13,8 +13,7 @@ export class CreateCategoryDto {
   })
   @IsNotEmpty()
   @IsString()
-  @MinLength(3, { message: CategoryDtoErrMsg.InvalidName })
-  @MaxLength(50, { message: CategoryDtoErrMsg.InvalidName })
+  @Length(3, 50, { message: CategoryDtoErrMsg.InvalidName })
   name: string;
 
   @ApiProperty({
@@ -27,7 +26,6 @@ export class CreateCategoryDto {
   })
   @IsNotEmpty()
   @IsString()
-  @MinLength(10, { message: CategoryDtoErrMsg.InvalidDescription })
-  @MaxLength(150, { message: CategoryDtoErrMsg.InvalidDescription })
+  @Length(10, 150, { message: CategoryDtoErrMsg.InvalidDescription })
   description: string;
 }

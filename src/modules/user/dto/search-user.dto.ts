@@ -1,29 +1,12 @@
-import {
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-  IsDate,
-} from 'class-validator';
-import { Trim } from '../../../common/decorators/validation'
-import { UserDtoErrorMessages as UserDtoErrMsg } from '../constants/user-dto-error-messages.enum';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsDate, IsOptional } from 'class-validator';
+import { UserDtoErrorMessages as UserDtoErrMsg } from '../constants/user-dto-error-messages.enum';
+import { CreateUserDto } from './create-user.dto';
 
-export class SearchUserDto {
-  @ApiProperty({
-    type: String,
-    required: false,
-    description: 'Nickname of searched user',
-    example: 'Nickname228',
-  })
-  @IsOptional()
-  @IsString()
-  @Trim()
-  @MinLength(3, { message: UserDtoErrMsg.InvalidNickname })
-  @MaxLength(15, { message: UserDtoErrMsg.InvalidNickname })
-  readonly nickname?: string;
-
+export class SearchUserDto extends PartialType(
+  OmitType(CreateUserDto, ['email', 'password']),
+) {
   @ApiProperty({
     type: Date,
     required: false,
