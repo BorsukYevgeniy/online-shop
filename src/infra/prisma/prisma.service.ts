@@ -4,15 +4,25 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { PrismaClientInitializationError } from '@prisma/client/runtime/library';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClientInitializationError } from '@prisma/client/runtime/client';
+import { PrismaClient } from '../../../generated/prisma/client';
+import { ConfigService } from '../../modules/config/config.service';
 
 @Injectable()
 export class PrismaService
   extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
+  implements OnModuleDestroy, OnModuleInit
 {
-  private readonly logger: Logger = new Logger(PrismaService.name);
+  private readonly logger = new Logger(PrismaService.name);
+
+  constructor(private readonly configService: ConfigService) {
+    super({
+      adapter: new PrismaPg({
+        connectionString: configService.DATABASE_URL,
+      }),
+    });
+  }
 
   async onModuleInit(): Promise<void> {
     try {
@@ -24,7 +34,8 @@ export class PrismaService
         this.logger.fatal('Error connecting to database: ' + e.message);
       } else {
         this.logger.fatal(
-          'Unexpected error connecting to database: ' + e.stack,
+          'Unexpected error connecting to database: ' +
+            (e as PrismaClientInitializationError).stack,
         );
       }
       throw e;

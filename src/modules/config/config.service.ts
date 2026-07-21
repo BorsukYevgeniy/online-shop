@@ -38,7 +38,7 @@ export class ConfigService {
   }
 
   get SMTP_USER() {
-      return this.nestConfigService.get('SMTP_USER')
+    return this.nestConfigService.get('SMTP_USER');
   }
 
   get APP_URL(): string {
@@ -48,7 +48,7 @@ export class ConfigService {
   get REDIS_CONFIG() {
     return {
       stores: new Keyv({
-        store: new KeyvRedis({ url: this.nestConfigService.get('REDIS_URL') }),
+        store: new KeyvRedis(this.nestConfigService.get('REDIS_URL')),
         namespace: '',
         useKeyPrefix: false,
       }),
@@ -56,4 +56,7 @@ export class ConfigService {
     };
   }
 
+  get DATABASE_URL(): string {
+    return this.nestConfigService.get('DATABASE_URL');
+  }
 }
