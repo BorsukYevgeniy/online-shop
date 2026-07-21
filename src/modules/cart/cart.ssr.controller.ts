@@ -1,34 +1,34 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Controller,
-  Get,
-  Post,
-  UseGuards,
-  Render,
-  Param,
-  Res,
   Delete,
+  Get,
+  Param,
+  Post,
+  Render,
+  Res,
   UseFilters,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-import { CartService } from './cart.service';
+import {
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Response } from 'express';
+import { User } from '../../common/decorators/routes/user.decorator';
+import { Role } from '../../common/enum/role.enum';
 import { SsrExceptionFilter } from '../../common/filter/ssr-exception.filter';
 import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { Role } from '../../common/enum/role.enum';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import {
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiParam,
-  ApiTags,
-  ApiCookieAuth,
-} from '@nestjs/swagger';
-import { User } from '../../common/decorators/routes/user.decorator';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { TokenPayload } from '../token/interface/token.interfaces';
+import { CartService } from './cart.service';
 
 @ApiTags('SSR Carts')
 @ApiCookieAuth('accessToken')
@@ -49,9 +49,7 @@ export class CartSsrController {
   @UseGuards(RolesGuard)
   @UseInterceptors(CacheInterceptor)
   async getCartByIdPage(@Param('cartId') cartId: number) {
-    const cart = await this.cartService.getCart(cartId);
-
-    return cart;
+    return await this.cartService.getCart(cartId);
   }
 
   @ApiOperation({ summary: 'Get my cart' })
@@ -62,9 +60,9 @@ export class CartSsrController {
   @Render('cart/my-cart')
   @UseInterceptors(CacheInterceptor)
   async getMyCart(@User() user: TokenPayload) {
-    const cart = await this.cartService.getMyCart(user.id);
+    const { products } = await this.cartService.getMyCart(user.id);
 
-    return { products: cart.products };
+    return { products };
   }
 
   @ApiOperation({ summary: 'Add product to cart' })

@@ -1,15 +1,15 @@
 import {
   BadRequestException,
-  NotFoundException,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { CartProduct } from './types/cart.type';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-import { CartErrorMessages as CartErrMsg } from './enum/cart-error-messages.enum';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { ProductErrorMessages as ProductErrMsg } from '../product/enum/product-error-messages.enum';
+import { CartErrorMessages as CartErrMsg } from './enum/cart-error-messages.enum';
 
 @Injectable()
 export class CartService {

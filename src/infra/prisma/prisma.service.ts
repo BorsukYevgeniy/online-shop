@@ -16,7 +16,7 @@ export class PrismaService
 {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(configService: ConfigService) {
     super({
       adapter: new PrismaPg({
         connectionString: configService.DATABASE_URL,

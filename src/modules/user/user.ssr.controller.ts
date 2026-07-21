@@ -1,52 +1,40 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
   Render,
   Res,
+  UseFilters,
   UseGuards,
   UseInterceptors,
-  Param,
-  Query,
-  Delete,
-  Patch,
-  UseFilters,
-  ParseIntPipe,
 } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserService } from './user.service';
-import { ProductService } from '../product/product.service';
-import { PaginationDto } from '../../common/dto/pagination.dto';
-import { SortProductDto } from '../product/dto/sort-product.dto';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { Response } from 'express';
-import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 import { Role } from '../../common/enum/role.enum';
+import { SsrExceptionFilter } from '../../common/filter/ssr-exception.filter';
+import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
+import { AuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles-auth.guard';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { ChatService } from '../chat/chat.service';
+import { SortProductDto } from '../product/dto/sort-product.dto';
+import { ProductService } from '../product/product.service';
 import { SearchUserDto } from './dto/search-user.dto';
 import { SortUserDto } from './dto/sort-user.dto';
 import { ValidateUserFilterPipe } from './pipe/validate-user-filter.pipe';
-import { SsrExceptionFilter } from '../../common/filter/ssr-exception.filter';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { ChatService } from '../chat/chat.service';
+import { UserService } from './user.service';
 
-import {
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiQuery,
-  ApiParam,
-  ApiNotFoundResponse,
-  ApiForbiddenResponse,
-  ApiNoContentResponse,
-  ApiTags,
-  ApiCookieAuth,
-  ApiBadRequestResponse,
-} from '@nestjs/swagger';
 import { User } from '../../common/decorators/routes/user.decorator';
 import { TokenPayload } from '../token/interface/token.interfaces';
+import { UserSsrRoutesDocs } from './docs/ssr/user-ssr-routes-docs';
+import { UserSsrControllerDocs } from './docs/ssr/users-ssr-controller-docs.decorator';
 
-@ApiTags('SSR Users')
-@ApiCookieAuth('accessToken')
+@UserSsrControllerDocs()
 @Controller('users')
 @UseGuards(AuthGuard)
 @UseFilters(SsrExceptionFilter)
@@ -57,12 +45,7 @@ export class UserSsrController {
     private readonly chatService: ChatService,
   ) {}
 
-  @ApiOperation({ summary: 'Getting all users' })
-  @ApiOkResponse({ description: 'Users fetched' })
-  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiQuery({ type: PaginationDto })
-  @ApiQuery({ type: SortUserDto })
+  @UserSsrRoutesDocs.GetAll()
   @Get()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -84,14 +67,7 @@ export class UserSsrController {
       ...sortDto,
     };
   }
-
-  @ApiOperation({ summary: 'Searching users' })
-  @ApiOkResponse({ description: 'Users fetched' })
-  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiQuery({ type: PaginationDto })
-  @ApiQuery({ type: SearchUserDto })
-  @ApiQuery({ type: SortUserDto })
+  @UserSsrRoutesDocs.Search()
   @Get('search')
   @Render('users/search-user')
   @UseInterceptors(CacheInterceptor)
@@ -112,22 +88,14 @@ export class UserSsrController {
       ...sortDto,
     };
   }
-
-  @ApiOperation({ summary: 'Getting my account' })
-  @ApiOkResponse({ description: 'User fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @UserSsrRoutesDocs.GetMe()
   @Get('me')
   @Render('users/user-account')
   @UseInterceptors(CacheInterceptor)
   async getUserAccountPage(@User() user: TokenPayload) {
     return await this.userService.getMe(user.id);
   }
-
-  @ApiOperation({ summary: 'Getting user by id' })
-  @ApiOkResponse({ description: 'Users fetched' })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiParam({ name: 'userId', type: Number })
+  @UserSsrRoutesDocs.GetById()
   @Get(':userId')
   @Render('users/get-user-by-id')
   @UseInterceptors(CacheInterceptor)
@@ -152,13 +120,7 @@ export class UserSsrController {
       chatId: chatBeetweenUsers?.id,
     };
   }
-
-  @ApiOperation({ summary: 'Getting product of user by id' })
-  @ApiOkResponse({ description: 'Users fetched' })
-  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiParam({ name: 'userId', type: Number })
+  @UserSsrRoutesDocs.GetUserProducts()
   @Get(':userId/products')
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(CacheInterceptor)
@@ -182,12 +144,7 @@ export class UserSsrController {
     };
   }
 
-  @ApiOperation({ summary: 'Assinging admin by user id' })
-  @ApiOkResponse({ description: 'Admin assigned' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Forbidden resource' })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiParam({ name: 'userId', type: Number })
+  @UserSsrRoutesDocs.HandleAssignAdmin()
   @Patch('assing-admin/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -199,11 +156,7 @@ export class UserSsrController {
 
     res.redirect(`/users/${userId}`);
   }
-
-  @ApiOperation({ summary: 'Deleting user by id as ownership of account' })
-  @ApiNoContentResponse({ description: 'User deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @Delete('me')
+  @UserSsrRoutesDocs.HandleDeleteMe()
   @Delete('delete/me')
   async handleDeleteUserByHimself(
     @User() user: TokenPayload,
@@ -216,11 +169,7 @@ export class UserSsrController {
 
     return res.redirect('/');
   }
-
-  @ApiOperation({ summary: 'Deleting user by id as admin' })
-  @ApiNoContentResponse({ description: 'User deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @Delete('me')
+  @UserSsrRoutesDocs.HandleDeleteById()
   @Delete('delete/:userId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
