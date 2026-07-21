@@ -11,7 +11,7 @@ import { SortUserDto } from '../../dto/sort-user.dto';
 
 import {
   ApiAdminForbiddenResponseDocs,
-  ApiVerifiedForbidden,
+  ApiVerifiedForbiddenResponseDocs,
 } from '../../../../common/decorators/docs/auth';
 import { ApiUserIdParamDocs, ApiUserNotFoundResponseDocs } from '../shared';
 
@@ -47,7 +47,7 @@ export class UserApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Getting product of user by id' }),
       ApiOkResponse({ description: 'Users fetched' }),
-      ApiVerifiedForbidden(),
+      ApiVerifiedForbiddenResponseDocs(),
       ApiUserNotFoundResponseDocs(),
       ApiUserIdParamDocs(),
     );

@@ -11,15 +11,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  ApiCookieAuth,
-  ApiForbiddenResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 import { Response } from 'express';
 import { User } from '../../common/decorators/routes/user.decorator';
 import { Role } from '../../common/enum/role.enum';
@@ -29,20 +20,16 @@ import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
 import { TokenPayload } from '../token/interface/token.interfaces';
 import { CartService } from './cart.service';
+import { CartSsrControllerDocs, CartSsrRoutesDocs } from './docs/ssr';
 
-@ApiTags('SSR Carts')
-@ApiCookieAuth('accessToken')
+@CartSsrControllerDocs()
 @Controller('cart')
 @UseGuards(VerifiedUserGuard)
 @UseFilters(SsrExceptionFilter)
 export class CartSsrController {
   constructor(private readonly cartService: CartService) {}
 
-  @ApiOperation({ summary: 'Get cart by id' })
-  @ApiOkResponse({ description: 'Cart fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiParam({ name: 'cartId', type: Number })
+  @CartSsrRoutesDocs.GetCartById()
   @Get(':cartId')
   @Render('cart/get-cart-by-id')
   @RequieredRoles(Role.ADMIN)
@@ -52,10 +39,7 @@ export class CartSsrController {
     return await this.cartService.getCart(cartId);
   }
 
-  @ApiOperation({ summary: 'Get my cart' })
-  @ApiOkResponse({ description: 'Cart fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @CartSsrRoutesDocs.GetMyCart()
   @Get()
   @Render('cart/my-cart')
   @UseInterceptors(CacheInterceptor)
@@ -65,11 +49,7 @@ export class CartSsrController {
     return { products };
   }
 
-  @ApiOperation({ summary: 'Add product to cart' })
-  @ApiOkResponse({ description: 'Product added' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiParam({ name: 'productId', type: Number })
+  @CartSsrRoutesDocs.AddToCart()
   @Post('products/:productId')
   async handleAddToCart(
     @Param('productId') productId: number,
@@ -81,11 +61,7 @@ export class CartSsrController {
     res.redirect(`/products/${productId}`);
   }
 
-  @ApiOperation({ summary: 'Remove product from cart' })
-  @ApiOkResponse({ description: 'Product added' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiParam({ name: 'productId', type: Number })
+  @CartSsrRoutesDocs.RemoveFromCart()
   @Delete('products/:productId')
   async handleDeleteCart(
     @Param('productId') productId: number,
@@ -97,10 +73,7 @@ export class CartSsrController {
     res.redirect(`/cart`);
   }
 
-  @ApiOperation({ summary: 'Clear cart' })
-  @ApiOkResponse({ description: 'Cart cleared' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
+  @CartSsrRoutesDocs.ClearCart()
   @Delete('products')
   async handleClearCart(@User() user: TokenPayload, @Res() res: Response) {
     await this.cartService.clearCart(user.id);
