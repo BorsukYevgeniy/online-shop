@@ -29,44 +29,22 @@ export class AuthApiController {
 
   @AuthApiRoutesDocs.Register()
   @Post('register')
-  async registration(
+  async register(
     @Res() res: Response,
     @Body() dto: CreateUserDto,
   ): Promise<void> {
-    const { accessToken, refreshToken }: Tokens =
-      await this.authService.register(dto);
+    const tokens: Tokens = await this.authService.register(dto);
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 1000, // 1 hour
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    res.send('Registered succesfully');
+    this.setTokenCookie(res, tokens, 201, 'Registered successfully');
   }
 
   @AuthApiRoutesDocs.Login()
   @Post('login')
   @HttpCode(200)
   async login(@Body() dto: LoginUserDto, @Res() res: Response): Promise<void> {
-    const { accessToken, refreshToken }: Tokens =
-      await this.authService.login(dto);
+    const tokens: Tokens = await this.authService.login(dto);
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 1000, // 1 hour
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    res.send('Loggined succesfully');
+    this.setTokenCookie(res, tokens, 200, 'Loggined succesfully');
   }
 
   @AuthApiRoutesDocs.Logout()
@@ -76,10 +54,7 @@ export class AuthApiController {
   async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
     await this.authService.logout(req.cookies['refreshToken']);
 
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-
-    res.sendStatus(204);
+    this.clearTokenCookie(res);
   }
 
   @AuthApiRoutesDocs.LogoutAll()
@@ -89,10 +64,7 @@ export class AuthApiController {
   async logoutAll(@User() user: TokenPayload, @Res() res: Response) {
     await this.authService.logoutAll(user.id);
 
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-
-    res.sendStatus(204);
+    this.clearTokenCookie(res);
   }
 
   @AuthApiRoutesDocs.Refresh()
@@ -107,16 +79,7 @@ export class AuthApiController {
 
     const newTokens: Tokens = await this.authService.refreshToken(refreshToken);
 
-    res.cookie('accessToken', newTokens.accessToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 1000, // 1 hour
-    });
-    res.cookie('refreshToken', newTokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    res.send({ message: 'Token refreshed' });
+    this.setTokenCookie(res, newTokens, 200, 'Token refreshed');
   }
 
   @AuthApiRoutesDocs.Verify()
@@ -134,5 +97,30 @@ export class AuthApiController {
   @HttpCode(204)
   async resendEmail(@User() user: TokenPayload) {
     return await this.authService.resendVerificationMail(user.id);
+  }
+
+  private setTokenCookie(
+    res: Response,
+    tokens: Tokens,
+    status: 200 | 201 = 200,
+    message: string,
+  ) {
+    const { accessToken, refreshToken } = tokens;
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    res.send({ message }).status(status).end();
+  }
+
+  private clearTokenCookie(res: Response) {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken').status(204).end();
   }
 }
