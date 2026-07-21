@@ -8,8 +8,12 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-// import { AuthCookiesDocs } from '../../../../common/decorators/docs/auth';
+import {
+  ApiUnauthorizedResponseDocs,
+  AuthCookiesDocs,
+} from '../../../../common/decorators/docs/auth';
 import { CreateUserDto } from '../../../user/dto/create-user.dto';
 import { LoginUserDto } from '../../dto/login-user.dto';
 
@@ -19,8 +23,7 @@ export class AuthApiRoutesDocs {
       ApiOperation({ summary: 'Register user' }),
       ApiCreatedResponse({ description: 'User registered' }),
       ApiBadRequestResponse({
-        description:
-          'Invalid request body or user with same creadentials alredy exists',
+        description: 'User with same creadentials alredy exists',
       }),
       ApiBody({ type: CreateUserDto }),
     );
@@ -38,16 +41,19 @@ export class AuthApiRoutesDocs {
 
   static Logout() {
     return applyDecorators(
-      // AuthCookiesDocs(),
+      AuthCookiesDocs(),
       ApiOperation({ summary: 'Logout user' }),
       ApiNoContentResponse({ description: 'User logouted' }),
+      ApiUnauthorizedResponseDocs(),
     );
   }
+
   static LogoutAll() {
     return applyDecorators(
       ApiOperation({ summary: 'Logout user in all devices' }),
       ApiNoContentResponse({ description: 'User logouted' }),
-      // AuthCookiesDocs(),
+      AuthCookiesDocs(),
+      ApiUnauthorizedResponseDocs(),
     );
   }
 
@@ -55,7 +61,7 @@ export class AuthApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Refresh pair of tokens' }),
       ApiOkResponse({ description: 'Tokens refreshed' }),
-      ApiBadRequestResponse({ description: 'Refresh token not found' }),
+      ApiUnauthorizedResponse({ description: 'Refresh token not found' }),
     );
   }
 
@@ -73,7 +79,8 @@ export class AuthApiRoutesDocs {
       ApiOperation({ summary: 'Resend verification email' }),
       ApiNoContentResponse({ description: 'Email sended' }),
       ApiBadRequestResponse({ description: 'User already verified' }),
-      // AuthCookiesDocs(),
+      AuthCookiesDocs(),
+      ApiUnauthorizedResponseDocs(),
     );
   }
 }

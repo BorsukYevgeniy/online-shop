@@ -113,7 +113,7 @@ export class AuthSsrController {
     return { link };
   }
 
-  @AuthSsrRoutesDocs.HandleVerifyUser()
+  @AuthSsrRoutesDocs.HandleVerify()
   @Post('verify/:link')
   async verifyUser(@Res() res: Response, @Param('link') link: string) {
     await this.authService.verifyUser(link);

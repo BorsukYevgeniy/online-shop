@@ -70,6 +70,7 @@ export class AuthApiController {
   }
 
   @AuthApiRoutesDocs.Logout()
+  @UseGuards(AuthGuard)
   @Post('logout')
   @HttpCode(204)
   async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
@@ -82,9 +83,9 @@ export class AuthApiController {
   }
 
   @AuthApiRoutesDocs.LogoutAll()
+  @UseGuards(AuthGuard)
   @Post('logout-all')
   @HttpCode(204)
-  @UseGuards(AuthGuard)
   async logoutAll(@User() user: TokenPayload, @Res() res: Response) {
     await this.authService.logoutAll(user.id);
 
