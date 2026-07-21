@@ -1,50 +1,33 @@
 import {
-  Controller,
-  Post,
-  Body,
-  Res,
   BadRequestException,
-  UseGuards,
+  Body,
+  Controller,
   HttpCode,
   Param,
+  Post,
   Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { TokenPayload, Tokens } from '../token/interface/token.interfaces';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from './guards/jwt-auth.guard';
 
 import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
 
-import {
-  ApiOperation,
-  ApiTags,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiNoContentResponse,
-  ApiNotFoundResponse,
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCookieAuth,
-  ApiParam,
-} from '@nestjs/swagger';
 import { User } from '../../common/decorators/routes/user.decorator';
 import { AuthRequest } from '../../common/types/request.type';
+import { AuthApiControllerDocs, AuthApiRoutesDocs } from './docs/api';
 
-@ApiTags('API Auth')
+@AuthApiControllerDocs()
 @Controller('api/auth')
 export class AuthApiController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: 'Register user' })
-  @ApiCreatedResponse({ description: 'User registered' })
-  @ApiBadRequestResponse({
-    description:
-      'Invalid request body or user with same creadentials alredy exists',
-  })
-  @ApiBody({ type: CreateUserDto })
+  @AuthApiRoutesDocs.Register()
   @Post('register')
   async registration(
     @Res() res: Response,
@@ -66,11 +49,7 @@ export class AuthApiController {
     res.send('Registered succesfully');
   }
 
-  @ApiOperation({ summary: 'Login user' })
-  @ApiOkResponse({ description: 'User loggined' })
-  @ApiBadRequestResponse({ description: 'Invalid request body' })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiBody({ type: LoginUserDto })
+  @AuthApiRoutesDocs.Login()
   @Post('login')
   @HttpCode(200)
   async login(@Body() dto: LoginUserDto, @Res() res: Response): Promise<void> {
@@ -90,8 +69,7 @@ export class AuthApiController {
     res.send('Loggined succesfully');
   }
 
-  @ApiOperation({ summary: 'Logout user' })
-  @ApiNoContentResponse({ description: 'User logouted' })
+  @AuthApiRoutesDocs.Logout()
   @Post('logout')
   @HttpCode(204)
   async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
@@ -103,9 +81,7 @@ export class AuthApiController {
     res.sendStatus(204);
   }
 
-  @ApiOperation({ summary: 'Logout user in all devices' })
-  @ApiNoContentResponse({ description: 'User logouted' })
-  @ApiCookieAuth('accessToken')
+  @AuthApiRoutesDocs.LogoutAll()
   @Post('logout-all')
   @HttpCode(204)
   @UseGuards(AuthGuard)
@@ -118,9 +94,7 @@ export class AuthApiController {
     res.sendStatus(204);
   }
 
-  @ApiOperation({ summary: 'Refresh pair of tokens' })
-  @ApiOkResponse({ description: 'Tokens refreshed' })
-  @ApiBadRequestResponse({ description: 'Refresh token not found' })
+  @AuthApiRoutesDocs.Refresh()
   @Post('refresh')
   @HttpCode(200)
   async refresh(@Req() req: Request, @Res() res: Response): Promise<void> {
@@ -144,11 +118,7 @@ export class AuthApiController {
     res.send({ message: 'Token refreshed' });
   }
 
-  @ApiOperation({ summary: 'Verify user' })
-  @ApiOkResponse({ description: 'User verified' })
-  @ApiBadRequestResponse({ description: 'User already verified' })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiParam({ name: 'link', type: String })
+  @AuthApiRoutesDocs.Verify()
   @Post('verify/:link')
   @HttpCode(200)
   async verify(@Param('link') link: string) {
@@ -157,10 +127,7 @@ export class AuthApiController {
     return { message: 'User verified succesfully' };
   }
 
-  @ApiOperation({ summary: 'Resend verification email' })
-  @ApiNoContentResponse({ description: 'Email sended' })
-  @ApiBadRequestResponse({ description: 'User already verified' })
-  @ApiCookieAuth('accessToken')
+  @AuthApiRoutesDocs.ResendEmail()
   @Post('resend-email')
   @UseGuards(AuthGuard)
   @HttpCode(204)
