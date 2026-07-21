@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../infra/prisma/prisma.module';
-import { ChatMessageModule } from '../chat-message/chat-message.module';
+import { ChatMessageModule } from '../chat/chat-message/chat-message.module';
 import { TokenModule } from '../token/token.module';
 import { MessageApiController } from './message.api.controller';
 import { MessageRepository } from './message.repository';

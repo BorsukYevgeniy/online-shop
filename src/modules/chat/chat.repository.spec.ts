@@ -123,4 +123,12 @@ describe('ChatRepository', () => {
     const result = await repository.deleteChat(1);
     expect(result).toEqual(undefined);
   });
+
+  it('Should get users in chat', async () => {
+    const mockUsers = { users: [{ id: 1 }, { id: 2 }] };
+    jest.spyOn(prisma.chat, 'findUnique').mockResolvedValue(mockUsers as any);
+
+    const result = await repository.getUsersInChat(1);
+    expect(result).toEqual(mockUsers);
+  });
 });

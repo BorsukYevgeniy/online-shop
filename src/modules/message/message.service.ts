@@ -13,7 +13,7 @@ import { MessageNickname, PaginatedMessages } from './types/message.type';
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
-import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { ChatMemberValidationService } from '../chat/chat-message/chat-member-validation.service';
 import { MessageErrorMessages as MessageErrMsg } from './enum/message-error-messages.enum';
 
 @Injectable()

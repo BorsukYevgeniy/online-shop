@@ -1,13 +1,13 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Chat } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { MessageService } from '../message/message.service';
+import { MessageNickname } from '../message/types/message.type';
+import { ChatMemberValidationService } from './chat-message/chat-member-validation.service';
 import { ChatRepository } from './chat.repository';
 import { ChatService } from './chat.service';
-import { Chat } from '@prisma/client';
 import { ChatMessages, UserChat } from './types/chat.types';
-import { NotFoundException } from '@nestjs/common';
-import { MessageNickname } from '../message/types/message.type';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
-import { MessageService } from '../message/message.service';
 
 describe('ChatService', () => {
   let repository: ChatRepository;
@@ -192,5 +192,15 @@ describe('ChatService', () => {
         );
       }
     });
+  });
+
+  it('Should get users in chat', async () => {
+    const mockUsers = { users: [{ id: 1 }, { id: 2 }] };
+    jest
+      .spyOn(repository, 'getUsersInChat')
+      .mockResolvedValue(mockUsers as any);
+
+    const result = await service.getUsersInChat(1);
+    expect(result).toEqual(mockUsers);
   });
 });

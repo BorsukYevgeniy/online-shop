@@ -9,8 +9,8 @@ import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum'
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
-import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 import { MessageService } from '../message/message.service';
+import { ChatMemberValidationService } from './chat-message/chat-member-validation.service';
 
 @Injectable()
 export class ChatService {
@@ -140,5 +140,9 @@ export class ChatService {
         throw new NotFoundException(ChatErrMsg.ChatNotFound);
       }
     }
+  }
+
+  async getUsersInChat(chatId: number) {
+    return this.chatRepository.getUsersInChat(chatId);
   }
 }

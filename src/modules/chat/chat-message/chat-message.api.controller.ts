@@ -1,3 +1,4 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -9,33 +10,30 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { MessageService } from '../message/message.service';
-import { CreateMessageDto } from '../message/dto/create-message.dto';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCookieAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { User } from '../../../common/decorators/routes/user.decorator';
+import { PaginationDto } from '../../../common/dto/pagination.dto';
+import { Role } from '../../../common/enum/role.enum';
+import { RequieredRoles } from '../../auth/decorator/requiered-roles.decorator';
+import { RolesGuard } from '../../auth/guards/roles-auth.guard';
+import { VerifiedUserGuard } from '../../auth/guards/verified-user.guard';
+import { CreateMessageDto } from '../../message/dto/create-message.dto';
+import { MessageService } from '../../message/message.service';
 import {
   MessageNickname,
   PaginatedMessages,
-} from '../message/types/message.type';
-
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-
-import { Role } from '../../common/enum/role.enum';
-import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import {
-  ApiOperation,
-  ApiOkResponse,
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-  ApiUnauthorizedResponse,
-  ApiParam,
-  ApiTags,
-  ApiCookieAuth,
-  ApiBody,
-} from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
-import { User } from '../../common/decorators/routes/user.decorator';
-import { TokenPayload } from '../token/interface/token.interfaces';
+} from '../../message/types/message.type';
+import { TokenPayload } from '../../token/interface/token.interfaces';
 
 @ApiTags('API ChatMessages')
 @ApiCookieAuth('accessToken')

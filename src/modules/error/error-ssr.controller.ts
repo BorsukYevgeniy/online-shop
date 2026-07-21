@@ -1,13 +1,11 @@
-import { Controller, Get, Res, Param, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { ErrorSsrControllerDocs, RenderErrorPageDocs } from './docs/error-docs';
 
-@ApiTags('SSR Errors')
+@ErrorSsrControllerDocs()
 @Controller('errors')
 export class ErrorSsrController {
-  @ApiOperation({ summary: 'Render error page' })
-  @ApiParam({ name: 'errorCode', type: Number })
-  @ApiQuery({ name: 'message', type: String })
+  @RenderErrorPageDocs()
   @Get(':errorCode')
   async getErrorPage(
     @Param('errorCode') errorCode: 400 | 403 | 404 | 500,

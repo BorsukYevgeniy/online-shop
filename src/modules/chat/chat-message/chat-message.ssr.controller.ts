@@ -2,21 +2,16 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Query,
   Render,
   UseFilters,
   UseGuards,
   UseInterceptors,
-  ParseIntPipe,
 } from '@nestjs/common';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { VerifiedUserGuard } from '../../auth/guards/verified-user.guard';
 
-import { Role } from '../../common/enum/role.enum';
-import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { SsrExceptionFilter } from '../../common/filter/ssr-exception.filter';
-import { MessageService } from '../message/message.service';
 import {
   ApiCookieAuth,
   ApiNotFoundResponse,
@@ -26,7 +21,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { PaginationDto } from '../../../common/dto/pagination.dto';
+import { Role } from '../../../common/enum/role.enum';
+import { SsrExceptionFilter } from '../../../common/filter/ssr-exception.filter';
+import { RequieredRoles } from '../../auth/decorator/requiered-roles.decorator';
+import { RolesGuard } from '../../auth/guards/roles-auth.guard';
+import { MessageService } from '../../message/message.service';
 
 @ApiTags('SSR ChatMessages')
 @ApiCookieAuth('accessToken')
