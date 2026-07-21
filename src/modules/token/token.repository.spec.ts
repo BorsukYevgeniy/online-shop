@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TokenRepository } from './token.repository';
-import { PrismaService } from '../prisma/prisma.service';
 import { Token } from '@prisma/client';
+import { PrismaService } from '../../infra/prisma/prisma.service';
+import { TokenRepository } from './token.repository';
 
 describe('TokenRepository', () => {
   let tokensRepository: TokenRepository;

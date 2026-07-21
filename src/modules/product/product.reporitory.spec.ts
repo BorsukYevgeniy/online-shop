@@ -1,10 +1,10 @@
+import { Test } from '@nestjs/testing';
 import { Order } from '../../common/enum/order.enum';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from './product.repository';
-import { Test } from '@nestjs/testing';
-import { SearchProductDto } from './dto/search-product.dto';
 
 describe('ProductRepository', () => {
   let repository: ProductRepository;

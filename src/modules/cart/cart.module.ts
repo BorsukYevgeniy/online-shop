@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { CartService } from './cart.service';
+import { PrismaModule } from '../../infra/prisma/prisma.module';
+import { TokenModule } from '../token/token.module';
 import { CartApiController } from './cart.api.controller';
 import { CartRepository } from './cart.repository';
-import { PrismaModule } from '../prisma/prisma.module';
-import { TokenModule } from '../token/token.module';
+import { CartService } from './cart.service';
 import { CartSsrController } from './cart.ssr.controller';
 
 @Module({

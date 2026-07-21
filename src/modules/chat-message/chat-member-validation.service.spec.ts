@@ -1,8 +1,7 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ChatMemberValidationRepository } from './chat-member-validation.repository';
 import { ChatMemberValidationService } from './chat-member-validation.service';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 describe('ChatRepository', () => {
   let repository: ChatMemberValidationRepository;

@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoryRepository } from './category.repository';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Order } from '../../common/enum/order.enum';
+import { PrismaService } from '../../infra/prisma/prisma.service';
+import { CategoryRepository } from './category.repository';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { SearchCategoryDto } from './dto/search-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 describe('CategoryRepository', () => {
   let repository: CategoryRepository;

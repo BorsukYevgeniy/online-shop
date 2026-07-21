@@ -3,6 +3,7 @@ import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { PrismaModule } from './infra/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CategoryModule } from './modules/category/category.module';
@@ -12,7 +13,6 @@ import { ConfigService } from './modules/config/config.service';
 import { ErrorModule } from './modules/error/error.module';
 import { FileModule } from './modules/file/file.module';
 import { MessageModule } from './modules/message/message.module';
-import { PrismaModule } from './modules/prisma/prisma.module';
 import { ProductModule } from './modules/product/product.module';
 import { TokenModule } from './modules/token/token.module';
 import { UserModule } from './modules/user/user.module';
@@ -24,7 +24,6 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { TokenSsrMiddleware } from './common/middlewares/token.ssr.middleware';
 
 import { AppSsrController } from './app.ssr.controller';
-
 
 @Module({
   imports: [

@@ -1,7 +1,7 @@
-import { TestingModule, Test } from '@nestjs/testing';
-import { MailService } from './mail.service';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '../config/config.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '../../modules/config/config.service';
+import { MailService } from './mail.service';
 
 describe('UserCleaningService', () => {
   let service: MailService;
@@ -17,7 +17,10 @@ describe('UserCleaningService', () => {
             sendMail: jest.fn(),
           },
         },
-        { provide: ConfigService, useValue: { SMTP_USER: 'USER', APP_URL: '123' } },
+        {
+          provide: ConfigService,
+          useValue: { SMTP_USER: 'USER', APP_URL: '123' },
+        },
       ],
     }).compile();
 

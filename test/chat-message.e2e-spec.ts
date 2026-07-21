@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import * as request from 'supertest';
-import { AuthModule } from '../src/modules/auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from '../src/modules/prisma/prisma.service';
-import * as cookieParser from 'cookie-parser';
-import { ValidationPipe } from '@nestjs/common';
-import { join } from 'path';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as cookieParser from 'cookie-parser';
 import Keyv from 'keyv';
+import { join } from 'path';
+import * as request from 'supertest';
+import { PrismaService } from '../src/infra/prisma/prisma.service';
+import { AuthModule } from '../src/modules/auth/auth.module';
 import { ChatModule } from '../src/modules/chat/chat.module';
 
 import { hash } from 'bcryptjs';

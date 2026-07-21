@@ -1,13 +1,13 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
+import { Token, User } from '@prisma/client';
+import { Role } from '../../common/enum/role.enum';
+import { MailService } from '../../infra/mail/mail.service';
+import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { Role } from '../../common/enum/role.enum';
-import { MailService } from '../mail/mail.service';
-import { ConfigService } from '../config/config.service';
-import { Token, User } from '@prisma/client';
+import { UserService } from '../user/user.service';
+import { AuthService } from './auth.service';
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -48,7 +48,7 @@ describe('AuthService', () => {
             updateTokens: jest.fn(),
           },
         },
-        { provide: ConfigService, useValue: { APP_URL: '123'}}
+        { provide: ConfigService, useValue: { APP_URL: '123' } },
       ],
     }).compile();
 

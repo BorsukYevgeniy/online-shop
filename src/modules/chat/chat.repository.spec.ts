@@ -1,5 +1,5 @@
-import { PrismaService } from '../prisma/prisma.service';
 import { Test } from '@nestjs/testing';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { ChatRepository } from './chat.repository';
 import { ChatMessages } from './types/chat.types';
 

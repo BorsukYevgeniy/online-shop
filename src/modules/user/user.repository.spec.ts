@@ -1,13 +1,12 @@
-import { PrismaService } from '../prisma/prisma.service';
-import { UserRepository } from './user.repository';
-import { TestingModule, Test } from '@nestjs/testing';
-import { Role } from '../../common/enum/role.enum';
+import { Test, TestingModule } from '@nestjs/testing';
+import { User } from '@prisma/client';
 import { Order } from '../../common/enum/order.enum';
+import { Role } from '../../common/enum/role.enum';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { UserNoPasswordVLink } from './types/user.types';
-import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library';
-import { User } from '@prisma/client';
+import { UserRepository } from './user.repository';
 
 describe('UserRepository', () => {
   const date = new Date();

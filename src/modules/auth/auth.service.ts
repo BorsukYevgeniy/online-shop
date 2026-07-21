@@ -1,24 +1,24 @@
 import {
-  NotFoundException,
   BadRequestException,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { UserService } from '../user/user.service';
-import { hash, compare } from 'bcryptjs';
 import { Token, User } from '@prisma/client';
-import { TokenService } from '../token/token.service';
-import { Tokens } from '../token/interface/token.interfaces';
-import { UserNoCred, UserNoPassword } from '../user/types/user.types';
-import { DeletingCount } from '../../common/types/deleting-count.type';
-import { LoginUserDto } from './dto/login-user.dto';
+import { compare, hash } from 'bcryptjs';
 import { Role } from '../../common/enum/role.enum';
-import { MailService } from '../mail/mail.service';
+import { DeletingCount } from '../../common/types/deleting-count.type';
+import { MailService } from '../../infra/mail/mail.service';
 import { ConfigService } from '../config/config.service';
+import { Tokens } from '../token/interface/token.interfaces';
+import { TokenService } from '../token/token.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UserNoCred, UserNoPassword } from '../user/types/user.types';
+import { UserService } from '../user/user.service';
+import { LoginUserDto } from './dto/login-user.dto';
 
-import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
+import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages.enum';
 
 @Injectable()
@@ -30,8 +30,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
-  ) {    
-  }
+  ) {}
 
   async register(
     dto: CreateUserDto,

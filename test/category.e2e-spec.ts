@@ -1,19 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import * as request from 'supertest';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from '../src/modules/prisma/prisma.service';
-import * as cookieParser from 'cookie-parser';
-import { CategoryModule } from '../src/modules/category/category.module';
-import { ValidationPipe } from '@nestjs/common';
-import { AuthModule } from '../src/modules/auth/auth.module';
-import { hash } from 'bcryptjs';
-import { CreateCategoryDto } from 'src/modules/category/dto/create-category.dto';
-import { UpdateCategoryDto } from 'src/modules/category/dto/update-category.dto';
-import { SearchCategoryDto } from 'src/modules/category/dto/search-category.dto';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'bcryptjs';
+import * as cookieParser from 'cookie-parser';
 import Keyv from 'keyv';
+import { CreateCategoryDto } from 'src/modules/category/dto/create-category.dto';
+import { SearchCategoryDto } from 'src/modules/category/dto/search-category.dto';
+import { UpdateCategoryDto } from 'src/modules/category/dto/update-category.dto';
+import * as request from 'supertest';
+import { PrismaService } from '../src/infra/prisma/prisma.service';
+import { AuthModule } from '../src/modules/auth/auth.module';
+import { CategoryModule } from '../src/modules/category/category.module';
 
 describe('CategoryApiController (e2e)', () => {
   let app: NestExpressApplication;

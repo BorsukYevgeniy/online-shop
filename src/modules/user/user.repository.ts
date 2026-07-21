@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
+import { DeletingCount } from 'src/common/types/deleting-count.type';
+import { PrismaService } from '../../infra/prisma/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
+import { SortUserDto } from './dto/sort-user.dto';
 import {
-  UserNoPasswordVLink,
   UserNoCred,
   UserNoPassword,
+  UserNoPasswordVLink,
 } from './types/user.types';
-import { SearchUserDto } from './dto/search-user.dto';
-import { User } from '@prisma/client';
-import { SortUserDto } from './dto/sort-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { DeletingCount } from 'src/common/types/deleting-count.type';
 
 @Injectable()
 export class UserRepository {

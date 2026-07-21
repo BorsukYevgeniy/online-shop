@@ -1,19 +1,19 @@
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { TestingModule, Test } from '@nestjs/testing';
-import * as cookieParser from 'cookie-parser';
-import * as request from 'supertest';
-import { AuthModule } from '../src/modules/auth/auth.module';
-import { PrismaService } from '../src/modules/prisma/prisma.service';
-import { ProductModule } from '../src/modules/product/product.module';
+import { Test, TestingModule } from '@nestjs/testing';
 import { hash } from 'bcryptjs';
-import { UpdateProductDto } from '../src/modules/product/dto/update-product.dto';
-import { SearchProductDto } from '../src/modules/product/dto/search-product.dto';
-import { CreateProductDto } from '../src/modules/product/dto/create-product.dto';
-import KeyvRedis from '@keyv/redis';
-import { CacheModule } from '@nestjs/cache-manager';
+import * as cookieParser from 'cookie-parser';
 import Keyv from 'keyv';
+import * as request from 'supertest';
+import { PrismaService } from '../src/infra/prisma/prisma.service';
+import { AuthModule } from '../src/modules/auth/auth.module';
+import { CreateProductDto } from '../src/modules/product/dto/create-product.dto';
+import { SearchProductDto } from '../src/modules/product/dto/search-product.dto';
+import { UpdateProductDto } from '../src/modules/product/dto/update-product.dto';
+import { ProductModule } from '../src/modules/product/product.module';
 
 describe('ProductApiController (e2e)', () => {
   let app: NestExpressApplication;

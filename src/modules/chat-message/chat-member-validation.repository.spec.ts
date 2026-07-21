@@ -1,5 +1,5 @@
-import { PrismaService } from '../prisma/prisma.service';
 import { Test } from '@nestjs/testing';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { ChatMemberValidationRepository } from './chat-member-validation.repository';
 
 describe('ChatRepository', () => {

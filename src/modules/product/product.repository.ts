@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Product } from '@prisma/client';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
+import { SortProductDto } from './dto/sort-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductCategory } from './types/product.types';
-import { SearchProductDto } from './dto/search-product.dto';
-import { Product } from '@prisma/client';
-import { SortProductDto } from './dto/sort-product.dto';
 
 @Injectable()
 export class ProductRepository {

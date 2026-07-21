@@ -1,16 +1,16 @@
-import { ConfigModule } from '@nestjs/config';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { TestingModule, Test } from '@nestjs/testing';
-import * as cookieParser from 'cookie-parser';
-import { AuthModule } from '../src/modules/auth/auth.module';
-import { PrismaService } from '../src/modules/prisma/prisma.service';
-import { UserModule } from '../src/modules/user/user.module';
-import * as request from 'supertest';
-import { hash } from 'bcryptjs';
-import { ValidationPipe } from '@nestjs/common';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'bcryptjs';
+import * as cookieParser from 'cookie-parser';
 import Keyv from 'keyv';
+import * as request from 'supertest';
+import { PrismaService } from '../src/infra/prisma/prisma.service';
+import { AuthModule } from '../src/modules/auth/auth.module';
+import { UserModule } from '../src/modules/user/user.module';
 
 describe('UserApiController (e2e)', () => {
   let app: NestExpressApplication;
