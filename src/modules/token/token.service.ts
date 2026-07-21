@@ -4,13 +4,13 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { TokenRepository } from './token.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '../config/config.service';
+import { TokenRepository } from './token.repository';
 
 import { Token } from '@prisma/client';
-import { TokenPayload, Tokens } from './interface/token.interfaces';
 import { DeletingCount } from '../../common/types/deleting-count.type';
+import { TokenPayload, Tokens } from './interface/token.interfaces';
 
 import { TokenErrorMessages as TokenErrMsg } from './enum/token-error-messages.enum';
 
@@ -35,7 +35,9 @@ export class TokenService {
       this.logger.log(`Generated tokens for user ${tokenPayload.id}`);
       return { accessToken, refreshToken };
     } catch (error) {
-      this.logger.error('Error generating tokens', { message: error.message });
+      this.logger.error('Error generating tokens', {
+        message: (error as Error).message,
+      });
       throw new UnauthorizedException(TokenErrMsg.ErrorGeneratingToken);
     }
   }
@@ -46,7 +48,9 @@ export class TokenService {
         secret: this.configService.JWT_CONFIG.JWT_REFRESH_SECRET,
       });
     } catch (error) {
-      this.logger.warn('Invalid refresh token', { message: error.message });
+      this.logger.warn('Invalid refresh token', {
+        message: (error as Error).message,
+      });
       throw new UnauthorizedException(TokenErrMsg.RefreshTokenIsMissing);
     }
   }
@@ -57,7 +61,9 @@ export class TokenService {
         secret: this.configService.JWT_CONFIG.JWT_ACCESS_SECRET,
       });
     } catch (error) {
-      this.logger.warn('Invalid access token', { message: error.message });
+      this.logger.warn('Invalid access token', {
+        message: (error as Error).message,
+      });
       throw new UnauthorizedException(TokenErrMsg.InvalidAccessToken);
     }
   }
@@ -88,7 +94,9 @@ export class TokenService {
       this.logger.log(`Saving token for user ${userId}`);
       return await this.tokenRepositry.create(userId, refreshToken, expiredAt);
     } catch (error) {
-      this.logger.error('Error saving token', { message: error.message });
+      this.logger.error('Error saving token', {
+        message: (error as Error).message,
+      });
       throw new InternalServerErrorException(TokenErrMsg.FailTokenSave);
     }
   }

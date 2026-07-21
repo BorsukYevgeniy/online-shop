@@ -4,16 +4,16 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { ProductRepository } from './product.repository';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file/file.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { PaginatedProduct, ProductCategory } from './types/product.types';
+import { CreateProductDto } from './dto/create-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductRepository } from './product.repository';
+import { PaginatedProduct, ProductCategory } from './types/product.types';
 
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 import { ProductErrorMessages as ProductErrMsg } from './enum/product-error-messages.enum';
 
 @Injectable()

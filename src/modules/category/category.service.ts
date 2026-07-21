@@ -4,16 +4,16 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoryRepository } from './category.repository';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Category } from '@prisma/client';
+import { CategoryRepository } from './category.repository';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { SearchCategoryDto } from './dto/search-category.dto';
-import { PaginatedCategory } from './type/category.type';
 import { SortCategoryDto } from './dto/sort-category.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PaginatedCategory } from './type/category.type';
 
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 import { CategoryErrorMessages as CategoryErrMsg } from './enum/category-error-messages.enum';
 
 @Injectable()

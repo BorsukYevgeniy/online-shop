@@ -4,17 +4,17 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { MessageRepository } from './message.repository';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { MessageRepository } from './message.repository';
 
 import { Message } from '@prisma/client';
 import { MessageNickname, PaginatedMessages } from './types/message.type';
 
-import { MessageErrorMessages as MessageErrMsg } from './enum/message-error-messages.enum';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { MessageErrorMessages as MessageErrMsg } from './enum/message-error-messages.enum';
 
 @Injectable()
 export class MessageService {

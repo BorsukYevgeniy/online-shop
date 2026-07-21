@@ -1,20 +1,15 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreateChatDto } from './dto/create-chat.dto';
-import { ChatRepository } from './chat.repository';
-import {
-  ChatMessages,
-  PaginatedChat,
-  PaginatedUserChats,
-  UserChat,
-} from './types/chat.types';
 import { Chat } from '@prisma/client';
+import { ChatRepository } from './chat.repository';
+import { CreateChatDto } from './dto/create-chat.dto';
+import { PaginatedChat, PaginatedUserChats } from './types/chat.types';
 
-import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum';
 import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
+import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum';
 
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ChatMemberValidationService } from '../chat-message/chat-member-validation.service';
 import { MessageService } from '../message/message.service';
 
 @Injectable()

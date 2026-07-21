@@ -1,23 +1,23 @@
 import {
-  Injectable,
   BadRequestException,
-  NotFoundException,
+  Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserRepository } from './user.repository';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import {
-  UserNoPasswordVLink,
-  UserNoCred,
-  PaginatedUserNoCreds,
-  UserNoPassword,
-} from './types/user.types';
-import { PaginationDto } from '../../common/dto/pagination.dto';
-import { SearchUserDto } from './dto/search-user.dto';
 import { User } from '@prisma/client';
+import { PaginationDto } from '../../common/dto/pagination.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 import { SortUserDto } from './dto/sort-user.dto';
+import {
+  PaginatedUserNoCreds,
+  UserNoCred,
+  UserNoPassword,
+  UserNoPasswordVLink,
+} from './types/user.types';
+import { UserRepository } from './user.repository';
 
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { UserErrorMessages as UserErrMsg } from './constants/user-error-messages.constants';
 
 @Injectable()

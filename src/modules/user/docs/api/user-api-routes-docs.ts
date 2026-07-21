@@ -1,6 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -58,7 +57,6 @@ export class UserApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Assinging admin by user id' }),
       ApiOkResponse({ description: 'Admin assigned' }),
-      ApiForbiddenResponse({ description: 'Forbidden resource' }),
       ApiUserNotFoundResponseDocs(),
       ApiUserIdParamDocs(),
       ApiAdminForbiddenResponseDocs(),

@@ -17,7 +17,7 @@ export class UserCleaningService {
       this.logger.log(`Deleted ${count} unverified users`);
     } catch (error) {
       this.logger.error('Error during token cleanup', {
-        message: error.message,
+        message: (error as Error).message,
       });
     }
   }

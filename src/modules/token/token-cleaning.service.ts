@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { DeletingCount } from '../../common/types/deleting-count.type';
 import { TokenRepository } from './token.repository';
-import { DeletingCount } from 'src/common/types/deleting-count.type';
 
 @Injectable()
 export class TokenCleaningService {
@@ -18,7 +18,7 @@ export class TokenCleaningService {
       this.logger.log(`Deleted ${result.count} expired tokens`);
     } catch (error) {
       this.logger.error('Error during token cleanup', {
-        message: error.message,
+        message: (error as Error).message,
       });
     }
   }

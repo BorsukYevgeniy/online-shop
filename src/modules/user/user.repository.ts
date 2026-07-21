@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { DeletingCount } from 'src/common/types/deleting-count.type';
+import { DeletingCount } from '../../common/types/deleting-count.type';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
