@@ -30,7 +30,7 @@ export class ChatMemberValidationService {
       this.logger.warn(
         `User with ID ${userId} is not a participant in chat ID ${chatId}.`,
       );
-      throw new ForbiddenException();
+      throw new ForbiddenException('You must be a participant of the chat');
     }
 
     this.logger.log(

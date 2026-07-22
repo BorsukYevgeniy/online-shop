@@ -10,17 +10,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCookieAuth,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 import { User } from '../../../common/decorators/routes/user.decorator';
 import { PaginationDto } from '../../../common/dto/pagination.dto';
 import { Role } from '../../../common/enum/role.enum';
@@ -34,20 +23,18 @@ import {
   PaginatedMessages,
 } from '../../message/types/message.type';
 import { TokenPayload } from '../../token/interface/token.interfaces';
+import {
+  ChatMessageApiControllerDocs,
+  ChatMessageApiRoutesDocs,
+} from './docs/api';
 
-@ApiTags('API ChatMessages')
-@ApiCookieAuth('accessToken')
+@ChatMessageApiControllerDocs()
 @Controller('api/chats/:chatId/messages')
 @UseGuards(VerifiedUserGuard)
 export class ChatMessageApiController {
   constructor(private readonly messageService: MessageService) {}
 
-  @ApiOperation({ summary: 'Get messages in chat' })
-  @ApiOkResponse({ description: 'Messages fetched' })
-  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
-  @ApiNotFoundResponse({ description: 'Chat not found' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiParam({ name: 'chatId', type: Number })
+  @ChatMessageApiRoutesDocs.GetAllMessages()
   @Get()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -59,13 +46,7 @@ export class ChatMessageApiController {
     return await this.messageService.getMessagesByChatId(chatId, paginationDto);
   }
 
-  @ApiOperation({ summary: 'Create message in chat' })
-  @ApiOkResponse({ description: 'Message created' })
-  @ApiBadRequestResponse({ description: 'Invalid request body' })
-  @ApiNotFoundResponse({ description: 'Chat not found' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiParam({ name: 'chatId', type: Number })
-  @ApiBody({ type: CreateMessageDto })
+  @ChatMessageApiRoutesDocs.CreatMessage()
   @Post()
   async createMessage(
     @User() user: TokenPayload,

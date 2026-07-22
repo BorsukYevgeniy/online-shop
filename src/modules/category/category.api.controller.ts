@@ -1,55 +1,38 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  Query,
+  Get,
   HttpCode,
-  UseInterceptors,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { Category } from '@prisma/client';
+import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Role } from '../../common/enum/role.enum';
+import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
+import { RolesGuard } from '../auth/guards/roles-auth.guard';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { RolesGuard } from '../auth/guards/roles-auth.guard';
-import { PaginationDto } from '../../common/dto/pagination.dto';
-import { Category } from '@prisma/client';
 import { SearchCategoryDto } from './dto/search-category.dto';
-import { PaginatedCategory } from './type/category.type';
-import { RequieredRoles } from '../auth/decorator/requiered-roles.decorator';
-import { Role } from '../../common/enum/role.enum';
 import { SortCategoryDto } from './dto/sort-category.dto';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PaginatedCategory } from './type/category.type';
 
-import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiForbiddenResponse,
-  ApiNoContentResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-  ApiUnauthorizedResponse,
-  ApiCookieAuth,
-} from '@nestjs/swagger';
+import { CategoryApiControllerDocs, CategoryApiRoutes } from './docs/api';
 
-@ApiTags('API Categories')
+@CategoryApiControllerDocs()
 @Controller('api/categories')
 export class CategoryApiController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @ApiOperation({ summary: 'Get all categories or search category' })
-  @ApiOkResponse({ description: 'Categories fetched' })
-  @ApiBadRequestResponse({ description: 'Invalid query parametres' })
-  @ApiQuery({ type: PaginationDto })
-  @ApiQuery({ type: SortCategoryDto })
-  @ApiQuery({ type: SearchCategoryDto })
+  @CategoryApiRoutes.GetAll()
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getAll(
@@ -60,9 +43,7 @@ export class CategoryApiController {
     return await this.categoryService.getAll(pagination, sortDto, searchDto);
   }
 
-  @ApiOperation({ summary: 'Get category by id' })
-  @ApiOkResponse({ description: 'Category fetched' })
-  @ApiParam({ name: 'categoryId', type: Number })
+  @CategoryApiRoutes.GetById()
   @Get(':categoryId')
   @UseInterceptors(CacheInterceptor)
   async getById(
@@ -71,13 +52,7 @@ export class CategoryApiController {
     return await this.categoryService.getById(id);
   }
 
-  @ApiOperation({ summary: 'Create category' })
-  @ApiOkResponse({ description: 'Category created' })
-  @ApiBadRequestResponse({ description: 'Invalid request body' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be an administrator' })
-  @ApiBody({ type: CreateCategoryDto })
-  @ApiCookieAuth('accessToken')
+  @CategoryApiRoutes.Create()
   @Post()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -85,14 +60,7 @@ export class CategoryApiController {
     return await this.categoryService.create(dto);
   }
 
-  @ApiOperation({ summary: 'Update category' })
-  @ApiOkResponse({ description: 'Category updated' })
-  @ApiBadRequestResponse({ description: 'Invalid request body' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be an administrator' })
-  @ApiBody({ type: UpdateCategoryDto })
-  @ApiParam({ name: 'categoryId', type: Number })
-  @ApiCookieAuth('accessToken')
+  @CategoryApiRoutes.Update()
   @Patch(':categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -103,12 +71,7 @@ export class CategoryApiController {
     return await this.categoryService.update(id, dto);
   }
 
-  @ApiOperation({ summary: 'Delete category' })
-  @ApiNoContentResponse({ description: 'Category deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be an administrator' })
-  @ApiParam({ name: 'categoryId', type: Number })
-  @ApiCookieAuth('accessToken')
+  @CategoryApiRoutes.DeleteById()
   @Delete(':categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
