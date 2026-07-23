@@ -1,62 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
-  UseGuards,
-
-  Param,
   Body,
+  Controller,
   Delete,
-  UseInterceptors,
+  Get,
   HttpCode,
-  Query,
+  Param,
   ParseIntPipe,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ChatService } from './chat.service';
-import { AuthRequest } from '../../common/types/request.type';
 import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { ChatService } from './chat.service';
 
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Chat } from '@prisma/client';
-import {
-  ChatMessages,
-  PaginatedChat,
-  PaginatedUserChats,
-  UserChat,
-} from './types/chat.types';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ValidateCreateChatDtoPipe } from './pipe/validate-create-chat-dto.pipe';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { PaginatedChat, PaginatedUserChats } from './types/chat.types';
 
-import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCookieAuth,
-  ApiForbiddenResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
 import { User } from '../../common/decorators/routes/user.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 import { TokenPayload } from '../token/interface/token.interfaces';
+import { ChatApiControllerDocs, ChatApiRoutesDocs } from './docs/api';
 
-@ApiTags('API Chats')
-@ApiCookieAuth('accessToken')
+@ChatApiControllerDocs()
 @Controller('api/chats')
 @UseGuards(VerifiedUserGuard)
 export class ChatApiController {
   constructor(private readonly chatService: ChatService) {}
 
-  @ApiOperation({ summary: 'Fecth my chats' })
-  @ApiOkResponse({ description: 'Message fetched' })
-  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ChatApiRoutesDocs.GetMyChats()
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getMyChats(
@@ -66,16 +41,7 @@ export class ChatApiController {
     return await this.chatService.getUserChats(user.id, paginationDto);
   }
 
-  @ApiOperation({ summary: 'Fetch chat by id' })
-  @ApiOkResponse({ description: 'Chat fetched' })
-  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({
-    description: 'You isnt participant of chat or you must be verified user',
-  })
-  @ApiNotFoundResponse({ description: 'Chat not found' })
-  @ApiParam({ name: 'chatId', type: Number })
-  @ApiQuery({ type: PaginationDto })
+  @ChatApiRoutesDocs.GetById()
   @Get(':chatId')
   @UseInterceptors(CacheInterceptor)
   async getСhatById(
@@ -83,19 +49,10 @@ export class ChatApiController {
     @Query() paginationDto: PaginationDto,
     @User() user: TokenPayload,
   ): Promise<PaginatedChat> {
-    return await this.chatService.getChatById(
-      chatId,
-      user.id,
-      paginationDto,
-    );
+    return await this.chatService.getChatById(chatId, user.id, paginationDto);
   }
 
-  @ApiOperation({ summary: 'Fetch chat by id' })
-  @ApiOkResponse({ description: 'Chat fetched' })
-  @ApiBadRequestResponse({ description: 'Invalid request body' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiBody({ type: CreateChatDto })
+  @ChatApiRoutesDocs.Create()
   @Post()
   async createChat(
     @Body(ValidateCreateChatDtoPipe) createDto: CreateChatDto,
@@ -103,14 +60,7 @@ export class ChatApiController {
     return await this.chatService.createChat(createDto);
   }
 
-  @ApiOperation({ summary: 'Delete chat by id' })
-  @ApiOkResponse({ description: 'Chat delete' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({
-    description: 'You isnt participant of chat or you must be verified user',
-  })
-  @ApiNotFoundResponse({ description: 'Chat not found' })
-  @ApiParam({ name: 'chatId', type: Number })
+  @ChatApiRoutesDocs.Delete()
   @Delete(':chatId')
   @HttpCode(204)
   async deleteChat(

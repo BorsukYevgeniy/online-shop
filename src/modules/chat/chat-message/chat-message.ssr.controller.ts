@@ -9,43 +9,31 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { VerifiedUserGuard } from '../../auth/guards/verified-user.guard';
 
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import {
-  ApiCookieAuth,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 import { PaginationDto } from '../../../common/dto/pagination.dto';
 import { Role } from '../../../common/enum/role.enum';
 import { SsrExceptionFilter } from '../../../common/filter/ssr-exception.filter';
 import { RequieredRoles } from '../../auth/decorator/requiered-roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles-auth.guard';
 import { MessageService } from '../../message/message.service';
+import {
+  ChatMessageSsrControllerDocs,
+  GetMessagesByChatIdDocs,
+} from './docs/ssr';
 
-@ApiTags('SSR ChatMessages')
-@ApiCookieAuth('accessToken')
+@ChatMessageSsrControllerDocs()
 @Controller('chats/:chatId/messages')
-@UseGuards(VerifiedUserGuard)
+@RequieredRoles(Role.ADMIN)
+@UseGuards(RolesGuard)
 @UseFilters(SsrExceptionFilter)
+@UseInterceptors(CacheInterceptor)
 export class ChatMessageSsrController {
   constructor(private readonly messageService: MessageService) {}
 
-  @ApiOperation({ summary: 'Get messages in chat' })
-  @ApiOkResponse({ description: 'Messages fetched' })
-  @ApiNotFoundResponse({ description: 'Chat not found' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiParam({ name: 'chatId', type: Number })
+  @GetMessagesByChatIdDocs()
   @Get()
-  @RequieredRoles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   @Render('message/get-all-messages')
-  @UseInterceptors(CacheInterceptor)
   async getMessagesByChatId(
     @Param('chatId', ParseIntPipe) chatId: number,
     @Query() paginationDto: PaginationDto,

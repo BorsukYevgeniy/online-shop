@@ -1,10 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Role } from '../../../common/enum/role.enum';
+import { MessageService } from '../../message/message.service';
+import { TokenService } from '../../token/token.service';
 import { ChatMessageApiController } from './chat-message.api.controller';
-import { MessageService } from '../message/message.service';
-import { Role } from '../../common/enum/role.enum';
-
 
 describe('ChatMessageApiController', () => {
   let controller: ChatMessageApiController;
