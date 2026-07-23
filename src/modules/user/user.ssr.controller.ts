@@ -67,6 +67,7 @@ export class UserSsrController {
       ...sortDto,
     };
   }
+
   @UserSsrRoutesDocs.Search()
   @Get('search')
   @Render('users/search-user')
@@ -88,6 +89,7 @@ export class UserSsrController {
       ...sortDto,
     };
   }
+
   @UserSsrRoutesDocs.GetMe()
   @Get('me')
   @Render('users/user-account')
@@ -95,6 +97,7 @@ export class UserSsrController {
   async getUserAccountPage(@User() user: TokenPayload) {
     return await this.userService.getMe(user.id);
   }
+
   @UserSsrRoutesDocs.GetById()
   @Get(':userId')
   @Render('users/get-user-by-id')
@@ -111,7 +114,7 @@ export class UserSsrController {
       userFromReq.id,
     );
 
-    if (userId === userFromReq.id) return res.redirect('/users/me');
+    if (userId === userFromReq.id) return res.redirect(303, '/users/me');
 
     return {
       ...user,
@@ -120,6 +123,7 @@ export class UserSsrController {
       chatId: chatBeetweenUsers?.id,
     };
   }
+
   @UserSsrRoutesDocs.GetUserProducts()
   @Get(':userId/products')
   @UseGuards(VerifiedUserGuard)
@@ -154,7 +158,7 @@ export class UserSsrController {
   ) {
     await this.userService.assignAdmin(userId);
 
-    res.redirect(`/users/${userId}`);
+    res.redirect(303, `/users/${userId}`);
   }
 
   @UserSsrRoutesDocs.HandleDeleteMe()
@@ -168,7 +172,7 @@ export class UserSsrController {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 
-    return res.redirect('/');
+    return res.redirect(303, '/');
   }
 
   @UserSsrRoutesDocs.HandleDeleteById()
@@ -181,6 +185,6 @@ export class UserSsrController {
   ) {
     await this.userService.delete(userId);
 
-    return res.redirect('/');
+    return res.redirect(303, '/');
   }
 }

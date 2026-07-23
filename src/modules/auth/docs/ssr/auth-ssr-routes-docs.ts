@@ -52,6 +52,7 @@ export class AuthSsrRoutesDocs {
       ApiRedirectResponse('/users/me'),
     );
   }
+
   static HandleResendEmail() {
     return applyDecorators(
       AuthApiRoutesDocs.ResendEmail(),

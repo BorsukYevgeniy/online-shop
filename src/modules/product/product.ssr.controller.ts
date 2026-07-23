@@ -16,15 +16,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  ApiCookieAuth,
-  ApiForbiddenResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 import { Response } from 'express';
 import { User } from '../../common/decorators/routes/user.decorator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -126,7 +117,7 @@ export class ProductSsrController {
     @Res() res: Response,
   ) {
     await this.productService.create(user.id, dto, images);
-    res.redirect('/users/me');
+    res.redirect(303, '/users/me');
   }
 
   @ProductSsrRoutesDocs.GetById()
@@ -178,19 +169,10 @@ export class ProductSsrController {
     @UploadedFiles() images: Express.Multer.File[],
   ) {
     await this.productService.update(user.id, productId, dto, images);
-    res.redirect(`/products/${productId}`);
+    res.redirect(303, `/products/${productId}`);
   }
 
   @ProductSsrRoutesDocs.HandleDelete()
-  @ApiOperation({ summary: 'Delete a product' })
-  @ApiOkResponse({ description: 'Product deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiForbiddenResponse({
-    description: 'You must be verified user or you isnt ownership of product',
-  })
-  @ApiParam({ name: 'productId', type: Number })
-  @ApiCookieAuth('accessToken')
   @UseGuards(VerifiedUserGuard)
   @Delete('delete/:productId')
   async handleDeleteProduct(
@@ -199,6 +181,6 @@ export class ProductSsrController {
     @Res() res: Response,
   ) {
     await this.productService.delete(user.id, productId);
-    res.redirect('/users/me');
+    res.redirect(303, '/users/me');
   }
 }

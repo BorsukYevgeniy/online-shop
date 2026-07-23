@@ -54,11 +54,13 @@ export class UserApiController {
   ): Promise<PaginatedUserNoCreds> {
     return await this.userService.getAll(paginationDto, sortDto, searchDto);
   }
+
   @UserApiRoutesDocs.GetMe()
   @Get('me')
   async getMe(@User() user: TokenPayload): Promise<UserNoPasswordVLink> {
     return await this.userService.getMe(user.id);
   }
+
   @UserApiRoutesDocs.GetById()
   @Get(':userId')
   @UseInterceptors(CacheInterceptor)
@@ -67,6 +69,7 @@ export class UserApiController {
   ): Promise<UserNoCred | void> {
     return await this.userService.getById(userId);
   }
+
   @UserApiRoutesDocs.GetUserProducts()
   @Get(':userId/products')
   @UseGuards(VerifiedUserGuard)

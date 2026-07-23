@@ -19,6 +19,7 @@ export class CartApiRoutesDocs {
       ApiOkResponse({ description: 'Cart fetched' }),
     );
   }
+
   static AddToCart() {
     return applyDecorators(
       ApiOperation({ summary: 'Add product to cart' }),

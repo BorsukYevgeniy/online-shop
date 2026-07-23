@@ -40,7 +40,7 @@ export class ChatSsrController {
   ) {
     const chat = await this.chatService.createChat(createDto);
 
-    res.redirect(`/chats/${chat.id}`);
+    res.redirect(303, `/chats/${chat.id}`);
   }
 
   @ChatSsrRoutesDocs.GetMyChats()
@@ -89,6 +89,6 @@ export class ChatSsrController {
   ) {
     await this.chatService.deleteChat(chatId, user.id);
 
-    res.redirect('/chats');
+    res.redirect(303, '/chats');
   }
 }

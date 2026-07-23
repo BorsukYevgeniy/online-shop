@@ -4,7 +4,6 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiNoContentResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -14,6 +13,7 @@ import {
   ApiUnauthorizedResponseDocs,
   AuthCookiesDocs,
 } from '../../../../common/decorators/docs/auth';
+import { ApiUserNotFoundResponseDocs } from '../../../user/docs/shared';
 import { CreateUserDto } from '../../../user/dto/create-user.dto';
 import { LoginUserDto } from '../../dto/login-user.dto';
 
@@ -33,8 +33,7 @@ export class AuthApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Login user' }),
       ApiOkResponse({ description: 'User loggined' }),
-      ApiBadRequestResponse({ description: 'Invalid request body' }),
-      ApiNotFoundResponse({ description: 'User not found' }),
+      ApiUserNotFoundResponseDocs(),
       ApiBody({ type: LoginUserDto }),
     );
   }
@@ -70,10 +69,11 @@ export class AuthApiRoutesDocs {
       ApiOperation({ summary: 'Verify user' }),
       ApiOkResponse({ description: 'User verified' }),
       ApiBadRequestResponse({ description: 'User already verified' }),
-      ApiNotFoundResponse({ description: 'User not found' }),
+      ApiUserNotFoundResponseDocs(),
       ApiParam({ name: 'link', type: String }),
     );
   }
+
   static ResendEmail() {
     return applyDecorators(
       ApiOperation({ summary: 'Resend verification email' }),

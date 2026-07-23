@@ -10,14 +10,15 @@ import { PaginationDto } from '../../../../common/dto/pagination.dto';
 import { SearchCategoryDto } from '../../dto/search-category.dto';
 import { SortCategoryDto } from '../../dto/sort-category.dto';
 import { CategoryApiRoutes } from '../api';
-import { ApiCategoryIdParamDocs } from '../shared';
 
 export class CategorySsrRoutesDocs {
   static GetAll() {
     return applyDecorators(
-      ApiOperation({ summary: 'Get category by id' }),
-      ApiOkResponse({ description: 'Category fetched' }),
-      ApiCategoryIdParamDocs(),
+      ApiOperation({ summary: 'Get all categories' }),
+      ApiOkResponse({ description: 'Categories fetched' }),
+      ApiQuery({ type: PaginationDto }),
+      ApiQuery({ type: SortCategoryDto }),
+      ApiQuery({ type: SearchCategoryDto }),
       AuthCookiesDocs(),
       ApiUnauthorizedResponseDocs(),
     );
@@ -35,11 +36,7 @@ export class CategorySsrRoutesDocs {
 
   static GetById() {
     return applyDecorators(
-      ApiOperation({ summary: 'Get all categories' }),
-      ApiOkResponse({ description: 'Categories fetched' }),
-      ApiQuery({ type: PaginationDto }),
-      ApiQuery({ type: SortCategoryDto }),
-      ApiQuery({ type: SearchCategoryDto }),
+      CategorySsrRoutesDocs.GetById(),
       AuthCookiesDocs(),
       ApiUnauthorizedResponseDocs(),
     );

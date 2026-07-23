@@ -4,6 +4,7 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
 import {
@@ -16,7 +17,10 @@ import { CreateCategoryDto } from '../../dto/create-category.dto';
 import { SearchCategoryDto } from '../../dto/search-category.dto';
 import { SortCategoryDto } from '../../dto/sort-category.dto';
 import { UpdateCategoryDto } from '../../dto/update-category.dto';
-import { ApiCategoryIdParamDocs } from '../shared';
+
+function ApiCategoryIdParamDocs() {
+  return ApiParam({ name: 'categoryId', type: Number });
+}
 
 export class CategoryApiRoutes {
   static GetAll() {

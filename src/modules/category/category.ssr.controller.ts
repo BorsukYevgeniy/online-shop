@@ -101,7 +101,7 @@ export class CategorySsrController {
   ) {
     await this.categoryService.create(createDto);
 
-    res.redirect('/categories');
+    res.redirect(303, '/categories');
   }
 
   @CategorySsrRoutesDocs.GetById()
@@ -142,7 +142,7 @@ export class CategorySsrController {
   ) {
     await this.categoryService.update(categoryId, updateDto);
 
-    res.redirect(`/categories/${categoryId}`);
+    res.redirect(303, `/categories/${categoryId}`);
   }
 
   @CategorySsrRoutesDocs.HandleDeleteById()
@@ -155,6 +155,6 @@ export class CategorySsrController {
   ) {
     await this.categoryService.delete(categoryId);
 
-    res.redirect('/categories');
+    res.redirect(303, '/categories');
   }
 }
