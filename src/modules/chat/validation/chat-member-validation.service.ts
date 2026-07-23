@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { ChatService } from '../chat.service';
 import { ChatErrorMessages as ChatErrMsg } from '../enum/chat-error-message.enum';
+import { ChatRepository } from '../repository/chat.repository';
 
 @Injectable()
 export class ChatMemberValidationService {
@@ -14,12 +14,12 @@ export class ChatMemberValidationService {
     ChatMemberValidationService.name,
   );
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatRepo: ChatRepository) {}
 
   async validateChatMembers(chatId: number, userId: number): Promise<void> {
     this.logger.log(`Validating participants for chat ID ${chatId}.`);
 
-    const chat = await this.chatService.getUsersInChat(chatId);
+    const chat = await this.chatRepo.getUsersInChat(chatId);
     if (!chat) {
       this.logger.warn(`Chat with ID ${chatId} not found.`);
       throw new NotFoundException(ChatErrMsg.ChatNotFound);

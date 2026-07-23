@@ -58,7 +58,7 @@ export class CartSsrController {
   ) {
     await this.cartService.addToCart(productId, user.id);
 
-    res.redirect(`/products/${productId}`);
+    res.redirect(303, `/products/${productId}`);
   }
 
   @CartSsrRoutesDocs.RemoveFromCart()
@@ -70,7 +70,7 @@ export class CartSsrController {
   ) {
     await this.cartService.removeFromCart(productId, user.id);
 
-    res.redirect(`/cart`);
+    res.redirect(303, '/cart');
   }
 
   @CartSsrRoutesDocs.ClearCart()
@@ -78,6 +78,6 @@ export class CartSsrController {
   async handleClearCart(@User() user: TokenPayload, @Res() res: Response) {
     await this.cartService.clearCart(user.id);
 
-    res.redirect('/cart');
+    res.redirect(303, '/cart');
   }
 }

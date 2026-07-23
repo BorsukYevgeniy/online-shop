@@ -1,6 +1,6 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChatMemberValidationService } from '../chat/chat-message/chat-member-validation.service';
+import { ChatMemberValidationService } from '../chat/validation/chat-member-validation.service';
 import { MessageRepository } from './message.repository';
 import { MessageService } from './message.service';
 

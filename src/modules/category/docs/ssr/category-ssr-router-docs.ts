@@ -1,15 +1,11 @@
 import { applyDecorators } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import {
   ApiAdminForbiddenResponseDocs,
   ApiUnauthorizedResponseDocs,
   AuthCookiesDocs,
 } from '../../../../common/decorators/docs/auth';
+import { ApiRedirectResponse } from '../../../../common/decorators/docs/routes';
 import { PaginationDto } from '../../../../common/dto/pagination.dto';
 import { SearchCategoryDto } from '../../dto/search-category.dto';
 import { SortCategoryDto } from '../../dto/sort-category.dto';
@@ -60,11 +56,8 @@ export class CategorySsrRoutesDocs {
 
   static HandleCreate() {
     return applyDecorators(
-      CategoryApiRoutes.Create,
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /categories',
-      }),
+      CategoryApiRoutes.Create(),
+      ApiRedirectResponse('/categories'),
     );
   }
 
@@ -79,21 +72,15 @@ export class CategorySsrRoutesDocs {
 
   static HandleUpdate() {
     return applyDecorators(
-      CategoryApiRoutes.Update,
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /categories/:categoryId',
-      }),
+      CategoryApiRoutes.Update(),
+      ApiRedirectResponse('/categories/:categoryId'),
     );
   }
 
   static HandleDeleteById() {
     return applyDecorators(
-      CategoryApiRoutes.DeleteById,
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /categories',
-      }),
+      CategoryApiRoutes.DeleteById(),
+      ApiRedirectResponse('/categories'),
     );
   }
 }

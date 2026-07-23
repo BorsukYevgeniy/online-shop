@@ -20,6 +20,8 @@ export function ChatMessageSsrControllerDocs() {
     ApiCookieAuth('accessToken'),
     ApiUnauthorizedResponseDocs(),
     ApiAdminForbiddenResponseDocs(),
+    ApiChatNotFoundResponseDocs(),
+    ApiChatIdParamDocs(),
   );
 }
 
@@ -27,7 +29,5 @@ export function GetMessagesByChatIdDocs() {
   return applyDecorators(
     ApiOperation({ summary: 'Get messages in chat' }),
     ApiOkResponse({ description: 'Messages fetched' }),
-    ApiChatNotFoundResponseDocs(),
-    ApiChatIdParamDocs(),
   );
 }

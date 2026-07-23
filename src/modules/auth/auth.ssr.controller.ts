@@ -50,7 +50,7 @@ export class AuthSsrController {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    return res.redirect('/users/me');
+    return res.redirect(303, '/users/me');
   }
 
   @AuthSsrRoutesDocs.RenderLoginPage()
@@ -76,7 +76,7 @@ export class AuthSsrController {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    return res.redirect('/users/me');
+    return res.redirect(303, '/users/me');
   }
 
   @AuthSsrRoutesDocs.HandleLogout()
@@ -91,7 +91,7 @@ export class AuthSsrController {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 
-    res.redirect('/');
+    res.redirect(303, '/');
   }
 
   @AuthSsrRoutesDocs.HandleLogoutAll()
@@ -103,7 +103,7 @@ export class AuthSsrController {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
 
-    res.redirect('/');
+    res.redirect(303, '/');
   }
 
   @AuthSsrRoutesDocs.RenderVerifyPage()
@@ -118,7 +118,7 @@ export class AuthSsrController {
   async verifyUser(@Res() res: Response, @Param('link') link: string) {
     await this.authService.verifyUser(link);
 
-    res.redirect('/users/me');
+    res.redirect(303, '/users/me');
   }
 
   @AuthSsrRoutesDocs.RenderCheckEmailPage()
@@ -133,6 +133,6 @@ export class AuthSsrController {
   async handleResendEmail(@User() user: TokenPayload, @Res() res: Response) {
     await this.authService.resendVerificationMail(user.id, 'ssr');
 
-    res.redirect('/auth/check-your-email');
+    res.redirect(303, '/auth/check-your-email');
   }
 }

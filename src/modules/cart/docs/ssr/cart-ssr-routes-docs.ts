@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiRedirectResponse } from '../../../../common/decorators/docs/routes';
 import { CartApiRoutesDocs } from '../api';
 
 export class CartSsrRoutesDocs {
@@ -9,30 +9,21 @@ export class CartSsrRoutesDocs {
   static AddToCart() {
     return applyDecorators(
       CartApiRoutesDocs.AddToCart(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /products/:productId',
-      }),
+      ApiRedirectResponse('/products/:productId'),
     );
   }
 
   static RemoveFromCart() {
     return applyDecorators(
       CartApiRoutesDocs.RemoveFromCart(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /cart',
-      }),
+      ApiRedirectResponse('/cart'),
     );
   }
 
   static ClearCart() {
     return applyDecorators(
       CartApiRoutesDocs.ClearCart(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /cart',
-      }),
+      ApiRedirectResponse('/cart'),
     );
   }
 }

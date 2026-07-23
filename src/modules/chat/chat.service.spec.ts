@@ -4,10 +4,10 @@ import { Chat } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { MessageService } from '../message/message.service';
 import { MessageNickname } from '../message/types/message.type';
-import { ChatMemberValidationService } from './chat-message/chat-member-validation.service';
-import { ChatRepository } from './chat.repository';
 import { ChatService } from './chat.service';
 import { ChatMessages, UserChat } from './types/chat.types';
+import { ChatMemberValidationService } from './validation/chat-member-validation.service';
+import { ChatRepository } from './validation/chat.repository';
 
 describe('ChatService', () => {
   let repository: ChatRepository;

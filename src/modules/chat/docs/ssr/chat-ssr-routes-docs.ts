@@ -1,25 +1,19 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiRedirectResponse } from '../../../../common/decorators/docs/routes';
 import { ChatApiRoutesDocs } from '../api';
 
 export class ChatSsrRoutesDocs {
   static HandleCreateChat() {
     return applyDecorators(
       ChatApiRoutesDocs.Create(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /chats/:chatId',
-      }),
+      ApiRedirectResponse('/chats/:chatId'),
     );
   }
 
   static HandleDeleteChat() {
     return applyDecorators(
       ChatApiRoutesDocs.Delete(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /chats',
-      }),
+      ApiRedirectResponse('/chats'),
     );
   }
 

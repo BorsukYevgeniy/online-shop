@@ -5,5 +5,6 @@ export function ApiChatIdParamDocs() {
     name: 'chatId',
     type: Number,
     description: 'Id of the chat',
+    required: true,
   });
 }

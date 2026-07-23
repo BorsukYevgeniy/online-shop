@@ -1,11 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ApiAdminForbiddenResponseDocs } from '../../../../common/decorators/docs/auth';
+import { ApiRedirectResponse } from '../../../../common/decorators/docs/routes';
 import { PaginationDto } from '../../../../common/dto/pagination.dto';
 import { SearchUserDto } from '../../dto/search-user.dto';
 import { SortUserDto } from '../../dto/sort-user.dto';
@@ -21,7 +17,6 @@ export class UserSsrRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Getting all users' }),
       ApiOkResponse({ description: 'Users fetched' }),
-
       ApiQuery({ type: PaginationDto }),
       ApiQuery({ type: SortUserDto }),
       ApiAdminForbiddenResponseDocs(),
@@ -41,20 +36,14 @@ export class UserSsrRoutesDocs {
   static HandleDeleteMe() {
     return applyDecorators(
       UserApiRoutesDocs.DeleteMe(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /',
-      }),
+      ApiRedirectResponse('/'),
     );
   }
 
   static HandleDeleteById() {
     return applyDecorators(
       UserApiRoutesDocs.DeleteById(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /',
-      }),
+      ApiRedirectResponse('/'),
     );
   }
 }

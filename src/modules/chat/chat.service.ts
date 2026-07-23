@@ -1,6 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Chat } from '@prisma/client';
-import { ChatRepository } from './chat.repository';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { PaginatedChat, PaginatedUserChats } from './types/chat.types';
 
@@ -10,7 +9,8 @@ import { ChatErrorMessages as ChatErrMsg } from './enum/chat-error-message.enum'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { MessageService } from '../message/message.service';
-import { ChatMemberValidationService } from './chat-message/chat-member-validation.service';
+import { ChatRepository } from './repository/chat.repository';
+import { ChatMemberValidationService } from './validation/chat-member-validation.service';
 
 @Injectable()
 export class ChatService {
@@ -41,6 +41,7 @@ export class ChatService {
     this.logger.log(`Chat found between user ${buyerId} and user ${sellerId}.`);
     return chat;
   }
+
   async getUserChats(
     userId: number,
     paginationDto: PaginationDto,

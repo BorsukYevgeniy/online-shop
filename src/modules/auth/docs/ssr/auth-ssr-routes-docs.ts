@@ -1,7 +1,9 @@
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { applyDecorators } from '@nestjs/common';
 import { AuthApiRoutesDocs } from '../api/auth-api-routes-docs';
+
+import { ApiRedirectResponse } from '../../../../common/decorators/docs/routes';
 
 export class AuthSsrRoutesDocs {
   static RenderRegisterPage() {
@@ -11,10 +13,7 @@ export class AuthSsrRoutesDocs {
   static HandleRegister() {
     return applyDecorators(
       AuthApiRoutesDocs.Register(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /users/me',
-      }),
+      ApiRedirectResponse('/users/me'),
     );
   }
 
@@ -25,30 +24,21 @@ export class AuthSsrRoutesDocs {
   static HandleLogin() {
     return applyDecorators(
       AuthApiRoutesDocs.Login(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /users/me',
-      }),
+      ApiRedirectResponse('/users/me'),
     );
   }
 
   static HandleLogout() {
     return applyDecorators(
       AuthApiRoutesDocs.Logout(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /',
-      }),
+      ApiRedirectResponse('/'),
     );
   }
 
   static HandleLogoutAll() {
     return applyDecorators(
       AuthApiRoutesDocs.LogoutAll(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /',
-      }),
+      ApiRedirectResponse('/'),
     );
   }
 
@@ -59,19 +49,13 @@ export class AuthSsrRoutesDocs {
   static HandleVerify() {
     return applyDecorators(
       AuthApiRoutesDocs.Verify(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /users/me',
-      }),
+      ApiRedirectResponse('/users/me'),
     );
   }
   static HandleResendEmail() {
     return applyDecorators(
       AuthApiRoutesDocs.ResendEmail(),
-      ApiResponse({
-        status: 302,
-        description: 'Redirects to /auth/check-your-email',
-      }),
+      ApiRedirectResponse('/auth/check-your-email'),
     );
   }
 

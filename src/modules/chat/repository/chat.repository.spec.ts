@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
-import { PrismaService } from '../../infra/prisma/prisma.service';
+import { PrismaService } from '../../../infra/prisma/prisma.service';
+import { ChatMessages } from '../types/chat.types';
 import { ChatRepository } from './chat.repository';
-import { ChatMessages } from './types/chat.types';
 
 describe('ChatRepository', () => {
   let repository: ChatRepository;
