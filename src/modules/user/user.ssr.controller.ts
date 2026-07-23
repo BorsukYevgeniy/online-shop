@@ -156,6 +156,7 @@ export class UserSsrController {
 
     res.redirect(`/users/${userId}`);
   }
+
   @UserSsrRoutesDocs.HandleDeleteMe()
   @Delete('delete/me')
   async handleDeleteUserByHimself(
@@ -169,6 +170,7 @@ export class UserSsrController {
 
     return res.redirect('/');
   }
+
   @UserSsrRoutesDocs.HandleDeleteById()
   @Delete('delete/:userId')
   @RequieredRoles(Role.ADMIN)

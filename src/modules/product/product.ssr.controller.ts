@@ -1,3 +1,4 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -16,37 +17,32 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiNotFoundResponse,
-  ApiConsumes,
-  ApiBody,
-  ApiParam,
-  ApiQuery,
   ApiCookieAuth,
   ApiForbiddenResponse,
-  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
-import { AuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ImagesInterceptor } from './interceptor/images.interceptor';
-import { ProductService } from './product.service';
-import { CategoryService } from '../category/category.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { SearchProductDto } from './dto/search-product.dto';
-import { SortProductDto } from './dto/sort-product.dto';
-import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
+import { User } from '../../common/decorators/routes/user.decorator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { SsrExceptionFilter } from '../../common/filter/ssr-exception.filter';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { User } from '../../common/decorators/routes/user.decorator';
+import { AuthGuard } from '../auth/guards/jwt-auth.guard';
+import { VerifiedUserGuard } from '../auth/guards/verified-user.guard';
+import { CategoryService } from '../category/category.service';
 import { TokenPayload } from '../token/interface/token.interfaces';
+import { ProductSsrControllerDocs, ProductSsrRoutesDocs } from './docs/ssr';
+import { CreateProductDto } from './dto/create-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
+import { SortProductDto } from './dto/sort-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ImagesInterceptor } from './interceptor/images.interceptor';
+import { ValidateProductDtoPipe } from './pipe/validate-product-filter.pipe';
+import { ProductService } from './product.service';
 
-@ApiTags('SSR Products')
+@ProductSsrControllerDocs()
 @Controller('products')
 @UseFilters(SsrExceptionFilter)
 export class ProductSsrController {
@@ -55,11 +51,7 @@ export class ProductSsrController {
     private readonly categorySerivce: CategoryService,
   ) {}
 
-  @ApiOperation({ summary: 'Getting all products' })
-  @ApiOkResponse({ description: 'Products fetched' })
-  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
-  @ApiQuery({ type: PaginationDto })
-  @ApiQuery({ type: SortProductDto })
+  @ProductSsrRoutesDocs.GetAll()
   @Get()
   @Render('products/get-all-products')
   @UseInterceptors(CacheInterceptor)
@@ -80,12 +72,7 @@ export class ProductSsrController {
     };
   }
 
-  @ApiOperation({ summary: 'Searching products' })
-  @ApiOkResponse({ description: 'Products fetched' })
-  @ApiBadRequestResponse({ description: 'Ivalid query parameters' })
-  @ApiQuery({ type: PaginationDto })
-  @ApiQuery({ type: SearchProductDto })
-  @ApiQuery({ type: SortProductDto })
+  @ProductSsrRoutesDocs.Search()
   @Get('search')
   @UseInterceptors(CacheInterceptor)
   @Render('products/search-product')
@@ -114,7 +101,7 @@ export class ProductSsrController {
     };
   }
 
-  @ApiOperation({ summary: 'Render create product page' })
+  @ProductSsrRoutesDocs.RenderCreatePage()
   @Get('create')
   @Render('products/create-product')
   @UseInterceptors(CacheInterceptor)
@@ -128,17 +115,7 @@ export class ProductSsrController {
     return { categories };
   }
 
-  @ApiOperation({ summary: 'Create a new product' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Product creation payload',
-    type: CreateProductDto,
-  })
-  @ApiOkResponse({ description: 'Product created' })
-  @ApiBadRequestResponse({ description: 'Ivalid request body' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiCookieAuth('accessToken')
+  @ProductSsrRoutesDocs.HandleCreate()
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   @Post('create')
@@ -152,11 +129,7 @@ export class ProductSsrController {
     res.redirect('/users/me');
   }
 
-  @ApiOperation({ summary: 'Get product by ID' })
-  @ApiOkResponse({ description: 'Product found' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiParam({ name: 'productId', type: Number })
-  @ApiCookieAuth('accessToken')
+  @ProductSsrRoutesDocs.GetById()
   @Get(':productId')
   @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
@@ -173,8 +146,7 @@ export class ProductSsrController {
     };
   }
 
-  @ApiOperation({ summary: 'Render update product page' })
-  @ApiParam({ name: 'productId', type: Number })
+  @ProductSsrRoutesDocs.RenderUpdatePage()
   @Get('update/:productId')
   @Render('products/update-product')
   @UseInterceptors(CacheInterceptor)
@@ -194,21 +166,7 @@ export class ProductSsrController {
     };
   }
 
-  @ApiOperation({ summary: 'Update an existing product' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Product update payload',
-    type: UpdateProductDto,
-  })
-  @ApiOkResponse({ description: 'Product updated' })
-  @ApiBadRequestResponse({ description: 'Ivalid request body' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({
-    description: 'You must be verified user or you isnt ownership of product',
-  })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiParam({ name: 'productId', type: Number })
-  @ApiCookieAuth('accessToken')
+  @ProductSsrRoutesDocs.HandleUpdate()
   @UseGuards(VerifiedUserGuard)
   @UseInterceptors(ImagesInterceptor())
   @Patch('update/:productId')
@@ -220,9 +178,10 @@ export class ProductSsrController {
     @UploadedFiles() images: Express.Multer.File[],
   ) {
     await this.productService.update(user.id, productId, dto, images);
-    res.redirect('/users/me');
+    res.redirect(`/products/${productId}`);
   }
 
+  @ProductSsrRoutesDocs.HandleDelete()
   @ApiOperation({ summary: 'Delete a product' })
   @ApiOkResponse({ description: 'Product deleted' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })

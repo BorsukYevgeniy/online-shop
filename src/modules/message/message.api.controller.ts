@@ -18,33 +18,16 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageService } from './message.service';
 import { MessageNickname } from './types/message.type';
 
-import {
-  ApiBody,
-  ApiCookieAuth,
-  ApiForbiddenResponse,
-  ApiNoContentResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
 import { User } from '../../common/decorators/routes/user.decorator';
+import { MessageApiControllerDocs, MessageApiRoutesDocs } from './docs';
 
-@ApiTags('API Messages')
-@ApiCookieAuth('accessToken')
+@MessageApiControllerDocs()
 @Controller('api/messages')
 @UseGuards(VerifiedUserGuard)
 export class MessageApiController {
   constructor(private readonly messageService: MessageService) {}
 
-  @ApiOperation({ summary: 'Get message by id' })
-  @ApiOkResponse({ description: 'Message fetched' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiNotFoundResponse({ description: 'Message not found' })
-  @ApiParam({ name: 'messageId', type: Number })
+  @MessageApiRoutesDocs.GetMessageById()
   @Get(':messageId')
   @UseInterceptors(CacheInterceptor)
   async getMessageById(
@@ -54,13 +37,7 @@ export class MessageApiController {
     return await this.messageService.getMessageById(messageId, user.id);
   }
 
-  @ApiOperation({ summary: 'Update message by id' })
-  @ApiOkResponse({ description: 'Message updated' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiNotFoundResponse({ description: 'Message not found' })
-  @ApiParam({ name: 'messageId', type: Number })
-  @ApiBody({ type: UpdateMessageDto })
+  @MessageApiRoutesDocs.Update()
   @Patch(':messageId')
   async updateMessage(
     @User() user: TokenPayload,
@@ -74,12 +51,7 @@ export class MessageApiController {
     );
   }
 
-  @ApiOperation({ summary: 'Delete message by id' })
-  @ApiNoContentResponse({ description: 'Message deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'You must be verified user' })
-  @ApiNotFoundResponse({ description: 'Message not found' })
-  @ApiParam({ name: 'messageId', type: Number })
+  @MessageApiRoutesDocs.Delete()
   @Delete(':messageId')
   @HttpCode(204)
   async deleteMessage(
