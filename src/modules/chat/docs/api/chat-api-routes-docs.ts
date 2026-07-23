@@ -18,17 +18,18 @@ export class ChatApiRoutesDocs {
       ApiOkResponse({ description: 'Chats fetched' }),
     );
   }
+
   static GetById() {
     return applyDecorators(
       ApiOperation({ summary: 'Fetch chat by id' }),
       ApiOkResponse({ description: 'Chat fetched' }),
       ApiForbiddenResponse({ description: 'You isnt participant of chat' }),
-      ApiVerifiedForbiddenResponseDocs(),
       ApiChatNotFoundResponseDocs(),
       ApiChatIdParamDocs(),
       ApiQuery({ type: PaginationDto }),
     );
   }
+
   static Create() {
     return applyDecorators(
       ApiOperation({ summary: 'Fetch chat by id' }),
@@ -36,12 +37,13 @@ export class ChatApiRoutesDocs {
       ApiBody({ type: CreateChatDto }),
     );
   }
+
   static Delete() {
     return applyDecorators(
       ApiOperation({ summary: 'Delete chat by id' }),
       ApiOkResponse({ description: 'Chat deleted' }),
-      ApiForbiddenResponse({ description: 'You isnt participant of chat' }),
       ApiVerifiedForbiddenResponseDocs(),
+      ApiForbiddenResponse({ description: 'You isnt participant of chat' }),
       ApiChatNotFoundResponseDocs(),
       ApiChatIdParamDocs(),
     );

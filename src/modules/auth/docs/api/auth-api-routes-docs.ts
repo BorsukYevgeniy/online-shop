@@ -9,10 +9,7 @@ import {
   ApiParam,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import {
-  ApiUnauthorizedResponseDocs,
-  AuthCookiesDocs,
-} from '../../../../common/decorators/docs/auth';
+import { ApiAuthDocs } from '../../../../common/decorators/docs/auth';
 import { ApiUserNotFoundResponseDocs } from '../../../user/docs/shared';
 import { CreateUserDto } from '../../../user/dto/create-user.dto';
 import { LoginUserDto } from '../../dto/login-user.dto';
@@ -33,17 +30,16 @@ export class AuthApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Login user' }),
       ApiOkResponse({ description: 'User loggined' }),
-      ApiUserNotFoundResponseDocs(),
+      ApiBadRequestResponse({ description: 'Login or password are invalid' }),
       ApiBody({ type: LoginUserDto }),
     );
   }
 
   static Logout() {
     return applyDecorators(
-      AuthCookiesDocs(),
+      ApiAuthDocs(),
       ApiOperation({ summary: 'Logout user' }),
       ApiNoContentResponse({ description: 'User logouted' }),
-      ApiUnauthorizedResponseDocs(),
     );
   }
 
@@ -51,8 +47,7 @@ export class AuthApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Logout user in all devices' }),
       ApiNoContentResponse({ description: 'User logouted' }),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
+      ApiAuthDocs(),
     );
   }
 
@@ -79,8 +74,7 @@ export class AuthApiRoutesDocs {
       ApiOperation({ summary: 'Resend verification email' }),
       ApiNoContentResponse({ description: 'Email sended' }),
       ApiBadRequestResponse({ description: 'User already verified' }),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
+      ApiAuthDocs(),
     );
   }
 }

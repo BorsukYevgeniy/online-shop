@@ -7,11 +7,7 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import {
-  ApiAdminForbiddenResponseDocs,
-  ApiUnauthorizedResponseDocs,
-  AuthCookiesDocs,
-} from '../../../../common/decorators/docs/auth';
+import { ApiAdminAuthDocs } from '../../../../common/decorators/docs/auth';
 import { PaginationDto } from '../../../../common/dto/pagination.dto';
 import { CreateCategoryDto } from '../../dto/create-category.dto';
 import { SearchCategoryDto } from '../../dto/search-category.dto';
@@ -22,7 +18,7 @@ function ApiCategoryIdParamDocs() {
   return ApiParam({ name: 'categoryId', type: Number });
 }
 
-export class CategoryApiRoutes {
+export class CategoryApiRoutesDocs {
   static GetAll() {
     return applyDecorators(
       ApiOperation({ summary: 'Get all categories or search category' }),
@@ -45,9 +41,7 @@ export class CategoryApiRoutes {
     return applyDecorators(
       ApiOperation({ summary: 'Create category' }),
       ApiOkResponse({ description: 'Category created' }),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
-      ApiAdminForbiddenResponseDocs(),
+      ApiAdminAuthDocs(),
       ApiBody({ type: CreateCategoryDto }),
     );
   }
@@ -56,9 +50,7 @@ export class CategoryApiRoutes {
     return applyDecorators(
       ApiOperation({ summary: 'Update category' }),
       ApiOkResponse({ description: 'Category updated' }),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
-      ApiAdminForbiddenResponseDocs(),
+      ApiAdminAuthDocs(),
       ApiBody({ type: UpdateCategoryDto }),
       ApiCategoryIdParamDocs(),
     );
@@ -68,9 +60,7 @@ export class CategoryApiRoutes {
     return applyDecorators(
       ApiOperation({ summary: 'Delete category' }),
       ApiNoContentResponse({ description: 'Category deleted' }),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
-      ApiAdminForbiddenResponseDocs(),
+      ApiAdminAuthDocs(),
       ApiCategoryIdParamDocs(),
     );
   }

@@ -22,10 +22,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const config = new DocumentBuilder()
-    .setTitle('OLX-CLONE API')
-    .setDescription('The olx-clone API description')
+    .setTitle('Onlie shop API')
+    .setDescription('The online shop API description')
     .setVersion('1.0')
-    .addTag('olx-clone')
     .build();
 
   SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, config));

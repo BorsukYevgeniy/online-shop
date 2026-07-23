@@ -65,7 +65,7 @@ export class AuthService {
 
     if (!candidate) {
       this.logger.warn(`User not found: ${dto.email}`);
-      throw new NotFoundException(AuthErrMsg.InvalidCredentials);
+      throw new BadRequestException(AuthErrMsg.InvalidCredentials);
     }
 
     const { password: hashedPassword } = candidate;

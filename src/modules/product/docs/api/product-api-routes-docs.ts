@@ -7,12 +7,8 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import {
-  ApiVerifiedForbiddenResponseDocs,
-  AuthCookiesDocs,
-} from '../../../../common/decorators/docs/auth';
+import { ApiVerifiedAuthDocs } from '../../../../common/decorators/docs/auth';
 import { PaginationDto } from '../../../../common/dto/pagination.dto';
 import { CreateProductDto } from '../../dto/create-product.dto';
 import { SearchProductDto } from '../../dto/search-product.dto';
@@ -53,9 +49,7 @@ export class ProductApiRoutesDocs {
         type: CreateProductDto,
       }),
       ApiOkResponse({ description: 'Product created' }),
-      ApiUnauthorizedResponse(),
-      AuthCookiesDocs(),
-      ApiVerifiedForbiddenResponseDocs(),
+      ApiVerifiedAuthDocs(),
     );
   }
 
@@ -68,14 +62,12 @@ export class ProductApiRoutesDocs {
         type: UpdateProductDto,
       }),
       ApiOkResponse({ description: 'Product updated' }),
-      ApiUnauthorizedResponse(),
       ApiForbiddenResponse({
         description: 'You isnt ownership of product',
       }),
-      ApiVerifiedForbiddenResponseDocs(),
+      ApiVerifiedAuthDocs(),
       ApiProductNotFoundResponse(),
       ApiProductIdParamDocs(),
-      AuthCookiesDocs(),
     );
   }
 
@@ -83,14 +75,12 @@ export class ProductApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Delete a product' }),
       ApiOkResponse({ description: 'Product deleted' }),
-      ApiUnauthorizedResponse(),
+      ApiVerifiedAuthDocs(),
       ApiProductNotFoundResponse(),
       ApiForbiddenResponse({
         description: 'You isnt ownership of product',
       }),
-      ApiVerifiedForbiddenResponseDocs(),
       ApiProductIdParamDocs(),
-      AuthCookiesDocs(),
     );
   }
 }

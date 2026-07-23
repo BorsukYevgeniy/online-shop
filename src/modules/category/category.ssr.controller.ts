@@ -32,7 +32,7 @@ import { SearchCategoryDto } from './dto/search-category.dto';
 import { SortCategoryDto } from './dto/sort-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
-CategorySsrControllerDocs();
+@CategorySsrControllerDocs()
 @Controller('categories')
 @UseFilters(SsrExceptionFilter)
 export class CategorySsrController {
@@ -84,6 +84,20 @@ export class CategorySsrController {
     };
   }
 
+  @CategorySsrRoutesDocs.GetById()
+  @Get(':categoryId')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  @Render('categories/get-category-by-id')
+  async getCategoryByIdPage(
+    @User() user: TokenPayload,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
+    const category = await this.categoryService.getById(Number(categoryId));
+
+    return { ...category, role: user.role };
+  }
+
   @CategorySsrRoutesDocs.RenderCreatePage()
   @Get('create')
   @Render('categories/create-category')
@@ -102,20 +116,6 @@ export class CategorySsrController {
     await this.categoryService.create(createDto);
 
     res.redirect(303, '/categories');
-  }
-
-  @CategorySsrRoutesDocs.GetById()
-  @Get(':categoryId')
-  @UseGuards(AuthGuard)
-  @Render('categories/get-category-by-id')
-  @UseInterceptors(CacheInterceptor)
-  async getCategoryByIdPage(
-    @User() user: TokenPayload,
-    @Param('categoryId', ParseIntPipe) categoryId: number,
-  ) {
-    const category = await this.categoryService.getById(Number(categoryId));
-
-    return { ...category, role: user.role };
   }
 
   @CategorySsrRoutesDocs.RenderUpdatePage()

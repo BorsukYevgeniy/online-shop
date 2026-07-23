@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { AuthCookiesDocs } from '../../../../../common/decorators/docs/auth';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiVerifiedAuthDocs } from '../../../../../common/decorators/docs/auth';
 import {
   ApiChatIdParamDocs,
   ApiChatNotFoundResponseDocs,
@@ -9,8 +9,7 @@ import {
 export function ChatMessageApiControllerDocs() {
   return applyDecorators(
     ApiTags('API ChatMessages'),
-    AuthCookiesDocs(),
-    ApiUnauthorizedResponse(),
+    ApiVerifiedAuthDocs(),
     ApiChatNotFoundResponseDocs(),
     ApiChatIdParamDocs(),
   );

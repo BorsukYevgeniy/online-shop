@@ -1,14 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import {
-  ApiCookieAuth,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
-import {
-  ApiAdminForbiddenResponseDocs,
-  ApiUnauthorizedResponseDocs,
-} from '../../../../../common/decorators/docs/auth';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiAdminAuthDocs } from '../../../../../common/decorators/docs/auth';
 import {
   ApiChatIdParamDocs,
   ApiChatNotFoundResponseDocs,
@@ -17,9 +9,7 @@ import {
 export function ChatMessageSsrControllerDocs() {
   return applyDecorators(
     ApiTags('SSR ChatMessages'),
-    ApiCookieAuth('accessToken'),
-    ApiUnauthorizedResponseDocs(),
-    ApiAdminForbiddenResponseDocs(),
+    ApiAdminAuthDocs(),
     ApiChatNotFoundResponseDocs(),
     ApiChatIdParamDocs(),
   );

@@ -25,14 +25,14 @@ import { SortCategoryDto } from './dto/sort-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PaginatedCategory } from './type/category.type';
 
-import { CategoryApiControllerDocs, CategoryApiRoutes } from './docs/api';
+import { CategoryApiControllerDocs, CategoryApiRoutesDocs } from './docs/api';
 
 @CategoryApiControllerDocs()
 @Controller('api/categories')
 export class CategoryApiController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @CategoryApiRoutes.GetAll()
+  @CategoryApiRoutesDocs.GetAll()
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getAll(
@@ -43,7 +43,7 @@ export class CategoryApiController {
     return await this.categoryService.getAll(pagination, sortDto, searchDto);
   }
 
-  @CategoryApiRoutes.GetById()
+  @CategoryApiRoutesDocs.GetById()
   @Get(':categoryId')
   @UseInterceptors(CacheInterceptor)
   async getById(
@@ -52,7 +52,7 @@ export class CategoryApiController {
     return await this.categoryService.getById(id);
   }
 
-  @CategoryApiRoutes.Create()
+  @CategoryApiRoutesDocs.Create()
   @Post()
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -60,7 +60,7 @@ export class CategoryApiController {
     return await this.categoryService.create(dto);
   }
 
-  @CategoryApiRoutes.Update()
+  @CategoryApiRoutesDocs.Update()
   @Patch(':categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)
@@ -71,7 +71,7 @@ export class CategoryApiController {
     return await this.categoryService.update(id, dto);
   }
 
-  @CategoryApiRoutes.DeleteById()
+  @CategoryApiRoutesDocs.DeleteById()
   @Delete(':categoryId')
   @RequieredRoles(Role.ADMIN)
   @UseGuards(RolesGuard)

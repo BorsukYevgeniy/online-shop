@@ -1,15 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import {
-  ApiVerifiedForbiddenResponseDocs,
-  AuthCookiesDocs,
-} from '../../../../common/decorators/docs/auth';
+import { ApiTags } from '@nestjs/swagger';
 
 export function ChatSsrControllerDocs() {
-  return applyDecorators(
-    ApiTags('SSR Chats'),
-    AuthCookiesDocs(),
-    ApiUnauthorizedResponse(),
-    ApiVerifiedForbiddenResponseDocs(),
-  );
+  return applyDecorators(ApiTags('SSR Chats'));
 }

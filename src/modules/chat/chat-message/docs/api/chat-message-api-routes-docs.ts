@@ -5,10 +5,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-import {
-  ApiAdminForbiddenResponseDocs,
-  ApiVerifiedForbiddenResponseDocs,
-} from '../../../../../common/decorators/docs/auth';
+import { ApiAdminForbiddenResponseDocs } from '../../../../../common/decorators/docs/auth';
 import { CreateMessageDto } from '../../../../message/dto/create-message.dto';
 
 export class ChatMessageApiRoutesDocs {
@@ -24,7 +21,7 @@ export class ChatMessageApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Create message in chat' }),
       ApiOkResponse({ description: 'Message created' }),
-      ApiVerifiedForbiddenResponseDocs(),
+
       ApiForbiddenResponse({
         description: 'You must be a participant of the chat',
       }),

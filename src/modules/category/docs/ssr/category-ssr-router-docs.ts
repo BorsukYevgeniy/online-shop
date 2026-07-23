@@ -1,15 +1,14 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import {
-  ApiAdminForbiddenResponseDocs,
-  ApiUnauthorizedResponseDocs,
-  AuthCookiesDocs,
+  ApiAdminAuthDocs,
+  ApiAuthDocs,
 } from '../../../../common/decorators/docs/auth';
 import { ApiRedirectResponse } from '../../../../common/decorators/docs/routes';
 import { PaginationDto } from '../../../../common/dto/pagination.dto';
 import { SearchCategoryDto } from '../../dto/search-category.dto';
 import { SortCategoryDto } from '../../dto/sort-category.dto';
-import { CategoryApiRoutes } from '../api';
+import { CategoryApiRoutesDocs } from '../api';
 
 export class CategorySsrRoutesDocs {
   static GetAll() {
@@ -19,8 +18,7 @@ export class CategorySsrRoutesDocs {
       ApiQuery({ type: PaginationDto }),
       ApiQuery({ type: SortCategoryDto }),
       ApiQuery({ type: SearchCategoryDto }),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
+      ApiAuthDocs(),
     );
   }
 
@@ -35,48 +33,40 @@ export class CategorySsrRoutesDocs {
   }
 
   static GetById() {
-    return applyDecorators(
-      CategorySsrRoutesDocs.GetById(),
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
-    );
+    return applyDecorators(CategoryApiRoutesDocs.GetById(), ApiAuthDocs());
   }
 
   static RenderCreatePage() {
     return applyDecorators(
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
-      ApiAdminForbiddenResponseDocs(),
+      ApiAdminAuthDocs(),
       ApiOperation({ summary: 'Render create category page' }),
     );
   }
 
   static HandleCreate() {
     return applyDecorators(
-      CategoryApiRoutes.Create(),
+      CategoryApiRoutesDocs.Create(),
       ApiRedirectResponse('/categories'),
     );
   }
 
   static RenderUpdatePage() {
     return applyDecorators(
-      AuthCookiesDocs(),
-      ApiUnauthorizedResponseDocs(),
-      ApiAdminForbiddenResponseDocs(),
+      ApiAdminAuthDocs(),
       ApiOperation({ summary: 'Render update category page' }),
     );
   }
 
   static HandleUpdate() {
     return applyDecorators(
-      CategoryApiRoutes.Update(),
+      CategoryApiRoutesDocs.Update(),
       ApiRedirectResponse('/categories/:categoryId'),
     );
   }
 
   static HandleDeleteById() {
     return applyDecorators(
-      CategoryApiRoutes.DeleteById(),
+      CategoryApiRoutesDocs.DeleteById(),
       ApiRedirectResponse('/categories'),
     );
   }
