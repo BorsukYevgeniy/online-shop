@@ -5,9 +5,9 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { MessageService } from '../message/message.service';
 import { MessageNickname } from '../message/types/message.type';
 import { ChatService } from './chat.service';
+import { ChatRepository } from './repository/chat.repository';
 import { ChatMessages, UserChat } from './types/chat.types';
 import { ChatMemberValidationService } from './validation/chat-member-validation.service';
-import { ChatRepository } from './validation/chat.repository';
 
 describe('ChatService', () => {
   let repository: ChatRepository;

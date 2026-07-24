@@ -5,15 +5,15 @@ import { ConfigModule } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { hash } from 'bcryptjs';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import Keyv from 'keyv';
-import { CreateCategoryDto } from 'src/modules/category/dto/create-category.dto';
-import { SearchCategoryDto } from 'src/modules/category/dto/search-category.dto';
-import { UpdateCategoryDto } from 'src/modules/category/dto/update-category.dto';
-import * as request from 'supertest';
+import request from 'supertest';
 import { PrismaService } from '../src/infra/prisma/prisma.service';
 import { AuthModule } from '../src/modules/auth/auth.module';
 import { CategoryModule } from '../src/modules/category/category.module';
+import { CreateCategoryDto } from '../src/modules/category/dto/create-category.dto';
+import { SearchCategoryDto } from '../src/modules/category/dto/search-category.dto';
+import { UpdateCategoryDto } from '../src/modules/category/dto/update-category.dto';
 
 describe('CategoryApiController (e2e)', () => {
   let app: NestExpressApplication;

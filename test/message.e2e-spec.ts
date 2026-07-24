@@ -4,14 +4,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as cookieParser from 'cookie-parser';
+import { hash } from 'bcryptjs';
+import cookieParser from 'cookie-parser';
 import Keyv from 'keyv';
 import { join } from 'path';
-import * as request from 'supertest';
+import request from 'supertest';
 import { PrismaService } from '../src/infra/prisma/prisma.service';
 import { AuthModule } from '../src/modules/auth/auth.module';
-
-import { hash } from 'bcryptjs';
 import { MessageModule } from '../src/modules/message/message.module';
 
 describe('MessageApiController (e2e)', () => {

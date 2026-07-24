@@ -1,9 +1,9 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CartService } from './cart.service';
-import { CartRepository } from './cart.repository';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { Product } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { CartRepository } from './cart.repository';
+import { CartService } from './cart.service';
 
 describe('CartService', () => {
   let service: CartService;

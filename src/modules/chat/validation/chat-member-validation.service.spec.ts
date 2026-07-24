@@ -1,10 +1,11 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { ChatMemberValidationRepository } from './chat-member-validation.repository';
 import { ChatMemberValidationService } from './chat-member-validation.service';
 
+import { ChatRepository } from '../repository/chat.repository';
+
 describe('ChatRepository', () => {
-  let repository: ChatMemberValidationRepository;
+  let repository: ChatRepository;
   let service: ChatMemberValidationService;
 
   beforeEach(async () => {
@@ -12,7 +13,7 @@ describe('ChatRepository', () => {
       providers: [
         ChatMemberValidationService,
         {
-          provide: ChatMemberValidationRepository,
+          provide: ChatRepository,
           useValue: {
             getUsersInChat: jest.fn(),
           },
@@ -20,9 +21,7 @@ describe('ChatRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<ChatMemberValidationRepository>(
-      ChatMemberValidationRepository,
-    );
+    repository = module.get<ChatRepository>(ChatRepository);
     service = module.get<ChatMemberValidationService>(
       ChatMemberValidationService,
     );

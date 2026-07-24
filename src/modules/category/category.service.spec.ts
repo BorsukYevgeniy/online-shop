@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CategoryService } from './category.service';
-import { CategoryRepository } from './category.repository';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Order } from '../../common/enum/order.enum';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { Order } from '../../common/enum/order.enum';
+import { CategoryRepository } from './category.repository';
+import { CategoryService } from './category.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { SearchCategoryDto } from './dto/search-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 describe('CategoryService', () => {
   let service: CategoryService;
