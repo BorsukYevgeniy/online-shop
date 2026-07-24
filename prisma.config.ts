@@ -9,7 +9,7 @@ config({
 });
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: 'prisma/schemas',
   migrations: {
     path: 'prisma/migrations',
   },
