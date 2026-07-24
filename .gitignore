@@ -2,5 +2,5 @@ node_modules
 dist
 .env.test
 .env.development
-images
+/images
 generated

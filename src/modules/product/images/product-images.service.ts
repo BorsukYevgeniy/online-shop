@@ -2,19 +2,32 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  OnModuleInit,
 } from '@nestjs/common';
-import { promises as fsPromises } from 'fs';
-import {
-  join as joinPath,
-  resolve as resolvePath,
-  extname as fileExtname,
-} from 'path';
+import { FileStorageService } from '../../../infra/file-storage/file-storage.service';
+
+import { extname as fileExtname, resolve as resolvePath } from 'path';
 import { v4 as uuidV4 } from 'uuid';
-import { FileErrorMessages as FileErrMsg } from './enum/file-error-messages.enum';
 
 @Injectable()
-export class FileService {
-  private readonly logger: Logger = new Logger(FileService.name);
+export class ProductImagesService implements OnModuleInit {
+  private readonly logger: Logger = new Logger(ProductImagesService.name);
+
+  constructor(private readonly fileService: FileStorageService) {}
+
+  private readonly PRODUCT_IMAGES_PATH: string = resolvePath(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'images',
+  );
+
+  async onModuleInit() {
+    return this.fileService.mkdir(this.PRODUCT_IMAGES_PATH);
+  }
 
   async createImages(
     images: Express.Multer.File[],
@@ -23,14 +36,6 @@ export class FileService {
 
     try {
       const fileNames: string[] = [];
-      const filePath: string = resolvePath(__dirname, '..', '..', 'images');
-
-      try {
-        await fsPromises.access(filePath);
-      } catch {
-        this.logger.debug(`Directory does not exist, creating: ${filePath}`);
-        await fsPromises.mkdir(filePath, { recursive: true });
-      }
 
       const writePromises: Promise<void>[] = images.map(
         (file: Express.Multer.File): Promise<void> => {
@@ -38,8 +43,9 @@ export class FileService {
 
           fileNames.push(fileName);
 
-          return fsPromises.writeFile(
-            joinPath(filePath, fileName),
+          return this.fileService.write(
+            fileName,
+            this.PRODUCT_IMAGES_PATH,
             file.buffer,
           );
         },
@@ -52,7 +58,7 @@ export class FileService {
     } catch (e: unknown) {
       this.logger.error('Error writing files to disk', e);
 
-      throw new InternalServerErrorException(FileErrMsg.ErrorWritingOnDisk);
+      throw new InternalServerErrorException('Error writing files to disk');
     }
   }
 }

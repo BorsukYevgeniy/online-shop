@@ -24,7 +24,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ImagesInterceptor } from './interceptor/images.interceptor';
+import { ImagesInterceptor } from './images/interceptor/images.interceptor';
 import { ProductService } from './product.service';
 import { PaginatedProduct, ProductCategory } from './types/product.types';
 

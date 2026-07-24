@@ -4,7 +4,6 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { FileService } from '../file/file.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { SortProductDto } from './dto/sort-product.dto';
@@ -15,6 +14,7 @@ import { PaginatedProduct, ProductCategory } from './types/product.types';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { ProductErrorMessages as ProductErrMsg } from './enum/product-error-messages.enum';
+import { ProductImagesService } from './images/product-images.service';
 
 @Injectable()
 export class ProductService {
@@ -22,7 +22,7 @@ export class ProductService {
 
   constructor(
     private readonly productRepository: ProductRepository,
-    private readonly fileService: FileService,
+    private readonly imagesService: ProductImagesService,
   ) {}
 
   private async validateProductOwnership(
@@ -98,7 +98,7 @@ export class ProductService {
     createProductDto: CreateProductDto,
     images: Express.Multer.File[],
   ): Promise<ProductCategory> {
-    const imagesNames: string[] = await this.fileService.createImages(images);
+    const imagesNames: string[] = await this.imagesService.createImages(images);
 
     const product = await this.productRepository.create(
       userId,
@@ -121,7 +121,7 @@ export class ProductService {
     await this.validateProductOwnership(userId, productId);
 
     try {
-      const imagesNames = await this.fileService.createImages(images);
+      const imagesNames = await this.imagesService.createImages(images);
       const product = await this.productRepository.update(
         productId,
         updateProductDto,

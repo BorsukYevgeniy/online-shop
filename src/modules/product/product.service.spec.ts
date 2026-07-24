@@ -1,14 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ProductService } from './product.service';
-import { ProductRepository } from './product.repository';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { FileService } from '../file/file.service';
-import { Order } from '../../common/enum/order.enum';
-import { SearchProductDto } from './dto/search-product.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { Product } from '@prisma/client';
-import { title } from 'process';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Order } from '../../common/enum/order.enum';
+import { CreateProductDto } from './dto/create-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductImagesService } from './images/product-images.service';
+import { ProductRepository } from './product.repository';
+import { ProductService } from './product.service';
 import { ProductCategory } from './types/product.types';
 
 const mockFiles: Express.Multer.File[] = [
@@ -18,7 +16,7 @@ const mockFiles: Express.Multer.File[] = [
 
 describe('ProductService', () => {
   let service: ProductService;
-  let fileService: FileService;
+  let fileService: ProductImagesService;
   let repository: ProductRepository;
 
   beforeEach(async () => {
@@ -42,7 +40,7 @@ describe('ProductService', () => {
           },
         },
         {
-          provide: FileService,
+          provide: ProductImagesService,
           useValue: {
             createImages: jest.fn(),
           },
@@ -51,7 +49,7 @@ describe('ProductService', () => {
     }).compile();
 
     service = module.get<ProductService>(ProductService);
-    fileService = module.get<FileService>(FileService);
+    fileService = module.get<ProductImagesService>(ProductImagesService);
     repository = module.get<ProductRepository>(ProductRepository);
   });
 
