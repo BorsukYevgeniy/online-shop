@@ -151,7 +151,10 @@ describe('ChatApiController', () => {
           .mockRejectedValue(new NotFoundException());
 
         await expect(
-          controller.deleteChat({ id: 1, role: Role.USER, isVerified: true }, 1),
+          controller.deleteChat(
+            { id: 1, role: Role.USER, isVerified: true },
+            1,
+          ),
         ).rejects.toThrow(NotFoundException);
       }
     });

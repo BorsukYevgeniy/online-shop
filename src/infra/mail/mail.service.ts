@@ -16,7 +16,7 @@ export class MailService {
   async sendVerificationMail(to: string, link: string): Promise<void> {
     await this.mailerService.sendMail({
       to,
-      subject: 'Verification mail on ' + this.appConf.app_url,
+      subject: 'Verification mail on ' + this.appConf.appUrl,
       text: '',
       html: `
       <div>

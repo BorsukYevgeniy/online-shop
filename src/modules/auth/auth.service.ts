@@ -162,7 +162,7 @@ export class AuthService {
   ): Promise<void> {
     return await this.mailService.sendVerificationMail(
       email,
-      this.config.app_url +
+      this.config.appUrl +
         (mode === 'api' ? '/api' : '') +
         `/auth/verify/${verificationLink}`,
     );

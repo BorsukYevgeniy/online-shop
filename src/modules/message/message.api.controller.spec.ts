@@ -7,7 +7,6 @@ import { TokenService } from '../token/token.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Role } from '../../common/enum/role.enum';
 
-
 describe('MessageApiController', () => {
   let controller: MessageApiController;
   let service: MessageService;
@@ -56,7 +55,11 @@ describe('MessageApiController', () => {
         // Simulate a scenario where the message is found and owned by the user
         jest.spyOn(service, 'getMessageById').mockResolvedValue(mockMessage);
 
-        const result = await controller.getMessageById(id, { id: 1, role: Role.USER, isVerified: true });
+        const result = await controller.getMessageById(id, {
+          id: 1,
+          role: Role.USER,
+          isVerified: true,
+        });
         expect(result).toEqual(mockMessage);
       } else if (found && !owned) {
         // Simulate a scenario where the user does not own the message
@@ -65,18 +68,26 @@ describe('MessageApiController', () => {
           .spyOn(service, 'getMessageById')
           .mockRejectedValue(new ForbiddenException());
 
-        await expect(controller.getMessageById(id, { id: 1, role: Role.USER, isVerified: true })).rejects.toThrow(
-          ForbiddenException,
-        );
+        await expect(
+          controller.getMessageById(id, {
+            id: 1,
+            role: Role.USER,
+            isVerified: true,
+          }),
+        ).rejects.toThrow(ForbiddenException);
       } else {
         // Simulate a scenario where the message is not found
         jest
           .spyOn(service, 'getMessageById')
           .mockRejectedValue(new NotFoundException());
 
-        await expect(controller.getMessageById(id, { id: 1, role: Role.USER, isVerified: true })).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(
+          controller.getMessageById(id, {
+            id: 1,
+            role: Role.USER,
+            isVerified: true,
+          }),
+        ).rejects.toThrow(NotFoundException);
       }
     });
   });
@@ -100,9 +111,13 @@ describe('MessageApiController', () => {
         // Simulate a scenario where the message is found and owned by the user
         jest.spyOn(service, 'updateMessage').mockResolvedValue(mockMessage);
 
-        const result = await controller.updateMessage({ id: 1, role: Role.USER, isVerified: true }, id, {
-          text: 'Updated Text',
-        });
+        const result = await controller.updateMessage(
+          { id: 1, role: Role.USER, isVerified: true },
+          id,
+          {
+            text: 'Updated Text',
+          },
+        );
 
         expect(result).toEqual(mockMessage);
       } else if (found && !owned) {
@@ -113,7 +128,11 @@ describe('MessageApiController', () => {
           .mockRejectedValue(new ForbiddenException());
 
         await expect(
-          controller.updateMessage({ id: 1, role: Role.USER, isVerified: true }, id, { text: 'Updated Text' }),
+          controller.updateMessage(
+            { id: 1, role: Role.USER, isVerified: true },
+            id,
+            { text: 'Updated Text' },
+          ),
         ).rejects.toThrow(ForbiddenException);
       } else {
         // Simulate a scenario where the message is not found
@@ -123,7 +142,11 @@ describe('MessageApiController', () => {
           .mockRejectedValue(new NotFoundException());
 
         await expect(
-          controller.updateMessage({ id: 1, role: Role.USER, isVerified: true }, id, { text: 'Updated Text' }),
+          controller.updateMessage(
+            { id: 1, role: Role.USER, isVerified: true },
+            id,
+            { text: 'Updated Text' },
+          ),
         ).rejects.toThrow(NotFoundException);
       }
     });
@@ -145,7 +168,10 @@ describe('MessageApiController', () => {
           createdAt: new Date(),
         });
 
-        const result = await controller.deleteMessage({ id: 1, role: Role.USER, isVerified: true }, id);
+        const result = await controller.deleteMessage(
+          { id: 1, role: Role.USER, isVerified: true },
+          id,
+        );
         expect(result).toEqual(undefined);
       } else if (found && !owned) {
         // Simulate a scenario where the user does not own the message
@@ -154,9 +180,12 @@ describe('MessageApiController', () => {
           .spyOn(service, 'deleteMessage')
           .mockRejectedValue(new ForbiddenException());
 
-        await expect(controller.deleteMessage({ id: 1, role: Role.USER, isVerified: true }, id)).rejects.toThrow(
-          ForbiddenException,
-        );
+        await expect(
+          controller.deleteMessage(
+            { id: 1, role: Role.USER, isVerified: true },
+            id,
+          ),
+        ).rejects.toThrow(ForbiddenException);
       } else {
         // Simulate a scenario where the message is not found
 
@@ -164,9 +193,12 @@ describe('MessageApiController', () => {
           .spyOn(service, 'deleteMessage')
           .mockRejectedValue(new NotFoundException());
 
-        await expect(controller.deleteMessage({ id: 1, role: Role.USER, isVerified: true }, id)).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(
+          controller.deleteMessage(
+            { id: 1, role: Role.USER, isVerified: true },
+            id,
+          ),
+        ).rejects.toThrow(NotFoundException);
       }
     });
   });

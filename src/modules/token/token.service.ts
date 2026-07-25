@@ -48,7 +48,7 @@ export class TokenService {
   async verifyRefreshToken(refreshToken: string): Promise<TokenPayload> {
     try {
       return await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
-        secret: this.config.jwt_refresh_secret,
+        secret: this.config.jwtRefreshSecret,
       });
     } catch (error) {
       this.logger.warn('Invalid refresh token', {
@@ -61,7 +61,7 @@ export class TokenService {
   async verifyAccessToken(accessToken: string): Promise<TokenPayload> {
     try {
       return await this.jwtService.verifyAsync<TokenPayload>(accessToken, {
-        secret: this.config.jwt_access_secret,
+        secret: this.config.jwtAccessTokenSecret,
       });
     } catch (error) {
       this.logger.warn('Invalid access token', {
@@ -108,8 +108,8 @@ export class TokenService {
     this.logger.log(`Generating access token for user ${payload.id}`);
 
     return await this.jwtService.signAsync(payload, {
-      expiresIn: this.config.access_token_expiration_time,
-      secret: this.config.jwt_access_secret,
+      expiresIn: this.config.jwtAccessTokenExpirationTime,
+      secret: this.config.jwtAccessTokenSecret,
     } as JwtSignOptions);
   }
 
@@ -117,8 +117,8 @@ export class TokenService {
     this.logger.log(`Generating refresh token for user ${payload.id}`);
 
     return await this.jwtService.signAsync(payload, {
-      expiresIn: this.config.refresh_token_expiration_time,
-      secret: this.config.jwt_refresh_secret,
+      expiresIn: this.config.jwtRefreshTokenExpirationTime,
+      secret: this.config.jwtRefreshSecret,
     } as JwtSignOptions);
   }
 

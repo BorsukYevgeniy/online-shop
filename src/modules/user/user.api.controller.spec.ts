@@ -203,7 +203,7 @@ describe('UserApiController', () => {
 
     jest.spyOn(userService, 'getMe').mockResolvedValue(mockUser);
 
-    const userFromControllet = await controller.getMe(user)
+    const userFromControllet = await controller.getMe(user);
 
     expect(userFromControllet).toEqual(mockUser);
     expect(userService.getMe).toHaveBeenCalledWith(1);

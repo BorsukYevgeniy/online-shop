@@ -24,7 +24,7 @@ export class PrismaService
   ) {
     super({
       adapter: new PrismaPg({
-        connectionString: config.database_url,
+        connectionString: config.databaseUrl,
       }),
     });
   }

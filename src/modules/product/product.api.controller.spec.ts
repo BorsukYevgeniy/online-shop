@@ -16,7 +16,7 @@ describe('ProductApiController', () => {
   let controller: ProductApiController;
   let service: ProductService;
 
-  const user:TokenPayload = { id: 1, role: Role.USER, isVerified: true };
+  const user: TokenPayload = { id: 1, role: Role.USER, isVerified: true };
 
   const mockFiles: Express.Multer.File[] = [
     { filename: 'file1.jpg' } as Express.Multer.File,

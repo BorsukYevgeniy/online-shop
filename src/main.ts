@@ -35,7 +35,7 @@ async function bootstrap() {
 
   await app.listen(appConf.app_port);
 
-  logger.log(`Application is running on: ${appConf.app_url}`);
+  logger.log(`Application is running on: ${appConf.appUrl}`);
 }
 
 bootstrap();

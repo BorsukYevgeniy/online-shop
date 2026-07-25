@@ -8,9 +8,10 @@ import {
 import { SearchUserDto } from '../dto/search-user.dto';
 
 @Injectable()
-export class ValidateUserFilterPipe
-  implements PipeTransform<SearchUserDto, SearchUserDto>
-{
+export class ValidateUserFilterPipe implements PipeTransform<
+  SearchUserDto,
+  SearchUserDto
+> {
   private readonly logger: Logger = new Logger(ValidateUserFilterPipe.name);
 
   transform(value: SearchUserDto, metadata: ArgumentMetadata): SearchUserDto {

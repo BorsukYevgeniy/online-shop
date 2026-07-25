@@ -10,9 +10,9 @@ import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 
 @Catch(HttpException, WsException)
-export class SsrExceptionFilter
-  implements ExceptionFilter<HttpException | WsException>
-{
+export class SsrExceptionFilter implements ExceptionFilter<
+  HttpException | WsException
+> {
   catch(exception: HttpException | WsException, host: ArgumentsHost) {
     if (exception instanceof HttpException) {
       const ctx = host.switchToHttp();

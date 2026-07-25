@@ -8,9 +8,10 @@ import {
 import { SearchProductDto } from '../dto/search-product.dto';
 
 @Injectable()
-export class ValidateProductDtoPipe
-  implements PipeTransform<SearchProductDto, SearchProductDto>
-{
+export class ValidateProductDtoPipe implements PipeTransform<
+  SearchProductDto,
+  SearchProductDto
+> {
   private readonly logger: Logger = new Logger(ValidateProductDtoPipe.name);
 
   transform(
