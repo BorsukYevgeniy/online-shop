@@ -6,7 +6,9 @@ import methodOverride from 'method-override';
 import { join } from 'path';
 import { AppModule } from './app.module';
 
+import { ConfigType } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import appConfig from './config/app.config';
 
 async function bootstrap() {
   const logger: Logger = new Logger('Bootstrap');
@@ -29,9 +31,11 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, config));
 
-  await app.listen(process.env.PORT);
+  const appConf = app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
 
-  logger.log(`Application is running on: http://localhost:${process.env.PORT}`);
+  await app.listen(appConf.app_port);
+
+  logger.log(`Application is running on: ${appConf.app_url}`);
 }
 
 bootstrap();

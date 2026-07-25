@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -9,7 +10,6 @@ import { compare, hash } from 'bcryptjs';
 import { Role } from '../../common/enum/role.enum';
 import { DeletingCount } from '../../common/types/deleting-count.type';
 import { MailService } from '../../infra/mail/mail.service';
-import { ConfigService } from '../config/config.service';
 import { Tokens } from '../token/interface/token.interfaces';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -17,6 +17,8 @@ import { UserNoCred, UserNoPassword } from '../user/types/user.types';
 import { UserService } from '../user/user.service';
 import { LoginUserDto } from './dto/login-user.dto';
 
+import { ConfigType } from '@nestjs/config';
+import appConfig from '../../config/app.config';
 import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
 import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages.enum';
@@ -29,7 +31,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
-    private readonly configService: ConfigService,
+    @Inject(appConfig.KEY)
+    private readonly config: ConfigType<typeof appConfig>,
   ) {}
 
   async register(
@@ -159,7 +162,7 @@ export class AuthService {
   ): Promise<void> {
     return await this.mailService.sendVerificationMail(
       email,
-      this.configService.APP_URL +
+      this.config.app_url +
         (mode === 'api' ? '/api' : '') +
         `/auth/verify/${verificationLink}`,
     );

@@ -1,16 +1,17 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '../../modules/config/config.module';
-import { ConfigService } from '../../modules/config/config.service';
+import { ConfigModule, ConfigType } from '@nestjs/config';
+import appConfig from '../../config/app.config';
+import smtpConfig from '../../config/smtp.config';
 import { MailService } from './mail.service';
 
 @Module({
   imports: [
-    ConfigModule,
+    ConfigModule.forFeature(appConfig),
     MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => configService.MAIL_CONFIG,
+      imports: [ConfigModule.forFeature(smtpConfig)],
+      inject: [smtpConfig.KEY],
+      useFactory: (config: ConfigType<typeof smtpConfig>) => config,
     }),
   ],
   providers: [MailService],

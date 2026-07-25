@@ -1,6 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '../../modules/config/config.service';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import appConfig from '../../config/app.config';
 
 @Injectable()
 export class MailService {
@@ -8,14 +9,14 @@ export class MailService {
 
   constructor(
     private readonly mailerService: MailerService,
-    private readonly configService: ConfigService,
+    @Inject(appConfig.KEY)
+    private readonly appConf: ConfigType<typeof appConfig>,
   ) {}
 
   async sendVerificationMail(to: string, link: string): Promise<void> {
     await this.mailerService.sendMail({
       to,
-      from: this.configService.SMTP_USER,
-      subject: 'Verification mail on ' + this.configService.APP_URL,
+      subject: 'Verification mail on ' + this.appConf.app_url,
       text: '',
       html: `
       <div>

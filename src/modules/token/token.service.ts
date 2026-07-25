@@ -1,17 +1,19 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '../config/config.service';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { TokenRepository } from './token.repository';
 
 import { Token } from '@prisma/client';
 import { DeletingCount } from '../../common/types/deleting-count.type';
 import { TokenPayload, Tokens } from './interface/token.interfaces';
 
+import { ConfigType } from '@nestjs/config';
+import jwtConfig from '../../config/jwt.config';
 import { TokenErrorMessages as TokenErrMsg } from './enum/token-error-messages.enum';
 
 @Injectable()
@@ -21,7 +23,8 @@ export class TokenService {
   constructor(
     private readonly tokenRepositry: TokenRepository,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    @Inject(jwtConfig.KEY)
+    private readonly config: ConfigType<typeof jwtConfig>,
   ) {}
 
   async generateTokens(tokenPayload: TokenPayload): Promise<Tokens> {
@@ -45,7 +48,7 @@ export class TokenService {
   async verifyRefreshToken(refreshToken: string): Promise<TokenPayload> {
     try {
       return await this.jwtService.verifyAsync<TokenPayload>(refreshToken, {
-        secret: this.configService.JWT_CONFIG.JWT_REFRESH_SECRET,
+        secret: this.config.jwt_refresh_secret,
       });
     } catch (error) {
       this.logger.warn('Invalid refresh token', {
@@ -58,7 +61,7 @@ export class TokenService {
   async verifyAccessToken(accessToken: string): Promise<TokenPayload> {
     try {
       return await this.jwtService.verifyAsync<TokenPayload>(accessToken, {
-        secret: this.configService.JWT_CONFIG.JWT_ACCESS_SECRET,
+        secret: this.config.jwt_access_secret,
       });
     } catch (error) {
       this.logger.warn('Invalid access token', {
@@ -105,18 +108,18 @@ export class TokenService {
     this.logger.log(`Generating access token for user ${payload.id}`);
 
     return await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.JWT_CONFIG.ACCESS_TOKEN_EXPIRATION_TIME,
-      secret: this.configService.JWT_CONFIG.JWT_ACCESS_SECRET,
-    });
+      expiresIn: this.config.access_token_expiration_time,
+      secret: this.config.jwt_access_secret,
+    } as JwtSignOptions);
   }
 
   private async generateRefreshToken(payload: TokenPayload) {
     this.logger.log(`Generating refresh token for user ${payload.id}`);
 
     return await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.JWT_CONFIG.REFRESH_TOKEN_EXPIRATION_TIME,
-      secret: this.configService.JWT_CONFIG.JWT_REFRESH_SECRET,
-    });
+      expiresIn: this.config.refresh_token_expiration_time,
+      secret: this.config.jwt_refresh_secret,
+    } as JwtSignOptions);
   }
 
   async updateTokens(refreshToken: string): Promise<Tokens> {
