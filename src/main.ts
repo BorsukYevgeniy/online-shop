@@ -33,7 +33,7 @@ async function bootstrap() {
 
   const appConf = app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
 
-  await app.listen(appConf.app_port);
+  await app.listen(appConf.appPort);
 
   logger.log(`Application is running on: ${appConf.appUrl}`);
 }

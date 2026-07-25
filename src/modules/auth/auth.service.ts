@@ -9,7 +9,6 @@ import { Token, User } from '@prisma/client';
 import { compare, hash } from 'bcryptjs';
 import { Role } from '../../common/enum/role.enum';
 import { DeletingCount } from '../../common/types/deleting-count.type';
-import { MailService } from '../../infra/mail/mail.service';
 import { Tokens } from '../token/interface/token.interfaces';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -22,6 +21,7 @@ import appConfig from '../../config/app.config';
 import { TokenErrorMessages as TokenErrMsg } from '../token/enum/token-error-messages.enum';
 import { UserErrorMessages as UserErrMsg } from '../user/constants/user-error-messages.constants';
 import { AuthErrorMessages as AuthErrMsg } from './enum/auth-error-messages.enum';
+import { AuthMailService } from './mail/auth-mail.service';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +30,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
-    private readonly mailService: MailService,
+    private readonly mailService: AuthMailService,
     @Inject(appConfig.KEY)
     private readonly config: ConfigType<typeof appConfig>,
   ) {}

@@ -1,6 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '../../modules/config/config.service';
 import { MailService } from './mail.service';
 
 describe('UserCleaningService', () => {
@@ -16,10 +15,6 @@ describe('UserCleaningService', () => {
           useValue: {
             sendMail: jest.fn(),
           },
-        },
-        {
-          provide: ConfigService,
-          useValue: { SMTP_USER: 'USER', APP_URL: '123' },
         },
       ],
     }).compile();
@@ -40,7 +35,7 @@ describe('UserCleaningService', () => {
     jest.spyOn(mailerService, 'sendMail').mockResolvedValue({});
 
     await expect(
-      service.sendVerificationMail('test@gmail.com', '/verify/123'),
+      service.sendMail('test@gmail.com', '/verify/123', '123'),
     ).resolves.toBe(undefined);
   });
 });

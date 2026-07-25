@@ -7,6 +7,7 @@ import { UserModule } from '../user/user.module';
 import { AuthApiController } from './auth.api.controller';
 import { AuthService } from './auth.service';
 import { AuthSsrController } from './auth.ssr.controller';
+import { AuthMailService } from './mail/auth-mail.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { AuthSsrController } from './auth.ssr.controller';
     ConfigModule.forFeature(appConfig),
   ],
   controllers: [AuthApiController, AuthSsrController],
-  providers: [AuthService],
+  providers: [AuthService, AuthMailService],
 })
 export class AuthModule {}
