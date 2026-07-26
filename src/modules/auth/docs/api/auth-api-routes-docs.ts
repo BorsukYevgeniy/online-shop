@@ -2,6 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -20,7 +21,7 @@ export class AuthApiRoutesDocs {
       ApiOperation({ summary: 'Register user' }),
       ApiCreatedResponse({ description: 'User registered' }),
       ApiBadRequestResponse({
-        description: 'User with same creadentials alredy exists',
+        description: 'Email or password are incorrect',
       }),
       ApiBody({ type: CreateUserDto }),
     );
@@ -63,7 +64,7 @@ export class AuthApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Verify user' }),
       ApiOkResponse({ description: 'User verified' }),
-      ApiBadRequestResponse({ description: 'User already verified' }),
+      ApiConflictResponse({ description: 'User already verified' }),
       ApiUserNotFoundResponseDocs(),
       ApiParam({ name: 'link', type: String }),
     );
@@ -73,7 +74,7 @@ export class AuthApiRoutesDocs {
     return applyDecorators(
       ApiOperation({ summary: 'Resend verification email' }),
       ApiNoContentResponse({ description: 'Email sended' }),
-      ApiBadRequestResponse({ description: 'User already verified' }),
+      ApiConflictResponse({ description: 'User already verified' }),
       ApiAuthDocs(),
     );
   }

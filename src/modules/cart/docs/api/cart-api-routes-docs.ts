@@ -1,7 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { ApiAdminForbiddenResponseDocs } from '../../../../common/decorators/docs/auth';
-import { ApiProductIdParamDocs } from '../../../product/docs/shared';
+import {
+  ApiProductIdParamDocs,
+  ApiProductNotFoundResponse,
+} from '../../../product/docs/shared';
 
 export class CartApiRoutesDocs {
   static GetCartById() {
@@ -25,6 +28,7 @@ export class CartApiRoutesDocs {
       ApiOperation({ summary: 'Add product to cart' }),
       ApiOkResponse({ description: 'Product added' }),
       ApiProductIdParamDocs(),
+      ApiProductNotFoundResponse(),
     );
   }
 
@@ -33,6 +37,7 @@ export class CartApiRoutesDocs {
       ApiOperation({ summary: 'Remove product from cart' }),
       ApiOkResponse({ description: 'Product added' }),
       ApiProductIdParamDocs(),
+      ApiProductNotFoundResponse(),
     );
   }
 

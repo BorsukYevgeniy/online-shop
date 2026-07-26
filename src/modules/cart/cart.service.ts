@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { CartProduct } from './types/cart.type';
 
@@ -45,7 +40,7 @@ export class CartService {
       return cart;
     } catch (e: unknown) {
       if (e instanceof PrismaClientKnownRequestError) {
-        throw new BadRequestException(ProductErrMsg.ProductNotFound);
+        throw new NotFoundException(ProductErrMsg.ProductNotFound);
       }
     }
   }
@@ -54,11 +49,17 @@ export class CartService {
     productId: number,
     userId: number,
   ): Promise<CartProduct> {
-    const cart = await this.cartRepository.removeFromCart(productId, userId);
+    try {
+      const cart = await this.cartRepository.removeFromCart(productId, userId);
 
-    this.logger.log(`Product ${productId} removed from cart user ${userId}`);
+      this.logger.log(`Product ${productId} removed from cart user ${userId}`);
 
-    return cart;
+      return cart;
+    } catch (e: unknown) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        throw new NotFoundException(ProductErrMsg.ProductNotFound);
+      }
+    }
   }
 
   async clearCart(userId: number): Promise<CartProduct> {

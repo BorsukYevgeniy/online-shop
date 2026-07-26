@@ -3,7 +3,6 @@ import {
   ApiBody,
   ApiConsumes,
   ApiForbiddenResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
@@ -14,11 +13,7 @@ import { CreateProductDto } from '../../dto/create-product.dto';
 import { SearchProductDto } from '../../dto/search-product.dto';
 import { SortProductDto } from '../../dto/sort-product.dto';
 import { UpdateProductDto } from '../../dto/update-product.dto';
-import { ApiProductIdParamDocs } from '../shared';
-
-function ApiProductNotFoundResponse() {
-  return ApiNotFoundResponse({ description: 'Product not found' });
-}
+import { ApiProductIdParamDocs, ApiProductNotFoundResponse } from '../shared';
 
 export class ProductApiRoutesDocs {
   static GetAll() {

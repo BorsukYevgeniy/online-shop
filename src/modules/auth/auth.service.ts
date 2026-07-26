@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   Logger,
@@ -136,7 +137,7 @@ export class AuthService {
 
     if (user.isVerified) {
       this.logger.warn(`User already verified: ${user.email}`);
-      throw new BadRequestException(AuthErrMsg.UserAlreadyVerified);
+      throw new ConflictException(AuthErrMsg.UserAlreadyVerified);
     }
 
     return await this.userService.verify(verificationLink);
@@ -149,8 +150,7 @@ export class AuthService {
     const { email, verificationLink, isVerified }: UserNoPassword =
       await this.userService.getFullUserById(userId);
 
-    if (isVerified)
-      throw new BadRequestException(AuthErrMsg.UserAlreadyVerified);
+    if (isVerified) throw new ConflictException(AuthErrMsg.UserAlreadyVerified);
 
     return await this.sendVerificationMail(email, verificationLink, mode);
   }

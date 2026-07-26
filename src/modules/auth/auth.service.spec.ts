@@ -1,9 +1,13 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Token, User } from '@prisma/client';
 import { Role } from '../../common/enum/role.enum';
+import appConfig from '../../config/app.config';
 import { MailService } from '../../infra/mail/mail.service';
-import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
@@ -35,7 +39,6 @@ describe('AuthService', () => {
             getFullUserById: jest.fn(),
           },
         },
-        { provide: ConfigService, useValue: { get: jest.fn() } },
         { provide: MailService, useValue: { sendVerificationMail: jest.fn() } },
         {
           provide: TokenService,
@@ -48,7 +51,7 @@ describe('AuthService', () => {
             updateTokens: jest.fn(),
           },
         },
-        { provide: ConfigService, useValue: { APP_URL: '123' } },
+        { provide: appConfig.KEY, useValue: { APP_URL: '123' } },
       ],
     }).compile();
 
@@ -284,7 +287,7 @@ describe('AuthService', () => {
         });
 
         await expect(service.verifyUser(link)).rejects.toThrow(
-          BadRequestException,
+          ConflictException,
         );
       }
     });

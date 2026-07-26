@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBody,
+  ApiConflictResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -43,6 +44,7 @@ export class CategoryApiRoutesDocs {
       ApiOkResponse({ description: 'Category created' }),
       ApiAdminAuthDocs(),
       ApiBody({ type: CreateCategoryDto }),
+      ApiConflictResponse({ description: 'Category already exists' }),
     );
   }
 

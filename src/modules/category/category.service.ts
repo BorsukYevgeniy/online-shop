@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -76,7 +76,7 @@ export class CategoryService {
         this.logger.warn(
           'Category already exists, name: ' + createCategoryDto.name,
         );
-        throw new BadRequestException(CategoryErrMsg.CategoryAlreadyExists);
+        throw new ConflictException(CategoryErrMsg.CategoryAlreadyExists);
       }
     }
   }

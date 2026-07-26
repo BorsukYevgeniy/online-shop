@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -128,7 +128,7 @@ export class UserService {
         this.logger.warn(
           `User with ${e.meta.target} ${createUserDto[e.meta.target as string]} already exists`,
         );
-        throw new BadRequestException(
+        throw new ConflictException(
           UserErrMsg.UserAlreadyExists(e.meta.target as string),
         );
       }
